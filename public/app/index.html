@@ -619,11 +619,16 @@ async function analyze() {
       ? { prompts, level: currentLevel }
       : { prompt: prompts[0], level: currentLevel };
 
+    const controller = new AbortController();
+    const fetchTimeout = setTimeout(() => controller.abort(), 35000);
+
     const res  = await fetch('/api/analyze', {
       method: 'POST',
+      signal: controller.signal,
       headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
       body: JSON.stringify(body)
     });
+    clearTimeout(fetchTimeout);
     const data = await res.json();
     msgTimers.forEach(clearTimeout);
 
@@ -667,7 +672,11 @@ async function analyze() {
     }
 
   } catch(err) {
-    document.getElementById('results').innerHTML = `<div class="error-state"><strong>Something went wrong</strong>${err.message}</div>`;
+    msgTimers.forEach(clearTimeout);
+    const msg = err.name === 'AbortError'
+      ? 'Analysis timed out — try a shorter prompt or switch to Fast optimization level.'
+      : err.message;
+    document.getElementById('results').innerHTML = `<div class="error-state"><strong>Something went wrong</strong>${msg}</div>`;
   }
 
   btn.disabled = false;
