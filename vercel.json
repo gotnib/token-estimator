@@ -1,5 +1,9 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" }
-  ]
+  ],
+  "functions": {
+    "api/analyze.js": { "maxDuration": 30 },
+    "api/challenge.js": { "maxDuration": 30 }
+  }
 }
