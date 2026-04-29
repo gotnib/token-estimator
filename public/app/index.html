@@ -801,18 +801,21 @@ function buildResultCards(d, idx) {
     </div>`;
   }).join('');
 
+  const effPrompt = (d.efficient_prompt || '').replace(/\n/g, '<br>');
+  const effPromptRaw = d.efficient_prompt || '';
+
   const optimizationSection = d.optimization_locked ? `
     <div style="position:relative;margin-bottom:12px;">
-      <div class="efficient-prompt" style="margin-bottom:0">${d.efficient_prompt_teaser || ''}…</div>
+      <div class="efficient-prompt" style="margin-bottom:0">${(d.efficient_prompt_teaser || '').replace(/\n/g, '<br>')}…</div>
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:0 0 var(--radius-lg) var(--radius-lg);padding:16px;text-align:center;">
         <div style="font-size:13px;font-weight:600;margin-bottom:4px;">🔒 Full optimization is a Plus/Pro feature</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Upgrade to see the complete rewrite and scoring.</div>
         <button class="btn-upgrade-cta" style="padding:9px 22px;font-size:13px;" onclick="goToCheckout(this)">Upgrade to Plus →</button>
       </div>
     </div>` : `
-    <div class="efficient-prompt">${d.efficient_prompt || ''}</div>
+    <div class="efficient-prompt">${effPrompt}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn-copy" data-copy="${escHtml(d.efficient_prompt || '')}">Copy</button>
+      <button class="btn-copy" data-copy="${escHtml(effPromptRaw)}">Copy</button>
       ${isPro ? `<button class="btn-save" data-save-id="${histId || idx}" data-saved="false">☆ Save to library</button>` : ''}
     </div>`;
 
