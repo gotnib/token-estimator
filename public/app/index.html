@@ -744,8 +744,8 @@ function buildResultCards(d, idx) {
     const barW = Math.round((item.tokens / maxTok) * 100);
     return `<div class="breakdown-row">
       <div class="breakdown-left">
-        <div class="breakdown-name">${item.category}</div>
-        <div class="breakdown-detail">${item.detail}</div>
+        <div class="breakdown-name">${escHtml(item.category)}</div>
+        <div class="breakdown-detail">${escHtml(item.detail)}</div>
         <div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:${COLORS[i % COLORS.length]}"></div></div>
       </div>
       <div class="breakdown-right">
@@ -781,28 +781,27 @@ function buildResultCards(d, idx) {
             </svg>
             <div class="score-ring-num" style="color:${color}">${val}</div>
           </div>
-          <div class="score-note">${scoreNotes[key] || ''}</div>
+          <div class="score-note">${escHtml(scoreNotes[key] || '')}</div>
         </div>`;
       }).join('')}
     </div>` : '';
 
   // ── Reasons with lessons ──
   const reasonsHTML = (d.reasons || []).map((r, i) => {
-    // Handle both old string format and new object format
     if (typeof r === 'string') {
       return `<div class="reason-card">
-        <div class="reason-change"><div class="reason-change-num">${i+1}</div>${r}</div>
+        <div class="reason-change"><div class="reason-change-num">${i+1}</div>${escHtml(r)}</div>
       </div>`;
     }
     return `<div class="reason-card">
-      <div class="reason-change"><div class="reason-change-num">${i+1}</div>${r.change || ''}</div>
-      ${r.principle ? `<div class="reason-principle">📌 ${r.principle}</div>` : ''}
-      ${r.lesson    ? `<div class="reason-lesson">💡 ${r.lesson}</div>` : ''}
+      <div class="reason-change"><div class="reason-change-num">${i+1}</div>${escHtml(r.change || '')}</div>
+      ${r.principle ? `<div class="reason-principle">📌 ${escHtml(r.principle)}</div>` : ''}
+      ${r.lesson    ? `<div class="reason-lesson">💡 ${escHtml(r.lesson)}</div>` : ''}
     </div>`;
   }).join('');
 
-  const effPrompt = (d.efficient_prompt || '').replace(/\n/g, '<br>');
   const effPromptRaw = d.efficient_prompt || '';
+  const effPrompt = escHtml(effPromptRaw).replace(/\n/g, '<br>');
 
   const optimizationSection = d.optimization_locked ? `
     <div style="position:relative;margin-bottom:12px;">
