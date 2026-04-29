@@ -596,9 +596,23 @@ async function analyze() {
     <div class="result-card">
       <div class="loading-state">
         <div class="spinner"></div>
-        <span>Claude is analyzing ${prompts.length > 1 ? prompts.length + ' prompts' : 'your prompt'}…</span>
+        <span id="loading-msg">Analyzing your prompt…</span>
       </div>
     </div>`;
+
+  // Progressive messages so users know it's working
+  const messages = [
+    [3000,  'Breaking down token categories…'],
+    [7000,  'Scoring clarity, conciseness, structure…'],
+    [12000, 'Generating your optimized rewrite…'],
+    [18000, 'Almost there — deep analysis takes a moment…'],
+  ];
+  const msgTimers = messages.map(([delay, text]) =>
+    setTimeout(() => {
+      const el = document.getElementById('loading-msg');
+      if (el) el.textContent = text;
+    }, delay)
+  );
 
   try {
     const body = currentPlan === 'pro'
@@ -611,6 +625,7 @@ async function analyze() {
       body: JSON.stringify(body)
     });
     const data = await res.json();
+    msgTimers.forEach(clearTimeout);
 
     if (res.status === 429 && data.error === 'rate_limited') {
       document.getElementById('results').innerHTML =
