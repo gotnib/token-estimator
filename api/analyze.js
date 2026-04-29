@@ -43,67 +43,32 @@ const LIMITS = {
   pro:  { daily: null, monthly: 600,  chars: 7500 }
 };
 
-const BASE_STRUCTURE = `Return ONLY a valid JSON object — no markdown, no code fences, no preamble. Use exactly this structure:
+const BASE_STRUCTURE = `Return ONLY valid JSON, no markdown, no preamble:
 {
   "estimated_tokens": <integer>,
-  "breakdown": [
-    { "category": "<label>", "tokens": <integer>, "detail": "<one-line explanation>" }
-  ],
-  "cost_estimate_usd": <number with 5 decimal places>,
+  "breakdown": [{ "category": "<label>", "tokens": <integer>, "detail": "<brief explanation>" }],
+  "cost_estimate_usd": <5 decimal places>,
   "efficient_prompt": "<rewritten prompt>",
   "savings_percent": <integer 0-100>,
   "efficient_tokens": <integer>,
-  "scores": {
-    "clarity": <integer 1-10>,
-    "conciseness": <integer 1-10>,
-    "structure": <integer 1-10>,
-    "specificity": <integer 1-10>
-  },
-  "score_notes": {
-    "clarity": "<one sentence explaining the clarity score>",
-    "conciseness": "<one sentence explaining the conciseness score>",
-    "structure": "<one sentence explaining the structure score>",
-    "specificity": "<one sentence explaining the specificity score>"
-  },
-  "reasons": [
-    {
-      "change": "<what specifically changed>",
-      "principle": "<the prompt engineering principle behind this change>",
-      "lesson": "<one actionable sentence the user can apply to future prompts>"
-    }
-  ]
+  "scores": { "clarity": <1-10>, "conciseness": <1-10>, "structure": <1-10>, "specificity": <1-10> },
+  "score_notes": { "clarity": "<10 words max>", "conciseness": "<10 words max>", "structure": "<10 words max>", "specificity": "<10 words max>" },
+  "reasons": [{ "change": "<what changed>", "principle": "<principle name only, 5 words max>", "lesson": "<one actionable sentence>" }]
 }
 
-Score definitions:
-- clarity (1-10): How unambiguous and precise is the instruction? 10 = crystal clear, 1 = vague and confusing
-- conciseness (1-10): How free of waste is it? 10 = no filler at all, 1 = extremely bloated
-- structure (1-10): How logically organized is it? 10 = perfect flow, 1 = disorganized
-- specificity (1-10): How well-defined is the expected output? 10 = exact format specified, 1 = no output guidance
-
-Breakdown categories (only include relevant ones):
-- "Core instruction" — the main task being asked
-- "Background context" — explanatory context provided
-- "System framing / role-setting" — persona or preamble
-- "Examples / few-shot" — examples given
-- "Constraints / rules" — do/don't rules
-- "Output format spec" — formatting instructions
-- "Redundancy / filler" — words that add no meaning
-- "Politeness overhead" — courteous language with no semantic value
-
-Pricing: $3 per 1,000,000 input tokens (claude-sonnet-4-5). Be precise.`;
+Scores: clarity=unambiguous instruction, conciseness=free of waste, structure=logical flow, specificity=output defined.
+Categories: Core instruction, Background context, System framing, Examples, Constraints, Output format spec, Redundancy/filler, Politeness overhead.
+Pricing: $3.00 per 1M input tokens (claude-sonnet-4-5). Max 3 breakdown items. Max 3 reasons.`;
 
 const SYSTEM_PROMPTS = {
-  fast: `You are a prompt efficiency expert. Perform a FAST, lightweight analysis — focus only on obvious waste. ${BASE_STRUCTURE}
+  fast: `Prompt efficiency expert. Fast analysis only — surface-level waste. ${BASE_STRUCTURE}
+efficient_prompt: remove filler and politeness only. 10-25% reduction. Minimal changes.`,
 
-For the efficient_prompt: make only surface-level edits — remove clear filler words, politeness overhead, and obvious redundancy. Do NOT restructure sentences or change the prompt's style. Aim for 10-25% token reduction. Keep changes minimal and safe.`,
+  balanced: `Prompt efficiency expert. Balanced analysis. ${BASE_STRUCTURE}
+efficient_prompt: remove filler, tighten phrasing, light restructure. 25-45% reduction.`,
 
-  balanced: `You are a prompt efficiency expert. Perform a BALANCED analysis — trim waste and improve clarity without over-engineering. ${BASE_STRUCTURE}
-
-For the efficient_prompt: remove filler, tighten phrasing, and consolidate redundant instructions. You may lightly restructure sentences for clarity but preserve the original intent and tone. Aim for 25-45% token reduction.`,
-
-  deep: `You are a prompt efficiency expert. Perform a DEEP, thorough optimization — maximize token efficiency while preserving full semantic meaning. ${BASE_STRUCTURE}
-
-For the efficient_prompt: completely restructure if needed. Eliminate all redundancy, merge overlapping instructions, convert verbose phrasing to precise directives, and strip any implicit assumptions that Claude already handles by default. Prioritize maximum compression without any loss of instruction quality. Aim for 45-70% token reduction. Provide detailed reasons explaining every significant change made.`
+  deep: `Prompt efficiency expert. Deep optimization. ${BASE_STRUCTURE}
+efficient_prompt: full restructure, eliminate all redundancy, maximum compression. 45-70% reduction.`
 };
 
 function getSystemPrompt(level, plan) {
@@ -124,7 +89,7 @@ async function analyzePrompt(prompt, apiKey, systemPrompt) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 1400,
+      max_tokens: 900,
       system: systemPrompt,
       messages: [{ role: 'user', content: 'Analyze this prompt:\n\n' + prompt }]
     })
@@ -345,3 +310,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message || 'Unexpected server error.' });
   }
 }
+
