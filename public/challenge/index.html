@@ -51,11 +51,25 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem
 .challenge-hero p{font-size:15px;color:var(--muted);max-width:480px;margin:0 auto 1.5rem;}
 .challenge-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent-light),#f5f3ff);border:1px solid #c4b5fd;border-radius:99px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:1rem;}
 
-/* CATEGORY PILLS */
-.category-wrap{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:2rem;}
-.category-pill{padding:6px 14px;border:1px solid var(--border2);border-radius:99px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;background:var(--white);transition:all 0.15s;}
-.category-pill:hover{border-color:var(--accent);color:var(--accent);}
-.category-pill.active{background:var(--accent);color:white;border-color:var(--accent);}
+/* TYPE SELECTOR */
+.type-selector{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:1.5rem;margin-bottom:1.5rem;}
+.type-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:10px;font-family:'Geist Mono',monospace;}
+.type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem;}
+.type-card{border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;}
+.type-card:hover{border-color:var(--border2);}
+.type-card.active{border-color:var(--accent);background:var(--accent-light);}
+.type-card.active.technical{border-color:var(--accent2);background:#f5f3ff;}
+.type-icon{font-size:18px;flex-shrink:0;}
+.type-name{font-size:13px;font-weight:600;color:var(--text);}
+.type-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+.subcat-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.subcat-pill{padding:5px 12px;border:1.5px solid var(--border);border-radius:99px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;background:var(--white);transition:all 0.15s;}
+.subcat-pill:hover{border-color:var(--border2);color:var(--text);}
+.subcat-pill.active{background:var(--accent);color:white;border-color:var(--accent);}
+.subcat-pill.active.technical{background:var(--accent2);border-color:var(--accent2);}
+.btn-start{width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:var(--radius-lg);font-size:14px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-start:hover{background:var(--accent-dark);transform:translateY(-1px);}
+.btn-start:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
 
 /* CARDS */
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1rem;}
@@ -162,21 +176,39 @@ footer a{color:var(--muted);text-decoration:none;}
   <div class="challenge-hero">
     <div class="challenge-badge">🎯 Challenge Mode</div>
     <h1>Test your prompt engineering skills</h1>
-    <p>We give you a bloated, inefficient prompt. You optimize it. Claude scores your attempt and shows you what you missed.</p>
+    <p>Pick a prompt type, hit Start, and optimize the generated prompt. Claude scores your attempt and shows you what you missed.</p>
     <div id="counter-wrap"></div>
   </div>
 
-  <div class="category-wrap" id="category-wrap">
-    <div class="category-pill active" data-cat="" onclick="selectCategory(this, '')">Any category</div>
-    <div class="category-pill" data-cat="technical documentation request" onclick="selectCategory(this, 'technical documentation request')">Technical</div>
-    <div class="category-pill" data-cat="code review or debugging task" onclick="selectCategory(this, 'code review or debugging task')">Code</div>
-    <div class="category-pill" data-cat="creative writing or brainstorming" onclick="selectCategory(this, 'creative writing or brainstorming')">Creative</div>
-    <div class="category-pill" data-cat="data analysis or summarization" onclick="selectCategory(this, 'data analysis or summarization')">Data</div>
-    <div class="category-pill" data-cat="email or professional communication" onclick="selectCategory(this, 'email or professional communication')">Email</div>
-    <div class="category-pill" data-cat="step-by-step instructions" onclick="selectCategory(this, 'step-by-step instructions')">Instructions</div>
+  <div class="type-selector" id="type-selector">
+    <div class="type-section-label">Step 1 — Choose a prompt type</div>
+    <div class="type-grid">
+      <div class="type-card active" id="type-general" onclick="selectType('general')">
+        <div class="type-icon">💬</div>
+        <div>
+          <div class="type-name">General</div>
+          <div class="type-desc">Everyday prompts — writing, research, advice</div>
+        </div>
+      </div>
+      <div class="type-card" id="type-technical" onclick="selectType('technical')">
+        <div class="type-icon">⚙️</div>
+        <div>
+          <div class="type-name">Technical</div>
+          <div class="type-desc">Code, data, documentation, debugging</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="type-section-label">Step 2 — Pick a category</div>
+    <div class="subcat-wrap" id="subcat-wrap"></div>
+
+    <button class="btn-start" id="start-btn" onclick="startChallenge()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Generate challenge
+    </button>
   </div>
 
-  <div id="content"><div class="loading-state"><div class="spinner"></div><span>Generating your challenge…</span></div></div>
+  <div id="content" style="display:none"></div>
 </div>
 
 <footer>TokenLens · <a href="/app">Analyzer</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></footer>
@@ -185,8 +217,54 @@ footer a{color:var(--muted);text-decoration:none;}
 const { createClient } = supabase;
 let sb, session, userPlan;
 let currentChallenge = null;
-let selectedCat = '';
-let hintUsed = false;
+let selectedType = 'general';
+let selectedCat  = '';
+let hintUsed     = false;
+
+const CATEGORIES = {
+  general: [
+    { label: 'Any',           value: '' },
+    { label: 'Creative',      value: 'creative writing or brainstorming' },
+    { label: 'Research',      value: 'research or fact-finding' },
+    { label: 'Email',         value: 'email or professional communication' },
+    { label: 'Instructions',  value: 'step-by-step instructions' },
+    { label: 'Comparison',    value: 'comparison or decision making' },
+    { label: 'Summarization', value: 'data analysis or summarization' },
+    { label: 'Advice',        value: 'personal advice or recommendations' },
+  ],
+  technical: [
+    { label: 'Any',           value: '' },
+    { label: 'Code review',   value: 'code review or debugging task' },
+    { label: 'Write code',    value: 'code generation or implementation' },
+    { label: 'Explain code',  value: 'code explanation or documentation' },
+    { label: 'SQL / Data',    value: 'SQL query or data processing task' },
+    { label: 'API design',    value: 'API or system design request' },
+    { label: 'Regex',         value: 'regex or text parsing task' },
+    { label: 'Tech docs',     value: 'technical documentation request' },
+  ]
+};
+
+function selectType(type) {
+  selectedType = type;
+  selectedCat  = '';
+  document.getElementById('type-general').className   = 'type-card' + (type === 'general'   ? ' active' : '');
+  document.getElementById('type-technical').className = 'type-card' + (type === 'technical' ? ' active technical' : '');
+  renderSubcats();
+}
+
+function renderSubcats() {
+  const cats = CATEGORIES[selectedType];
+  const isTech = selectedType === 'technical';
+  document.getElementById('subcat-wrap').innerHTML = cats.map(c => `
+    <div class="subcat-pill${c.value === selectedCat ? (' active' + (isTech ? ' technical' : '')) : ''}"
+         onclick="selectSubcat('${c.value}')">${c.label}</div>
+  `).join('');
+}
+
+function selectSubcat(val) {
+  selectedCat = val;
+  renderSubcats();
+}
 
 async function init() {
   const cfgRes = await fetch('/api/config');
@@ -207,7 +285,8 @@ async function init() {
   updateCounter(profile);
 
   if (userPlan === 'free') { renderGate(); return; }
-  loadChallenge();
+
+  renderSubcats();
 }
 
 function renderNavPill(plan) {
@@ -237,27 +316,36 @@ function updateCounter(profile) {
 
 async function logout() { await sb.auth.signOut(); window.location.href = '/'; }
 
-function selectCategory(el, cat) {
-  document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  selectedCat = cat;
-}
-
-async function loadChallenge() {
+async function startChallenge() {
   hintUsed = false;
   currentChallenge = null;
+
+  const btn = document.getElementById('start-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Generating…';
+
+  // Build category string — combine type context with specific category
+  let cat = selectedCat;
+  if (!cat && selectedType === 'technical') cat = 'technical coding or development task';
+  if (!cat && selectedType === 'general')   cat = 'general everyday task';
+
+  document.getElementById('type-selector').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
   document.getElementById('content').innerHTML = `
     <div class="loading-state"><div class="spinner"></div><span>Generating your challenge…</span></div>`;
 
   try {
-    const url = '/api/challenge' + (selectedCat ? `?category=${encodeURIComponent(selectedCat)}` : '');
+    const url = '/api/challenge' + (cat ? `?category=${encodeURIComponent(cat)}` : '');
     const res = await fetch(url, {
       headers: { 'authorization': 'Bearer ' + session.access_token }
     });
     const data = await res.json();
 
     if (res.status === 403 && data.error === 'limit_reached') {
+      document.getElementById('type-selector').style.display = 'block';
       renderLimitReached(data);
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
       return;
     }
     if (res.status === 403 && data.error === 'upgrade_required') {
@@ -268,7 +356,6 @@ async function loadChallenge() {
 
     currentChallenge = data.challenge;
 
-    // Refresh counter
     const { data: profile } = await sb.from('users')
       .select('plan, challenges_today, last_challenge_at')
       .eq('id', session.user.id).single();
@@ -276,8 +363,11 @@ async function loadChallenge() {
 
     renderChallenge();
   } catch(err) {
+    document.getElementById('type-selector').style.display = 'block';
     document.getElementById('content').innerHTML =
       `<div style="text-align:center;padding:2rem;color:var(--red)">Error: ${err.message}</div>`;
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
   }
 }
 
@@ -308,7 +398,7 @@ function renderChallenge() {
         <div class="attempt-footer">
           <span class="char-hint" id="char-hint">0 characters</span>
           <div style="display:flex;gap:8px;">
-            <button class="btn-secondary" onclick="loadChallenge()">Skip →</button>
+            <button class="btn-secondary" onclick="returnToSelector()">Skip →</button>
             <button class="btn-primary" id="submit-btn" onclick="submitAttempt()">
               Submit for scoring
             </button>
@@ -316,6 +406,15 @@ function renderChallenge() {
         </div>
       </div>
     </div>`;
+}
+
+function returnToSelector() {
+  document.getElementById('content').style.display = 'none';
+  document.getElementById('type-selector').style.display = 'block';
+  document.getElementById('content').innerHTML = '';
+  const btn = document.getElementById('start-btn');
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
 }
 
 function showHint() {
@@ -410,7 +509,7 @@ function renderScore(result, userAttempt) {
     </div>
 
     <div style="display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;">
-      <button class="btn-primary" onclick="loadChallenge()">
+      <button class="btn-primary" onclick="returnToSelector()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
         Next challenge
       </button>
