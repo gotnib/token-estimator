@@ -111,30 +111,47 @@ function getSystemPrompt(level, plan) {
 }
 
 async function analyzePrompt(prompt, apiKey, systemPrompt) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: 'Analyze this prompt:\n\n' + prompt }]
-    })
-  });
+  // Scale max_tokens with prompt length — longer prompts need more output tokens
+  const promptLen = prompt.length;
+  const maxTok = promptLen < 500 ? 1000 : promptLen < 1500 ? 1400 : 1800;
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || 'Anthropic API error ' + res.status);
+  // 25 second timeout — Vercel functions cut off at 30s
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: maxTok,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: 'Analyze this prompt:\n\n' + prompt }]
+      })
+    });
+
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'Anthropic API error ' + res.status);
+    }
+
+    const data    = await res.json();
+    const raw     = (data.content || []).map(c => c.text || '').join('');
+    const cleaned = raw.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim();
+    return JSON.parse(cleaned);
+  } catch(err) {
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') throw new Error('Analysis timed out. Try a shorter prompt or use Fast optimization level.');
+    throw err;
   }
-
-  const data    = await res.json();
-  const raw     = (data.content || []).map(c => c.text || '').join('');
-  const cleaned = raw.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim();
-  return JSON.parse(cleaned);
 }
 
 function checkRollingWindow(usedCount, startAt, windowDays) {
