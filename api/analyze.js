@@ -61,14 +61,45 @@ Categories: Core instruction, Background context, System framing, Examples, Cons
 Pricing: $3.00 per 1M input tokens (claude-sonnet-4-5). Max 3 breakdown items. Max 3 reasons.`;
 
 const SYSTEM_PROMPTS = {
-  fast: `Prompt efficiency expert. Fast analysis only — surface-level waste. ${BASE_STRUCTURE}
-efficient_prompt: remove filler and politeness only. 10-25% reduction. Minimal changes.`,
+  fast: `You are a prompt efficiency expert performing a FAST surface-level trim. ${BASE_STRUCTURE}
 
-  balanced: `Prompt efficiency expert. Balanced analysis. ${BASE_STRUCTURE}
-efficient_prompt: remove filler, tighten phrasing, light restructure. 25-45% reduction.`,
+FAST rules — follow strictly:
+- ONLY remove words that add zero meaning: please, could you, I was wondering, feel free to, as an AI, thank you, I hope this helps, etc.
+- ONLY remove obvious duplicate phrases that say the same thing twice
+- Do NOT restructure any sentences
+- Do NOT reorder any content
+- Do NOT change the vocabulary or writing style
+- Do NOT combine separate instructions into one
+- The output should look almost identical to the input — just shorter
+- Target: 10-20% token reduction maximum
+- If the prompt is already clean, savings_percent should be 0-5%`,
 
-  deep: `Prompt efficiency expert. Deep optimization. ${BASE_STRUCTURE}
-efficient_prompt: full restructure, eliminate all redundancy, maximum compression. 45-70% reduction.`
+  balanced: `You are a prompt efficiency expert performing a BALANCED rewrite. ${BASE_STRUCTURE}
+
+BALANCED rules — follow strictly:
+- Remove all filler words and politeness overhead
+- Consolidate redundant ideas that appear more than once
+- Tighten verbose phrasing into direct language
+- You MAY lightly restructure sentences for clarity
+- You MAY reorder content if it improves logical flow
+- Preserve all unique instructions and constraints — do not lose meaning
+- The output should be noticeably shorter and cleaner but recognisably similar to the original
+- Target: 30-50% token reduction
+- Rewrite should feel like the same prompt, edited by a professional`,
+
+  deep: `You are a prompt efficiency expert performing a DEEP maximum compression. ${BASE_STRUCTURE}
+
+DEEP rules — follow strictly:
+- Strip the prompt to its absolute minimum viable instruction
+- Remove EVERYTHING that is implied, default AI behaviour, or obvious context
+- Convert all verbose phrases to the shortest precise directive possible
+- Merge all related instructions into single compressed statements
+- Remove all examples unless absolutely essential to the task
+- Remove all output format instructions that are standard or implied
+- The output should look dramatically different from the input — ruthlessly compressed
+- Target: 55-75% token reduction
+- Ask yourself after each word: does removing this change what the AI will do? If no — remove it
+- Final output should be the minimum tokens needed to produce the same AI response`
 };
 
 function getSystemPrompt(level, plan) {
@@ -89,7 +120,7 @@ async function analyzePrompt(prompt, apiKey, systemPrompt) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 900,
+      max_tokens: 1000,
       system: systemPrompt,
       messages: [{ role: 'user', content: 'Analyze this prompt:\n\n' + prompt }]
     })
@@ -310,4 +341,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message || 'Unexpected server error.' });
   }
 }
-
