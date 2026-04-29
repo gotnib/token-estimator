@@ -686,14 +686,18 @@ async function analyze() {
 // ── RENDER RESULTS ────────────────────────────────
 function renderResults(resultArr, usage, level) {
   const wrap = document.getElementById('results');
-
-  if (resultArr.length === 1) {
-    wrap.innerHTML = `<div class="results-wrap">${buildResultCards({...resultArr[0], level}, 0)}</div>`;
-  } else {
-    // Batch — tabbed
-    const tabs = resultArr.map((_, i) => `<button class="batch-tab ${i === 0 ? 'active' : ''}" onclick="switchTab(${i})" id="tab-${i}">Prompt ${i + 1}</button>`).join('');
-    const panels = resultArr.map((r, i) => `<div id="panel-${i}" style="${i > 0 ? 'display:none' : ''}"><div class="results-wrap" style="padding-top:1rem">${buildResultCards({...r, level}, i)}</div></div>`).join('');
-    wrap.innerHTML = `<div class="result-card" style="overflow:visible"><div class="batch-tabs">${tabs}</div>${panels}</div>`;
+  try {
+    if (resultArr.length === 1) {
+      wrap.innerHTML = `<div class="results-wrap">${buildResultCards({...resultArr[0], level}, 0)}</div>`;
+    } else {
+      const tabs   = resultArr.map((_, i) => `<button class="batch-tab ${i === 0 ? 'active' : ''}" onclick="switchTab(${i})" id="tab-${i}">Prompt ${i + 1}</button>`).join('');
+      const panels = resultArr.map((r, i) => `<div id="panel-${i}" style="${i > 0 ? 'display:none' : ''}"><div class="results-wrap" style="padding-top:1rem">${buildResultCards({...r, level}, i)}</div></div>`).join('');
+      wrap.innerHTML = `<div class="result-card" style="overflow:visible"><div class="batch-tabs">${tabs}</div>${panels}</div>`;
+    }
+  } catch(err) {
+    console.error('renderResults error:', err);
+    wrap.innerHTML = `<div class="error-state"><strong>Render error</strong>${err.message} — please try again.</div>`;
+    return;
   }
 
   // Attach copy/save listeners
@@ -732,7 +736,8 @@ function switchTab(i) {
 }
 
 function buildResultCards(d, idx) {
-  const maxTok    = Math.max(...(d.breakdown || []).map(b => b.tokens), 1);
+  try {
+    const maxTok    = Math.max(...(d.breakdown || []).map(b => b.tokens), 1);
   const savings   = d.savings_percent || 0;
   const effTokens = d.efficient_tokens || Math.round((d.estimated_tokens || 0) * (1 - savings / 100));
   const cost      = typeof d.cost_estimate_usd === 'number' ? '$' + d.cost_estimate_usd.toFixed(5) : 'N/A';
@@ -862,6 +867,10 @@ function buildResultCards(d, idx) {
       </div>
       <div class="rc-body">${reasonsHTML}</div>
     </div>`;
+  } catch(err) {
+    console.error('buildResultCards error:', err, 'data:', JSON.stringify(d).slice(0, 500));
+    return `<div class="error-state"><strong>Display error: ${escHtml(err.message)}</strong>Please try again.</div>`;
+  }
 }
 
 // ── LIMIT REACHED ─────────────────────────────────
