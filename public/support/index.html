@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support | TokenLens</title>
+<meta name="description" content="Get help with TokenLens. Contact our support team for billing, technical issues, or account questions.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://tokenlens.live/support">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tokenlens.live/support">
+<meta property="og:title" content="Support | TokenLens">
+<meta property="og:description" content="Get help with TokenLens. Contact our support team for billing, technical issues, or account questions.">
+<meta property="og:image" content="https://tokenlens.live/og-image.png">
+<meta property="og:site_name" content="TokenLens">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Support | TokenLens">
+<meta name="twitter:description" content="Get help with TokenLens. Contact our support team for billing, technical issues, or account questions.">
+<meta name="twitter:image" content="https://tokenlens.live/og-image.png">
+<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#f8f9fb;--white:#fff;--surface2:#f3f4f6;--border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;--dim:#9ca3af;
+  --accent:#2563eb;--accent-light:#eff6ff;--accent-dark:#1d4ed8;
+  --green:#16a34a;--green-light:#f0fdf4;--red:#dc2626;--red-light:#fef2f2;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+.nav-logo{display:flex;align-items:center;text-decoration:none;}
+.btn-nav{background:transparent;border:1px solid var(--border);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--muted);cursor:pointer;text-decoration:none;transition:all 0.15s;display:inline-block;}
+.btn-nav:hover{background:var(--surface2);color:var(--text);}
+
+.page{max-width:720px;margin:0 auto;padding:3rem 1.5rem 6rem;display:grid;grid-template-columns:1fr 1.6fr;gap:3rem;align-items:start;}
+
+/* LEFT COLUMN */
+.support-info h1{font-size:26px;font-weight:600;letter-spacing:-0.02em;margin-bottom:12px;}
+.support-info p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:2rem;}
+
+.info-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:1.25rem;margin-bottom:1rem;}
+.info-card-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:10px;font-family:'Geist Mono',monospace;}
+.info-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.info-item:last-child{margin-bottom:0;}
+.info-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+.info-text{font-size:13px;color:var(--muted);line-height:1.55;}
+.info-text strong{color:var(--text);font-weight:500;}
+.info-text a{color:var(--accent);text-decoration:none;}
+.info-text a:hover{text-decoration:underline;}
+
+/* FORM */
+.form-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);overflow:hidden;}
+.form-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);}
+.form-header-title{font-size:14px;font-weight:600;color:var(--text);}
+.form-header-sub{font-size:12px;color:var(--dim);margin-top:2px;}
+.form-body{padding:1.5rem;display:flex;flex-direction:column;gap:14px;}
+
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:12px;font-weight:500;color:var(--text);}
+.form-input,.form-select,.form-textarea{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Geist',sans-serif;font-size:14px;padding:10px 12px;transition:border-color 0.15s,box-shadow 0.15s;width:100%;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);background:var(--white);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--dim);}
+.form-textarea{min-height:130px;resize:vertical;line-height:1.65;}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+.btn-submit{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:11px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;width:100%;}
+.btn-submit:hover{background:var(--accent-dark);}
+.btn-submit:disabled{opacity:0.5;cursor:not-allowed;}
+
+.form-success{background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius-lg);padding:16px;text-align:center;}
+.form-success-icon{font-size:28px;margin-bottom:8px;}
+.form-success-title{font-size:15px;font-weight:600;color:var(--green);margin-bottom:4px;}
+.form-success-sub{font-size:13px;color:var(--muted);}
+
+.form-error{background:var(--red-light);border:1px solid #fecaca;border-radius:var(--radius);padding:10px 12px;font-size:13px;color:var(--red);}
+
+.char-count{font-size:11px;color:var(--dim);text-align:right;font-family:'Geist Mono',monospace;}
+
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--dim);border-top:1px solid var(--border);}
+footer a{color:var(--muted);text-decoration:none;}
+footer a:hover{color:var(--text);}
+
+@media(max-width:640px){
+  .page{grid-template-columns:1fr;gap:2rem;padding:2rem 1rem 4rem;}
+  nav{padding:0 1rem;}
+  .form-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+  </a>
+  <a class="btn-nav" href="/">← Back to home</a>
+</nav>
+
+<div class="page">
+
+  <!-- LEFT: info -->
+  <div class="support-info">
+    <h1>How can we help?</h1>
+    <p>Got a question, billing issue, or something not working right? Send us a message and we'll get back to you as soon as possible.</p>
+
+    <div class="info-card">
+      <div class="info-card-title">Contact info</div>
+      <div class="info-item">
+        <div class="info-icon">✉️</div>
+        <div class="info-text"><strong>Email</strong><br><a href="mailto:support@tokenlens.live">support@tokenlens.live</a></div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">⏱️</div>
+        <div class="info-text"><strong>Response time</strong><br>Usually within 24 hours</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-title">Common questions</div>
+      <div class="info-item">
+        <div class="info-icon">💳</div>
+        <div class="info-text"><strong>Billing issues</strong><br>For invoices and payment method changes, use the <a href="/account">billing portal</a> in your account.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">🔄</div>
+        <div class="info-text"><strong>Cancel your plan</strong><br>You can cancel anytime from your <a href="/account">Account page</a>. You keep access until the end of your billing period.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">🔑</div>
+        <div class="info-text"><strong>Forgot your password</strong><br>Use the "Forgot password" link on the login screen to reset it via email.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">📋</div>
+        <div class="info-text"><strong>Legal</strong><br>See our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: form -->
+  <div class="form-card">
+    <div class="form-header">
+      <div class="form-header-title">Send us a message</div>
+      <div class="form-header-sub">We'll reply to your email address</div>
+    </div>
+    <div class="form-body" id="form-body">
+      <div id="form-error" style="display:none" class="form-error"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Your name</label>
+          <input class="form-input" type="text" id="f-name" placeholder="Jane Smith" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input class="form-input" type="email" id="f-email" placeholder="jane@example.com" autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your plan</label>
+        <select class="form-select" id="f-plan">
+          <option value="Free">Free</option>
+          <option value="Plus">Plus</option>
+          <option value="Pro">Pro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subject</label>
+        <select class="form-select" id="f-subject">
+          <option value="Billing question">Billing question</option>
+          <option value="Technical issue">Technical issue</option>
+          <option value="Account help">Account help</option>
+          <option value="Feature request">Feature request</option>
+          <option value="Bug report">Bug report</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" id="f-message" placeholder="Describe your issue or question in as much detail as possible…" oninput="updateCharCount()"></textarea>
+        <div class="char-count" id="char-count">0 / 5000</div>
+      </div>
+      <button class="btn-submit" id="submit-btn" onclick="submitForm()">Send message</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2026 TokenLens · <a href="/">Home</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Pre-fill email if logged in
+async function prefill() {
+  try {
+    const cfgRes = await fetch('/api/config');
+    const { supabaseUrl, supabaseAnonKey } = await cfgRes.json();
+    const sb = supabase.createClient(supabaseUrl, supabaseAnonKey);
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      document.getElementById('f-email').value = session.user.email;
+      // Set plan from DB
+      const { data: profile } = await sb.from('users').select('plan').eq('id', session.user.id).single();
+      if (profile?.plan) {
+        const sel = document.getElementById('f-plan');
+        const opt = [...sel.options].find(o => o.value.toLowerCase() === profile.plan);
+        if (opt) sel.value = opt.value;
+      }
+    }
+  } catch(e) {}
+}
+
+function updateCharCount() {
+  const len = document.getElementById('f-message').value.length;
+  const el  = document.getElementById('char-count');
+  el.textContent = `${len.toLocaleString()} / 5,000`;
+  el.style.color = len > 4500 ? 'var(--red)' : 'var(--dim)';
+}
+
+function showError(msg) {
+  const el = document.getElementById('form-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function hideError() {
+  document.getElementById('form-error').style.display = 'none';
+}
+
+async function submitForm() {
+  hideError();
+  const name    = document.getElementById('f-name').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const plan    = document.getElementById('f-plan').value;
+  const subject = document.getElementById('f-subject').value;
+  const message = document.getElementById('f-message').value.trim();
+
+  if (!name)    { showError('Please enter your name.'); return; }
+  if (!email)   { showError('Please enter your email address.'); return; }
+  if (!message) { showError('Please enter a message.'); return; }
+  if (message.length > 5000) { showError('Message too long — maximum 5,000 characters.'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const res  = await fetch('/api/support', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name, email, plan, subject, message })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to send');
+
+    document.getElementById('form-body').innerHTML = `
+      <div class="form-success">
+        <div class="form-success-icon">✅</div>
+        <div class="form-success-title">Message sent!</div>
+        <div class="form-success-sub">Thanks ${name} — we'll get back to you at <strong>${email}</strong> within 24 hours.</div>
+      </div>`;
+  } catch(err) {
+    showError(err.message);
+    btn.disabled = false;
+    btn.textContent = 'Send message';
+  }
+}
+
+prefill();
+</script>
+</body>
+</html>

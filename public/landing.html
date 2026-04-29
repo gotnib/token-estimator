@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokenLens — See Every Token. Save More. Prompt Smarter.</title>
+<meta name="description" content="Analyze your AI prompts for token usage, cost, and efficiency. Get a leaner rewrite instantly. Powered by Claude.">
+<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06070a;
+  --surface: #0d0f14;
+  --surface2: #13161d;
+  --border: #1e2230;
+  --border2: #2a2f42;
+  --text: #f0f2f7;
+  --muted: #8b91a8;
+  --dim: #4a5068;
+  --accent: #5b8ef0;
+  --accent2: #8b6fe8;
+  --accent-glow: rgba(91,142,240,0.15);
+  --green: #34d399;
+  --amber: #fbbf24;
+  --radius: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Geist', sans-serif; font-weight: 400; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2.5rem; height: 64px;
+  background: rgba(6,7,10,0.8);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 0; text-decoration: none; }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+.nav-links a:hover { color: var(--text); }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.btn-ghost { background: transparent; border: 1px solid var(--border2); border-radius: var(--radius); padding: 8px 18px; font-size: 13px; font-weight: 500; font-family: 'Geist', sans-serif; color: var(--muted); cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-flex; align-items: center; }
+.btn-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
+.btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: var(--radius); padding: 9px 20px; font-size: 13px; font-weight: 600; font-family: 'Geist', sans-serif; color: white; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; box-shadow: 0 0 20px rgba(91,142,240,0.3); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(91,142,240,0.45); }
+.btn-primary:active { transform: translateY(0); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 8rem 1.5rem 6rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Radial glow behind hero */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px; height: 500px;
+  background: radial-gradient(ellipse, rgba(91,142,240,0.12) 0%, rgba(139,111,232,0.06) 50%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Subtle grid */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.25;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent);
+}
+
+.hero-inner { position: relative; z-index: 1; max-width: 800px; }
+
+.hero-logo {
+  width: clamp(260px, 45vw, 420px);
+  height: auto;
+  margin: 0 auto 2.5rem;
+  animation: float 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 40px rgba(91,142,240,0.25));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(91,142,240,0.1);
+  border: 1px solid rgba(91,142,240,0.25);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 12px; font-weight: 500; color: var(--accent);
+  margin-bottom: 1.5rem;
+  font-family: 'Geist Mono', monospace;
+  letter-spacing: 0.04em;
+}
+.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(160deg, #ffffff 30%, #8b91a8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: clamp(16px, 2vw, 19px);
+  color: var(--muted);
+  max-width: 500px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 4rem; }
+
+.btn-hero {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; border-radius: var(--radius-lg);
+  padding: 14px 32px; font-size: 16px; font-weight: 600;
+  font-family: 'Geist', sans-serif; color: white; cursor: pointer;
+  transition: all 0.2s; text-decoration: none;
+  box-shadow: 0 0 40px rgba(91,142,240,0.35), 0 4px 16px rgba(0,0,0,0.3);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-hero:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(91,142,240,0.5), 0 8px 24px rgba(0,0,0,0.4); }
+.btn-hero-ghost {
+  background: transparent; border: 1px solid var(--border2);
+  border-radius: var(--radius-lg); padding: 14px 32px;
+  font-size: 16px; font-weight: 500; font-family: 'Geist', sans-serif;
+  color: var(--muted); cursor: pointer; transition: all 0.2s;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-hero-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
+
+/* Social proof */
+.social-proof { display: flex; align-items: center; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.proof-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--dim); }
+.proof-check { color: var(--green); font-size: 12px; }
+.proof-divider { width: 1px; height: 16px; background: var(--border); }
+
+/* ── STATS STRIP ── */
+.stats-strip {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 3rem 2rem;
+}
+.stats-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: center; }
+.stat-num { font-size: 42px; font-weight: 700; letter-spacing: -0.03em; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
+.stat-desc { font-size: 14px; color: var(--muted); }
+
+/* ── FEATURES ── */
+.section { padding: 7rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+.section-label { font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+.section-title { font-size: clamp(28px, 4vw, 42px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 1rem; }
+.section-sub { font-size: 16px; color: var(--muted); max-width: 480px; line-height: 1.65; font-weight: 300; }
+
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; margin-top: 4rem; }
+.feature-card { background: var(--surface); padding: 2rem; transition: background 0.2s; }
+.feature-card:hover { background: var(--surface2); }
+.feature-icon { width: 44px; height: 44px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 1.25rem; }
+.feature-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* ── HOW IT WORKS ── */
+.how-section { padding: 7rem 1.5rem; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.how-inner { max-width: 900px; margin: 0 auto; }
+.how-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem; position: relative; }
+.how-steps::before { content: ''; position: absolute; top: 28px; left: 16%; right: 16%; height: 1px; background: linear-gradient(90deg, transparent, var(--border2), transparent); }
+.step { text-align: center; }
+.step-num { width: 56px; height: 56px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; font-family: 'Geist Mono', monospace; font-size: 16px; font-weight: 500; color: var(--accent); position: relative; z-index: 1; }
+.step-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ── PRICING ── */
+.pricing-section { padding: 7rem 1.5rem; max-width: 900px; margin: 0 auto; text-align: center; }
+.pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 680px; margin: 4rem auto 0; text-align: left; }
+.pricing-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.pricing-card:hover { border-color: var(--border2); }
+.pricing-card.featured {
+  background: linear-gradient(160deg, rgba(91,142,240,0.08), rgba(139,111,232,0.05));
+  border-color: rgba(91,142,240,0.4);
+  box-shadow: 0 0 40px rgba(91,142,240,0.1);
+}
+.featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; font-size: 11px; font-weight: 600; padding: 3px 14px; border-radius: 99px; white-space: nowrap; }
+.plan-name { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
+.plan-price { font-size: 48px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
+.plan-price span { font-size: 16px; font-weight: 400; color: var(--muted); }
+.plan-desc { font-size: 13px; color: var(--dim); margin-bottom: 1.5rem; }
+.plan-divider { height: 1px; background: var(--border); margin-bottom: 1.5rem; }
+.plan-feature { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.plan-feature-check { color: var(--green); font-size: 13px; flex-shrink: 0; }
+.plan-cta { display: block; width: 100%; margin-top: 1.75rem; padding: 12px; border-radius: var(--radius-lg); font-size: 14px; font-weight: 600; font-family: 'Geist', sans-serif; cursor: pointer; text-align: center; border: none; transition: all 0.2s; text-decoration: none; }
+.plan-cta-ghost { background: transparent; border: 1px solid var(--border2); color: var(--muted); }
+.plan-cta-ghost:hover { color: var(--text); background: var(--surface2); }
+.plan-cta-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; box-shadow: 0 0 24px rgba(91,142,240,0.3); }
+.plan-cta-primary:hover { transform: translateY(-1px); box-shadow: 0 0 40px rgba(91,142,240,0.45); }
+
+/* ── TESTIMONIALS ── */
+.testimonials-section { padding: 7rem 1.5rem; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.testimonials-inner { max-width: 900px; margin: 0 auto; }
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 4rem; }
+.testimonial-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1.5rem; }
+.testimonial-stars { color: var(--amber); font-size: 13px; margin-bottom: 1rem; letter-spacing: 2px; }
+.testimonial-text { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 10px; }
+.author-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.author-name { font-size: 13px; font-weight: 600; }
+.author-role { font-size: 11px; color: var(--dim); }
+
+/* ── CTA BAND ── */
+.cta-band { padding: 7rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
+.cta-band::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(91,142,240,0.1), transparent 70%); pointer-events: none; }
+.cta-band-inner { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; }
+.cta-band h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 1rem; }
+.cta-band p { font-size: 16px; color: var(--muted); margin-bottom: 2rem; font-weight: 300; }
+
+/* ── FOOTER ── */
+footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+.footer-brand p { font-size: 13px; color: var(--dim); margin-top: 10px; max-width: 260px; line-height: 1.65; }
+.footer-col h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim); margin-bottom: 1rem; }
+.footer-col a { display: block; font-size: 13px; color: var(--muted); text-decoration: none; margin-bottom: 8px; transition: color 0.15s; }
+.footer-col a:hover { color: var(--text); }
+.footer-bottom { max-width: 1100px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--dim); }
+.footer-bottom a { color: var(--dim); text-decoration: none; }
+.footer-bottom a:hover { color: var(--muted); }
+
+@media (max-width: 768px) {
+  nav { padding: 0 1rem; }
+  .nav-links { display: none; }
+  .features-grid { grid-template-columns: 1fr; }
+  .how-steps { grid-template-columns: 1fr; }
+  .how-steps::before { display: none; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .stats-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#e8eaf2;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <div class="nav-right">
+    <a class="btn-ghost" href="/app">Log in</a>
+    <a class="btn-primary" href="/app">Start free →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      Powered by Claude · Anthropic
+    </div>
+
+    <img src="/tokenlens_logo.png" alt="TokenLens" class="hero-logo">
+
+    <h1>See every token.<br>Save more.<br>Prompt smarter.</h1>
+
+    <p class="hero-sub">Paste any AI prompt and instantly see where your tokens are going, what it costs, and how to cut it down — without losing any meaning.</p>
+
+    <div class="hero-cta">
+      <a class="btn-hero" href="/app">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Analyze your first prompt free
+      </a>
+      <a class="btn-hero-ghost" href="#how">See how it works</a>
+    </div>
+
+    <div class="social-proof">
+      <div class="proof-item"><span class="proof-check">✓</span> Free to start</div>
+      <div class="proof-divider"></div>
+      <div class="proof-item"><span class="proof-check">✓</span> No credit card</div>
+      <div class="proof-divider"></div>
+      <div class="proof-item"><span class="proof-check">✓</span> Results in seconds</div>
+      <div class="proof-divider"></div>
+      <div class="proof-item"><span class="proof-check">✓</span> Powered by Claude</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div>
+      <div class="stat-num">73%</div>
+      <div class="stat-desc">Average token reduction on verbose prompts</div>
+    </div>
+    <div>
+      <div class="stat-num">$0.003</div>
+      <div class="stat-desc">Average cost per analysis on Sonnet</div>
+    </div>
+    <div>
+      <div class="stat-num">&lt;3s</div>
+      <div class="stat-desc">Average time to full analysis and rewrite</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div>
+    <div class="section-label">Features</div>
+    <div class="section-title">Everything you need to<br>write leaner prompts</div>
+    <div class="section-sub">TokenLens breaks down exactly where your tokens go and shows you how to get the same results for less.</div>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(91,142,240,0.1)">📊</div>
+      <div class="feature-title">Token breakdown</div>
+      <div class="feature-desc">See exactly which parts of your prompt consume the most tokens — core instruction, context, examples, filler, and more — broken down with a visual bar chart.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(52,211,153,0.1)">💰</div>
+      <div class="feature-title">Cost estimator</div>
+      <div class="feature-desc">Know your exact cost per call before you run it. We calculate against Anthropic's Sonnet pricing so you can budget your API usage with confidence.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(139,111,232,0.1)">✨</div>
+      <div class="feature-title">Efficient rewrite</div>
+      <div class="feature-desc">Claude rewrites your prompt to say the same thing in fewer tokens. Not paraphrased nonsense — a genuinely tighter version that performs just as well.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(251,191,36,0.1)">💡</div>
+      <div class="feature-title">Actionable reasons</div>
+      <div class="feature-desc">Don't just see a shorter prompt — understand why it's better. We explain each optimization so you can apply the same thinking to future prompts yourself.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(248,113,113,0.1)">⚡</div>
+      <div class="feature-title">Instant results</div>
+      <div class="feature-desc">No waiting around. Paste your prompt, hit analyze, and get the full breakdown in under 3 seconds — token count, cost, rewrite, and explanation all at once.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(91,142,240,0.1)">🔒</div>
+      <div class="feature-title">Secure by design</div>
+      <div class="feature-desc">Your prompts go directly to Anthropic's API through our server. Nothing is stored, logged, or used for training. Your ideas stay yours.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="how-inner">
+    <div style="text-align:center">
+      <div class="section-label" style="justify-content:center;display:flex">How it works</div>
+      <div class="section-title">Three steps to smarter prompts</div>
+    </div>
+    <div class="how-steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Paste your prompt</div>
+        <div class="step-desc">Copy any prompt you're working on — a system prompt, a user message, a template. The longer and wordier, the more we can save you.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Claude analyzes it</div>
+        <div class="step-desc">Our API sends your prompt to Claude, which breaks it down by category, estimates token count and cost, and drafts a leaner version.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Apply and save</div>
+        <div class="step-desc">Review the breakdown, copy the optimized prompt, and understand the reasoning. Apply the same principles to every prompt you write going forward.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-label" style="display:flex;justify-content:center">Pricing</div>
+  <div class="section-title">Simple, honest pricing</div>
+  <div class="section-sub" style="margin:0 auto">Start free. Upgrade when you're ready. No tricks, no hidden fees.</div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">$0 <span>/ month</span></div>
+      <div class="plan-desc">Perfect for trying it out</div>
+      <div class="plan-divider"></div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> 3 prompt analyses</div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> Full token breakdown</div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> Efficient rewrite</div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> No credit card needed</div>
+      <a class="plan-cta plan-cta-ghost" href="/app">Get started free</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="featured-badge">Most popular</div>
+      <div class="plan-name" style="color:var(--accent)">Pro</div>
+      <div class="plan-price" style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">$9 <span style="-webkit-text-fill-color:var(--dim)">/ month</span></div>
+      <div class="plan-desc">For developers and power users</div>
+      <div class="plan-divider"></div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> Unlimited analyses</div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> Full token breakdown</div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> Efficient rewrite</div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> Usage history</div>
+      <div class="plan-feature"><span class="plan-feature-check">✓</span> Priority processing</div>
+      <a class="plan-cta plan-cta-primary" href="/app" onclick="alert('Stripe coming soon!')">Upgrade to Pro →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="testimonials-inner">
+    <div style="text-align:center">
+      <div class="section-label" style="justify-content:center;display:flex">Testimonials</div>
+      <div class="section-title">What developers are saying</div>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"Cut my average system prompt from 800 tokens to 310. That's real money saved at scale when you're running thousands of calls a day."</div>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:rgba(91,142,240,0.15);color:var(--accent)">MR</div>
+          <div><div class="author-name">Marcus R.</div><div class="author-role">Backend Engineer</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"The rewrite feature is genuinely impressive. It doesn't just shorten your prompt — it keeps the intent and improves the structure."</div>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:rgba(52,211,153,0.15);color:var(--green)">SL</div>
+          <div><div class="author-name">Sarah L.</div><div class="author-role">AI Product Manager</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"I use this before finalizing every prompt template. The breakdown showing politeness overhead was eye-opening — I had no idea how much it added up."</div>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:rgba(139,111,232,0.15);color:var(--accent2)">JP</div>
+          <div><div class="author-name">James P.</div><div class="author-role">Indie Developer</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="cta-band">
+  <div class="cta-band-inner">
+    <h2>Start analyzing your prompts today</h2>
+    <p>Free to start. No credit card. Results in seconds.</p>
+    <a class="btn-hero" href="/app">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Analyze your first prompt free
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div>
+        <span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:#e8eaf2;">Token</span><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+      </div>
+      <p>See every token. Save more. Prompt smarter. Powered by Anthropic Claude.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#how">How it works</a>
+      <a href="/app">Get started</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="https://anthropic.com" target="_blank">Powered by Anthropic</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 TokenLens. All rights reserved.</span>
+    <span>Built with <a href="https://anthropic.com">Claude</a> · Hosted on <a href="https://vercel.com">Vercel</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

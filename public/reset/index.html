@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password | TokenLens</title>
+<meta name="description" content="Reset your TokenLens password.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://tokenlens.live/reset">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tokenlens.live/reset">
+<meta property="og:title" content="Reset Password | TokenLens">
+<meta property="og:description" content="Reset your TokenLens password.">
+<meta property="og:image" content="https://tokenlens.live/og-image.png">
+<meta property="og:site_name" content="TokenLens">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reset Password | TokenLens">
+<meta name="twitter:description" content="Reset your TokenLens password.">
+<meta name="twitter:image" content="https://tokenlens.live/og-image.png">
+<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#f8f9fb;--white:#fff;--surface2:#f3f4f6;--border:#e5e7eb;
+  --text:#111827;--muted:#6b7280;--dim:#9ca3af;
+  --accent:#2563eb;--accent-light:#eff6ff;--accent-dark:#1d4ed8;
+  --green:#16a34a;--green-light:#f0fdf4;--red:#dc2626;--red-light:#fef2f2;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;}
+
+.logo{margin-bottom:2rem;text-align:center;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);width:100%;max-width:400px;padding:2rem;}
+.card-title{font-size:20px;font-weight:600;letter-spacing:-0.02em;margin-bottom:6px;}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem;line-height:1.6;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:12px;font-weight:500;color:var(--text);display:block;margin-bottom:5px;}
+.form-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Geist',sans-serif;font-size:14px;padding:10px 12px;transition:border-color 0.15s,box-shadow 0.15s;}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);background:var(--white);}
+.form-input::placeholder{color:var(--dim);}
+.btn{width:100%;padding:11px;border-radius:var(--radius);font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;border:none;transition:all 0.15s;background:var(--accent);color:white;}
+.btn:hover{background:var(--accent-dark);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.msg{border-radius:var(--radius);padding:10px 12px;font-size:13px;margin-bottom:14px;}
+.msg.error{background:var(--red-light);border:1px solid #fecaca;color:var(--red);}
+.msg.success{background:var(--green-light);border:1px solid #bbf7d0;color:var(--green);}
+.back-link{display:block;text-align:center;margin-top:1rem;font-size:13px;color:var(--muted);text-decoration:none;}
+.back-link:hover{color:var(--text);}
+.back-link a{color:var(--accent);text-decoration:none;}
+.back-link a:hover{text-decoration:underline;}
+
+.success-state{text-align:center;padding:1rem 0;}
+.success-icon{font-size:40px;margin-bottom:1rem;}
+.success-title{font-size:18px;font-weight:600;margin-bottom:8px;}
+.success-sub{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:1.5rem;}
+
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.75s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+footer{margin-top:2rem;font-size:12px;color:var(--dim);text-align:center;}
+footer a{color:var(--dim);text-decoration:none;}
+footer a:hover{color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="logo">
+  <a href="/" style="text-decoration:none;">
+    <span style="font-weight:700;font-size:22px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:22px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+  </a>
+</div>
+
+<div class="card" id="card">
+  <div class="loading" style="text-align:center;padding:1rem;color:var(--muted);">Loading…</div>
+</div>
+
+<footer>
+  <a href="/">Home</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="/support">Support</a>
+</footer>
+
+<script>
+const { createClient } = supabase;
+let sb;
+
+async function init() {
+  const cfgRes = await fetch('/api/config');
+  const { supabaseUrl, supabaseAnonKey } = await cfgRes.json();
+  sb = createClient(supabaseUrl, supabaseAnonKey);
+
+  // Check if this is a reset link (has access_token in URL hash)
+  const hash   = window.location.hash;
+  const params = new URLSearchParams(hash.replace('#', ''));
+  const type   = params.get('type');
+  const accessToken = params.get('access_token');
+
+  if (type === 'recovery' && accessToken) {
+    // User clicked reset link in email — show new password form
+    await sb.auth.setSession({
+      access_token: accessToken,
+      refresh_token: params.get('refresh_token') || ''
+    });
+    renderNewPassword();
+  } else {
+    // Show request reset form
+    renderRequestReset();
+  }
+}
+
+function renderRequestReset() {
+  document.getElementById('card').innerHTML = `
+    <div class="card-title">Reset your password</div>
+    <div class="card-sub">Enter your email address and we'll send you a link to reset your password.</div>
+    <div id="msg"></div>
+    <div class="form-group">
+      <label class="form-label">Email address</label>
+      <input class="form-input" type="email" id="reset-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <button class="btn" id="reset-btn" onclick="requestReset()">Send reset link</button>
+    <div class="back-link">Remember your password? <a href="/app">Log in</a></div>`;
+  setTimeout(() => document.getElementById('reset-email')?.focus(), 50);
+  document.getElementById('reset-email').addEventListener('keydown', e => {
+    if (e.key === 'Enter') requestReset();
+  });
+}
+
+async function requestReset() {
+  const email = document.getElementById('reset-email').value.trim();
+  if (!email) { showMsg('Please enter your email address.', 'error'); return; }
+
+  const btn = document.getElementById('reset-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Sending…';
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://tokenlens.live/reset'
+  });
+
+  if (error) {
+    showMsg(error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Send reset link';
+    return;
+  }
+
+  document.getElementById('card').innerHTML = `
+    <div class="success-state">
+      <div class="success-icon">📬</div>
+      <div class="success-title">Check your email</div>
+      <div class="success-sub">We sent a password reset link to <strong>${email}</strong>. Check your inbox and click the link to set a new password.<br><br>The link expires in 1 hour.</div>
+      <a href="/app" style="display:inline-block;background:var(--accent);color:white;font-size:14px;font-weight:500;padding:10px 24px;border-radius:var(--radius);text-decoration:none;">Back to login</a>
+    </div>`;
+}
+
+function renderNewPassword() {
+  document.getElementById('card').innerHTML = `
+    <div class="card-title">Set a new password</div>
+    <div class="card-sub">Choose a strong password for your TokenLens account.</div>
+    <div id="msg"></div>
+    <div class="form-group">
+      <label class="form-label">New password</label>
+      <input class="form-input" type="password" id="new-password" placeholder="At least 6 characters" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirm password</label>
+      <input class="form-input" type="password" id="confirm-password" placeholder="Repeat your password" autocomplete="new-password">
+    </div>
+    <button class="btn" id="save-btn" onclick="savePassword()">Set new password</button>`;
+  setTimeout(() => document.getElementById('new-password')?.focus(), 50);
+  document.getElementById('confirm-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') savePassword();
+  });
+}
+
+async function savePassword() {
+  const pass    = document.getElementById('new-password').value;
+  const confirm = document.getElementById('confirm-password').value;
+
+  if (pass.length < 6)   { showMsg('Password must be at least 6 characters.', 'error'); return; }
+  if (pass !== confirm)  { showMsg('Passwords do not match.', 'error'); return; }
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Saving…';
+
+  const { error } = await sb.auth.updateUser({ password: pass });
+
+  if (error) {
+    showMsg(error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Set new password';
+    return;
+  }
+
+  document.getElementById('card').innerHTML = `
+    <div class="success-state">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Password updated!</div>
+      <div class="success-sub">Your password has been changed successfully. You can now log in with your new password.</div>
+      <a href="/app" style="display:inline-block;background:var(--accent);color:white;font-size:14px;font-weight:500;padding:10px 24px;border-radius:var(--radius);text-decoration:none;">Go to app</a>
+    </div>`;
+}
+
+function showMsg(text, type) {
+  const el = document.getElementById('msg');
+  if (el) el.innerHTML = `<div class="msg ${type}">${text}</div>`;
+}
+
+init();
+</script>
+</body>
+</html>

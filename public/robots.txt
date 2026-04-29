@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /account
+Disallow: /library
+Disallow: /reset
+Disallow: /api/
+
+Sitemap: https://tokenlens.live/sitemap.xml

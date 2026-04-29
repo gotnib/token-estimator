@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokenLens App — Analyze & Optimize AI Prompts</title>
+<meta name="description" content="Paste any AI prompt and instantly get a token breakdown, cost estimate, optimization score, and a leaner rewrite. Free to start — no credit card needed.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://tokenlens.live/app">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tokenlens.live/app">
+<meta property="og:title" content="TokenLens App — Analyze & Optimize AI Prompts">
+<meta property="og:description" content="Paste any AI prompt and instantly get a token breakdown, cost estimate, optimization score, and a leaner rewrite. Free to start — no credit card needed.">
+<meta property="og:image" content="https://tokenlens.live/og-image.png">
+<meta property="og:site_name" content="TokenLens">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TokenLens App — Analyze & Optimize AI Prompts">
+<meta name="twitter:description" content="Paste any AI prompt and instantly get a token breakdown, cost estimate, optimization score, and a leaner rewrite. Free to start — no credit card needed.">
+<meta name="twitter:image" content="https://tokenlens.live/og-image.png">
+<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#f8f9fb;--white:#fff;--surface2:#f3f4f6;--border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;--dim:#9ca3af;
+  --accent:#2563eb;--accent-light:#eff6ff;--accent-dark:#1d4ed8;--accent2:#7c52e0;
+  --green:#16a34a;--green-light:#f0fdf4;--amber:#d97706;--amber-light:#fffbeb;
+  --red:#dc2626;--red-light:#fef2f2;--gold:#b45309;--gold-light:#fef3c7;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;font-weight:400;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
+
+/* NAV */
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+.nav-logo{display:flex;align-items:center;gap:0;text-decoration:none;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-links{display:flex;align-items:center;gap:4px;margin-right:8px;}
+.nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+.nav-link.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
+.usage-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:5px 12px;font-size:12px;color:var(--muted);font-family:'Geist Mono',monospace;}
+.usage-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.usage-dot.warn{background:var(--amber);}
+.usage-dot.danger{background:var(--red);}
+.priority-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold-light);color:var(--gold);border:1px solid #fcd34d;border-radius:99px;font-size:11px;font-weight:600;padding:3px 10px;}
+.plan-pill{display:inline-flex;align-items:center;gap:5px;border-radius:99px;font-size:11px;font-weight:600;padding:4px 12px;}
+.plan-pill.free{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.plan-pill.plus{background:var(--accent-light);color:var(--accent);border:1px solid #bfdbfe;}
+.plan-pill.pro{background:var(--gold-light);color:var(--gold);border:1px solid #fcd34d;}
+.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.btn-nav:hover{background:var(--surface2);}
+.btn-nav-primary{background:var(--accent);color:white;border-color:var(--accent);}
+.btn-nav-primary:hover{background:var(--accent-dark);}
+
+/* PAGE */
+.page{max-width:820px;margin:0 auto;padding:0 1.5rem;}
+.hero{text-align:center;padding:3rem 1.5rem 2rem;max-width:640px;margin:0 auto;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);border:1px solid #bfdbfe;border-radius:99px;padding:4px 12px;font-size:12px;font-weight:500;margin-bottom:1.25rem;}
+.hero-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
+h1{font-size:clamp(26px,4vw,38px);font-weight:600;letter-spacing:-0.03em;line-height:1.15;margin-bottom:0.75rem;}
+h1 span{color:var(--accent);}
+.hero-sub{font-size:15px;color:var(--muted);max-width:420px;margin:0 auto;}
+
+/* GATE */
+.gate-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:3rem 2rem;text-align:center;margin-bottom:2rem;}
+.gate-icon{font-size:32px;margin-bottom:1rem;}
+.gate-title{font-size:18px;font-weight:600;margin-bottom:8px;}
+.gate-sub{font-size:14px;color:var(--muted);margin-bottom:1.5rem;max-width:340px;margin-left:auto;margin-right:auto;}
+.gate-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* MAIN CARD */
+.main-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);margin-bottom:1.5rem;overflow:hidden;}
+.card-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.card-header-left{flex:1;}
+.card-header-title{font-size:13px;font-weight:600;color:var(--text);}
+.card-header-sub{font-size:12px;color:var(--dim);margin-top:2px;}
+.card-body{padding:1.5rem;}
+
+/* PROMPT BOXES */
+.prompt-list{display:flex;flex-direction:column;gap:12px;}
+.prompt-item{position:relative;}
+.prompt-label{font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);margin-bottom:5px;}
+.prompt-row{display:flex;gap:8px;align-items:flex-start;}
+textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);color:var(--text);font-family:'Geist',sans-serif;font-size:14px;padding:14px 16px;min-height:120px;resize:vertical;line-height:1.7;transition:border-color 0.15s,box-shadow 0.15s;}
+textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);background:var(--white);}
+textarea::placeholder{color:var(--dim);}
+.btn-remove{width:32px;height:32px;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:8px;transition:all 0.15s;}
+.btn-remove:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
+.batch-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:8px;}
+.btn-add-prompt{background:transparent;border:1px dashed var(--border2);border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--muted);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px;}
+.btn-add-prompt:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+.batch-info{font-size:12px;color:var(--dim);font-family:'Geist Mono',monospace;}
+.input-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+.char-count{font-family:'Geist Mono',monospace;font-size:11px;color:var(--dim);}
+.btn-analyze{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:8px;}
+.btn-analyze:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.25);}
+.btn-analyze:active{transform:translateY(0);}
+.btn-analyze:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* RESULTS */
+.results-wrap{display:flex;flex-direction:column;gap:12px;padding-bottom:4rem;}
+.result-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);overflow:hidden;animation:slideUp 0.3s ease both;}
+.result-card:nth-child(2){animation-delay:0.06s;}
+.result-card:nth-child(3){animation-delay:0.12s;}
+.result-card:nth-child(4){animation-delay:0.18s;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.rc-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.rc-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.rc-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.rc-body{padding:1.25rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.stat-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;}
+.stat-label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
+.stat-value{font-size:28px;font-weight:600;color:var(--text);line-height:1;letter-spacing:-0.02em;}
+.stat-sub{font-size:11px;color:var(--dim);margin-top:4px;}
+.breakdown-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.breakdown-row:first-child{padding-top:0;}
+.breakdown-row:last-child{border-bottom:none;padding-bottom:0;}
+.breakdown-left{flex:1;min-width:0;}
+.breakdown-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.breakdown-detail{font-size:11px;color:var(--dim);}
+.breakdown-right{text-align:right;flex-shrink:0;}
+.breakdown-tokens{font-family:'Geist Mono',monospace;font-size:13px;font-weight:500;color:var(--text);}
+.breakdown-pct{font-size:11px;color:var(--dim);}
+.bar-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px;}
+.bar-fill{height:100%;border-radius:2px;}
+.efficient-prompt{background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius-lg);padding:16px;font-size:14px;color:#1e40af;line-height:1.7;margin-bottom:12px;font-style:italic;}
+.savings-badge{display:inline-flex;align-items:center;background:var(--green-light);color:var(--green);border:1px solid #bbf7d0;border-radius:99px;font-size:11px;font-weight:600;padding:3px 10px;}
+.btn-copy{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.btn-copy:hover{background:var(--border2);}
+.btn-save{background:transparent;border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--muted);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-save:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-light);}
+.btn-save.saved{background:var(--gold-light);color:var(--gold);border-color:#fcd34d;}
+.reason-row{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);}
+.reason-row:first-child{padding-top:0;}
+.reason-row:last-child{border-bottom:none;padding-bottom:0;}
+.reason-num{width:22px;height:22px;background:var(--accent-light);color:var(--accent);border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.reason-text{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* SCORE CARD */
+.score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem;}
+.score-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center;}
+.score-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:8px;}
+.score-ring{position:relative;width:52px;height:52px;margin:0 auto 6px;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring-bg{fill:none;stroke:var(--border);stroke-width:4;}
+.score-ring-fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1);}
+.score-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--text);}
+.score-note{font-size:10px;color:var(--dim);line-height:1.4;}
+.score-delta{font-size:10px;font-weight:600;margin-top:4px;}
+.score-delta.up{color:var(--green);}
+.score-delta.down{color:var(--red);}
+.score-delta.same{color:var(--dim);}
+
+/* LESSON CARDS */
+.reason-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;}
+.reason-card:last-child{margin-bottom:0;}
+.reason-change{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;}
+.reason-change-num{width:20px;height:20px;background:var(--accent-light);color:var(--accent);border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.reason-principle{font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:4px;margin-left:28px;}
+.reason-lesson{font-size:12px;color:var(--muted);line-height:1.6;margin-left:28px;padding:8px 10px;background:var(--white);border-left:3px solid var(--accent2);border-radius:0 var(--radius) var(--radius) 0;}
+.slider-wrap{margin-top:14px;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);}
+.slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.slider-label{font-size:12px;font-weight:500;color:var(--text);}
+.slider-value{font-size:12px;font-weight:600;padding:2px 10px;border-radius:99px;}
+.slider-value.fast{background:var(--green-light);color:var(--green);}
+.slider-value.balanced{background:var(--accent-light);color:var(--accent);}
+.slider-value.deep{background:#f5f3ff;color:var(--accent2);}
+.slider-track{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.slider-option{padding:8px;border:1.5px solid var(--border);border-radius:var(--radius);text-align:center;cursor:pointer;transition:all 0.15s;}
+.slider-option:hover{border-color:var(--border2);}
+.slider-option.active.fast{border-color:var(--green);background:var(--green-light);}
+.slider-option.active.balanced{border-color:var(--accent);background:var(--accent-light);}
+.slider-option.active.deep{border-color:var(--accent2);background:#f5f3ff;}
+.slider-option.locked{opacity:0.4;cursor:not-allowed;}
+.slider-option-name{font-size:12px;font-weight:600;margin-bottom:2px;}
+.slider-option-desc{font-size:10px;color:var(--muted);line-height:1.4;}
+.slider-option.active.fast .slider-option-name{color:var(--green);}
+.slider-option.active.balanced .slider-option-name{color:var(--accent);}
+.slider-option.active.deep .slider-option-name{color:var(--accent2);}
+.slider-lock-note{font-size:11px;color:var(--dim);margin-top:8px;text-align:center;}
+.batch-tabs{display:flex;gap:4px;padding:1rem 1.25rem;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.batch-tab{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Geist',sans-serif;transition:all 0.15s;}
+.batch-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
+.batch-tab:hover:not(.active){background:var(--surface2);}
+
+/* LOADING */
+.loading-state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:3rem;color:var(--muted);font-size:14px;}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.75s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* LIMIT/ERROR/BANNERS */
+.error-state{background:var(--red-light);border:1px solid #fecaca;border-radius:var(--radius-lg);padding:14px 16px;font-size:13px;color:var(--red);}
+.error-state strong{display:block;font-weight:600;margin-bottom:3px;}
+.limit-banner{background:var(--amber-light);border:1px solid #fde68a;border-radius:var(--radius-lg);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;margin-bottom:12px;}
+.limit-banner-text{color:#92400e;}
+.limit-banner-text strong{font-weight:600;}
+.btn-upgrade-inline{background:var(--amber);color:white;border:none;border-radius:var(--radius);padding:7px 16px;font-size:12px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.btn-upgrade-inline:hover{opacity:0.85;}
+
+/* UPGRADE CARD */
+.upgrade-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:3rem 2rem;text-align:center;margin-bottom:2rem;}
+.upgrade-icon{font-size:32px;margin-bottom:1rem;}
+.upgrade-title{font-size:20px;font-weight:600;margin-bottom:8px;}
+.upgrade-sub{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 1.75rem;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:680px;margin:0 auto 1.5rem;text-align:left;}
+.pricing-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;position:relative;}
+.pricing-card.featured{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.featured-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;font-size:10px;font-weight:600;padding:3px 12px;border-radius:99px;white-space:nowrap;}
+.pricing-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.pricing-price{font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-bottom:12px;}
+.pricing-price span{font-size:13px;font-weight:400;color:var(--muted);}
+.pricing-feature{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.plan-feature-check{color:var(--green);font-weight:700;font-size:11px;flex-shrink:0;}
+.btn-upgrade-cta{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:12px 28px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;}
+.btn-upgrade-cta:hover{background:var(--accent-dark);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn 0.15s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--white);border-radius:var(--radius-xl);box-shadow:var(--shadow);width:100%;max-width:400px;padding:2rem;animation:slideUp 0.2s ease;}
+.modal.wide{max-width:600px;}
+.plan-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem;}
+.plan-select-card{border:2px solid var(--border);border-radius:var(--radius-lg);padding:12px;cursor:pointer;transition:all 0.15s;text-align:center;position:relative;}
+.plan-select-card:hover{border-color:var(--border2);}
+.plan-select-card.selected{border-color:var(--accent);background:var(--accent-light);}
+.plan-select-card.selected.pro{border-color:var(--accent2);background:#f5f3ff;}
+.plan-select-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.plan-select-price{font-size:11px;color:var(--muted);margin-bottom:6px;font-family:'Geist Mono',monospace;}
+.plan-select-feature{font-size:10px;color:var(--dim);line-height:1.5;}
+.modal-title{font-size:20px;font-weight:600;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:12px;font-weight:500;color:var(--text);display:block;margin-bottom:5px;}
+.form-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Geist',sans-serif;font-size:14px;padding:10px 12px;transition:border-color 0.15s,box-shadow 0.15s;}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.btn-full{width:100%;padding:11px;border-radius:var(--radius);font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;border:none;transition:all 0.15s;}
+.btn-primary-full{background:var(--accent);color:white;}
+.btn-primary-full:hover{background:var(--accent-dark);}
+.btn-primary-full:disabled{opacity:0.5;cursor:not-allowed;}
+.modal-switch{text-align:center;margin-top:1rem;font-size:13px;color:var(--muted);}
+.modal-switch a{color:var(--accent);text-decoration:none;cursor:pointer;font-weight:500;}
+.modal-error{background:var(--red-light);border:1px solid #fecaca;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--red);margin-bottom:14px;}
+.modal-success{background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--green);margin-bottom:14px;}
+
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--dim);border-top:1px solid var(--border);margin-top:2rem;}
+footer a{color:var(--muted);text-decoration:none;}
+footer a:hover{color:var(--text);}
+
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr;}
+  .pricing-grid{grid-template-columns:1fr;}
+  nav{padding:0 1rem;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+  </a>
+  <div class="nav-links" id="nav-links" style="display:none">
+    <a class="nav-link active" href="/app">Analyzer</a>
+    <a class="nav-link" href="/challenge">Challenge</a>
+    <a class="nav-link" href="/library" id="nav-library" style="display:none">Library</a>
+    <a class="nav-link" href="/account">Account</a>
+  </div>
+  <div class="nav-right">
+    <div id="nav-plan-pill"></div>
+    <div class="priority-badge" id="priority-badge" style="display:none">⚡ Priority</div>
+    <button class="btn-nav" id="btn-logout" style="display:none" onclick="logout()">Log out</button>
+    <button class="btn-nav" id="btn-login" onclick="openModal('login')">Log in</button>
+    <button class="btn-nav btn-nav-primary" id="btn-signup" onclick="openModal('signup')">Sign up free</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-badge"><div class="hero-badge-dot"></div>Powered by Claude</div>
+    <h1>Understand your <span>prompt costs</span><br>before they add up</h1>
+    <p class="hero-sub">Get a token breakdown, cost estimate, and a leaner rewrite — instantly.</p>
+  </div>
+  <div id="app-body"></div>
+</div>
+
+<footer>
+  TokenLens · Powered by <a href="https://anthropic.com" target="_blank">Anthropic Claude</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a>
+</footer>
+
+<div class="modal-overlay" id="modal" style="display:none" onclick="closeModalOnOverlay(event)">
+  <div class="modal wide" id="modal-box"><div id="modal-content"></div></div>
+</div>
+
+<script>
+const { createClient } = supabase;
+const COLORS = ['#2563eb','#16a34a','#d97706','#dc2626','#7c3aed','#0891b2'];
+const PLAN_ICONS  = { free: '🔍', plus: '⚡', pro: '🚀' };
+const PLAN_LABELS = { free: 'Free', plus: 'Plus', pro: 'Pro' };
+const CHAR_LIMITS = { free: 1500, plus: 5000, pro: 7500 };
+const LEVEL_CONFIG = {
+  fast:     { label: 'Fast',     desc: 'Trim obvious waste only', color: 'fast',     plans: ['free','plus','pro'] },
+  balanced: { label: 'Balanced', desc: 'Tighten and restructure',  color: 'balanced', plans: ['plus','pro'] },
+  deep:     { label: 'Deep',     desc: 'Maximum compression',      color: 'deep',     plans: ['pro'] }
+};
+
+let sb, currentUser, currentSession, currentPlan = 'free';
+let currentLevel = 'balanced';
+let prompts = [''];
+
+function charLimit() { return CHAR_LIMITS[currentPlan] || 1500; }
+
+function setLevel(level) {
+  const cfg = LEVEL_CONFIG[level];
+  if (!cfg.plans.includes(currentPlan)) return; // locked
+  currentLevel = level;
+  renderSlider();
+}
+
+function renderSlider() {
+  const wrap = document.getElementById('opt-slider');
+  if (!wrap) return;
+
+  const levels = ['fast', 'balanced', 'deep'];
+  const optionsHTML = levels.map(l => {
+    const cfg     = LEVEL_CONFIG[l];
+    const allowed = cfg.plans.includes(currentPlan);
+    const active  = currentLevel === l;
+    const cls     = `slider-option${active ? ' active ' + l : ''}${!allowed ? ' locked' : ''}`;
+    return `<div class="${cls}" onclick="setLevel('${l}')" title="${!allowed ? 'Upgrade to unlock' : ''}">
+      <div class="slider-option-name">${cfg.label}${!allowed ? ' 🔒' : ''}</div>
+      <div class="slider-option-desc">${cfg.desc}</div>
+    </div>`;
+  }).join('');
+
+  const valueCfg = LEVEL_CONFIG[currentLevel];
+  wrap.innerHTML = `
+    <div class="slider-header">
+      <span class="slider-label">Optimization level</span>
+      <span class="slider-value ${valueCfg.color}">${valueCfg.label}</span>
+    </div>
+    <div class="slider-track">${optionsHTML}</div>
+    ${currentPlan === 'free' ? `<div class="slider-lock-note">Balanced and Deep available on <a href="#" onclick="showUpgrade()" style="color:var(--accent)">Plus and Pro</a></div>` : ''}
+    ${currentPlan === 'plus' ? `<div class="slider-lock-note">Deep optimization available on <a href="#" onclick="showUpgrade()" style="color:var(--accent2)">Pro</a></div>` : ''}`;
+}
+
+function renderNavPill(plan) {
+  const styles = { free:'color:#111827', plus:'color:#7c52e0', pro:'color:#b45309' };
+  const labels = { free:'FREE', plus:'PLUS', pro:'PRO' };
+  const pill = document.getElementById('nav-plan-pill');
+  if (!pill) return;
+  pill.innerHTML = `<span style="${styles[plan]||styles.free};font-weight:600;font-size:13px;">${labels[plan]||'FREE'}</span>`;
+}
+// ── INIT ──────────────────────────────────────────
+async function init() {
+  const res = await fetch('/api/config');
+  const { supabaseUrl, supabaseAnonKey } = await res.json();
+  sb = createClient(supabaseUrl, supabaseAnonKey);
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) { currentUser = session.user; currentSession = session; await onLoggedIn(); }
+  else {
+    onLoggedOut();
+    // Check if landing page sent us here with a plan pre-selected
+    const params = new URLSearchParams(window.location.search);
+    const signupPlan = params.get('signup');
+    if (signupPlan && ['plus', 'pro'].includes(signupPlan)) {
+      window.history.replaceState({}, '', '/app');
+      openModal('signup', signupPlan);
+    }
+  }
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (session) { currentUser = session.user; currentSession = session; await onLoggedIn(); }
+    else { currentUser = null; currentSession = null; currentPlan = 'free'; onLoggedOut(); }
+  });
+}
+
+async function onLoggedIn() {
+  closeModal();
+  document.getElementById('btn-login').style.display = 'none';
+  document.getElementById('btn-signup').style.display = 'none';
+  document.getElementById('btn-logout').style.display = 'block';
+  document.getElementById('nav-links').style.display = 'flex';
+  const profile = await refreshUsage();
+  currentPlan = profile?.plan || 'free';
+  // Set default level for plan
+  currentLevel = currentPlan === 'free' ? 'fast' : currentPlan === 'plus' ? 'balanced' : 'balanced';
+  renderNavPill(currentPlan);
+  if (currentPlan === 'pro') {
+    document.getElementById('priority-badge').style.display = 'inline-flex';
+    document.getElementById('nav-library').style.display = 'block';
+  }
+  renderAnalyzer();
+}
+
+function onLoggedOut() {
+  document.getElementById('btn-login').style.display = 'block';
+  document.getElementById('btn-signup').style.display = 'block';
+  document.getElementById('btn-logout').style.display = 'none';
+  document.getElementById('priority-badge').style.display = 'none';
+  document.getElementById('nav-links').style.display = 'none';
+  renderGate();
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  currentUser    = null;
+  currentSession = null;
+  currentPlan    = 'free';
+  onLoggedOut();
+}
+
+async function refreshUsage() {
+  if (!currentUser) return null;
+  const { data } = await sb
+    .from('users')
+    .select('plan, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at')
+    .eq('id', currentUser.id)
+    .single();
+  return data || null;
+}
+
+async function goToCheckout(btnEl) {
+  const plan = btnEl.textContent.toLowerCase().includes('plus') ? 'plus' : 'pro';
+  if (!currentSession) { openModal('login'); return; }
+  btnEl.disabled = true;
+  const orig = btnEl.textContent;
+  btnEl.textContent = 'Loading…';
+  try {
+    const res  = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
+      body: JSON.stringify({ plan })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    if (data.upgraded) {
+      // Instant swap — reload plan and re-render
+      const profile = await refreshUsage();
+      currentPlan   = profile?.plan || currentPlan;
+      currentLevel  = currentPlan === 'free' ? 'fast' : 'balanced';
+      renderNavPill(currentPlan);
+      renderAnalyzer();
+      window.location.href = '/account?upgraded=true';
+    } else if (data.url) {
+      window.location.href = data.url;
+    }
+  } catch(err) {
+    alert('Could not start checkout: ' + err.message);
+    btnEl.disabled = false;
+    btnEl.textContent = orig;
+  }
+}
+
+// ── RENDER STATES ─────────────────────────────────
+function renderGate() {
+  document.getElementById('app-body').innerHTML = `
+    <div class="gate-card">
+      <div class="gate-icon">🔍</div>
+      <div class="gate-title">Sign up to start analyzing</div>
+      <div class="gate-sub">Free account includes 3 analyses per day. No credit card required.</div>
+      <div class="gate-buttons">
+        <button class="btn-nav btn-nav-primary" style="padding:10px 24px;font-size:14px;" onclick="openModal('signup')">Create free account</button>
+        <button class="btn-nav" style="padding:10px 24px;font-size:14px;" onclick="openModal('login')">Log in</button>
+      </div>
+    </div>`;
+}
+
+function renderAnalyzer() {
+  const isPro  = currentPlan === 'pro';
+  const isFree = currentPlan === 'free';
+  document.getElementById('app-body').innerHTML = `
+    <div class="main-card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-header-title">Analyze ${isPro ? 'prompts' : 'a prompt'}${isPro ? ' <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;">— batch mode enabled</span>' : ''}</div>
+          <div class="card-header-sub">${isPro ? 'Add up to 15 prompts — each counts as one analysis' : 'Paste any prompt — the wordier the better to see the savings'}</div>
+        </div>
+        ${isPro ? `<button class="btn-add-prompt" id="btn-add" onclick="addPrompt()"><span style="font-size:16px">+</span> Add another prompt</button>` : ''}
+      </div>
+      <div class="card-body">
+        <div class="prompt-list" id="prompt-list"></div>
+        <div class="${isPro ? 'batch-footer' : 'input-footer'}">
+          ${isPro
+            ? `<span class="batch-info" id="batch-info">1 prompt · 1 analysis</span>`
+            : `<span class="char-count" id="char-count">0 / ${charLimit().toLocaleString()}</span>`}
+          <button class="btn-analyze" id="analyze-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            ${isPro ? 'Analyze all' : 'Analyze prompt'}
+          </button>
+        </div>
+        <div id="opt-slider" class="slider-wrap"></div>
+      </div>
+    </div>
+    <div id="results"></div>`;
+
+  renderPromptList();
+  renderSlider();
+  document.getElementById('analyze-btn').addEventListener('click', analyze);
+}
+
+function renderPromptList() {
+  const isPro = currentPlan === 'pro';
+  const list  = document.getElementById('prompt-list');
+  if (!list) return;
+  list.innerHTML = prompts.map((p, i) => `
+    <div class="prompt-item">
+      ${isPro && prompts.length > 1 ? `<div class="prompt-label">Prompt ${i + 1}</div>` : ''}
+      <div class="prompt-row">
+        <textarea id="prompt-${i}" placeholder="Paste your prompt here…" oninput="onPromptInput(${i}, this.value)">${escHtml(p)}</textarea>
+        ${isPro && prompts.length > 1 ? `<button class="btn-remove" onclick="removePrompt(${i})" title="Remove">×</button>` : ''}
+      </div>
+    </div>`).join('');
+
+  if (!isPro) {
+    const ta = document.getElementById('prompt-0');
+    if (ta) ta.addEventListener('input', function() {
+      const cc  = document.getElementById('char-count');
+      const lim = charLimit();
+      const len = this.value.length;
+      if (cc) {
+        cc.textContent = `${len.toLocaleString()} / ${lim.toLocaleString()}`;
+        cc.style.color = len > lim ? 'var(--red)' : '';
+      }
+    });
+  }
+  updateBatchInfo();
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function onPromptInput(i, val) {
+  prompts[i] = val;
+  updateBatchInfo();
+  // Show per-prompt char count indicator
+  const lim   = charLimit();
+  const label = document.querySelector(`#prompt-${i}`)?.closest('.prompt-item')?.querySelector('.prompt-label');
+  if (label && currentPlan === 'pro') {
+    const over = val.length > lim;
+    label.innerHTML = `Prompt ${i + 1} <span style="font-family:'Geist Mono',monospace;font-size:10px;color:${over ? 'var(--red)' : 'var(--dim)'}">${val.length.toLocaleString()} / ${lim.toLocaleString()}</span>`;
+  }
+}
+
+function addPrompt() {
+  if (prompts.length >= 15) return;
+  prompts.push('');
+  renderPromptList();
+  const newTa = document.getElementById(`prompt-${prompts.length - 1}`);
+  if (newTa) newTa.focus();
+}
+
+function removePrompt(i) {
+  if (prompts.length <= 1) return;
+  prompts.splice(i, 1);
+  renderPromptList();
+}
+
+function updateBatchInfo() {
+  const info = document.getElementById('batch-info');
+  if (!info) return;
+  const n = prompts.length;
+  info.textContent = `${n} prompt${n !== 1 ? 's' : ''} · ${n} ${n !== 1 ? 'analyses' : 'analysis'}`;
+  const btn = document.getElementById('btn-add');
+  if (btn) btn.style.opacity = prompts.length >= 15 ? '0.4' : '1';
+}
+
+// ── ANALYZE ───────────────────────────────────────
+async function analyze() {
+  if (!currentSession) { openModal('login'); return; }
+
+  // Sync textarea values into prompts array
+  prompts = prompts.map((_, i) => {
+    const ta = document.getElementById(`prompt-${i}`);
+    return ta ? ta.value.trim() : '';
+  }).filter(p => p.length > 0);
+
+  if (!prompts.length) return;
+
+  // Client-side char limit check
+  const lim      = charLimit();
+  const overLimit = prompts.find(p => p.length > lim);
+  if (overLimit) {
+    document.getElementById('results').innerHTML = `<div class="error-state"><strong>Prompt too long</strong>Your ${currentPlan} plan supports up to ${lim.toLocaleString()} characters per prompt. Please shorten your prompt or upgrade.</div>`;
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
+    return;
+  }
+
+  const btn = document.getElementById('analyze-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Analyzing…';
+
+  document.getElementById('results').innerHTML = `
+    <div class="result-card">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <span>Claude is analyzing ${prompts.length > 1 ? prompts.length + ' prompts' : 'your prompt'}…</span>
+      </div>
+    </div>`;
+
+  try {
+    const body = currentPlan === 'pro'
+      ? { prompts, level: currentLevel }
+      : { prompt: prompts[0], level: currentLevel };
+
+    const res  = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+
+    if (res.status === 429 && data.error === 'rate_limited') {
+      document.getElementById('results').innerHTML =
+        `<div class="error-state"><strong>Slow down a little</strong>${data.message}</div>`;
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
+      return;
+    }
+
+    if (res.status === 403 && data.error === 'limit_reached') {
+      renderLimitReached(data);
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
+      return;
+    }
+    if (!res.ok) throw new Error(data.error || 'Server error ' + res.status);
+
+    await refreshUsage();
+
+    // Normalise: single or batch
+    const resultArr = data.batch ? (Array.isArray(data.results) ? data.results : [data.results]) : [data.results || data];
+    renderResults(resultArr, data.usage, data.level);
+
+    // Banners
+    const u = data.usage;
+    if (u && u.remaining !== null) {
+      if (u.remaining === 0 || u.remaining <= (u.plan === 'plus' ? 10 : u.plan === 'pro' ? 50 : 0)) {
+        const banner = document.createElement('div');
+        banner.className = 'limit-banner';
+        if (u.remaining === 0) {
+          banner.innerHTML = u.plan === 'free'
+            ? `<div class="limit-banner-text"><strong>Last free analysis used today.</strong> Resets in 24h.</div><button class="btn-upgrade-inline" onclick="showUpgrade()">Upgrade</button>`
+            : `<div class="limit-banner-text"><strong>Monthly limit reached.</strong> Upgrade for more.</div><button class="btn-upgrade-inline" onclick="showUpgrade()">Upgrade</button>`;
+        } else {
+          banner.innerHTML = `<div class="limit-banner-text"><strong>${u.remaining} analyses remaining</strong> this ${u.period}.</div><button class="btn-upgrade-inline" onclick="showUpgrade()">Upgrade</button>`;
+        }
+        document.getElementById('results').prepend(banner);
+      }
+    }
+
+  } catch(err) {
+    document.getElementById('results').innerHTML = `<div class="error-state"><strong>Something went wrong</strong>${err.message}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
+}
+
+// ── RENDER RESULTS ────────────────────────────────
+function renderResults(resultArr, usage, level) {
+  const wrap = document.getElementById('results');
+
+  if (resultArr.length === 1) {
+    wrap.innerHTML = `<div class="results-wrap">${buildResultCards({...resultArr[0], level}, 0)}</div>`;
+  } else {
+    // Batch — tabbed
+    const tabs = resultArr.map((_, i) => `<button class="batch-tab ${i === 0 ? 'active' : ''}" onclick="switchTab(${i})" id="tab-${i}">Prompt ${i + 1}</button>`).join('');
+    const panels = resultArr.map((r, i) => `<div id="panel-${i}" style="${i > 0 ? 'display:none' : ''}"><div class="results-wrap" style="padding-top:1rem">${buildResultCards({...r, level}, i)}</div></div>`).join('');
+    wrap.innerHTML = `<div class="result-card" style="overflow:visible"><div class="batch-tabs">${tabs}</div>${panels}</div>`;
+  }
+
+  // Attach copy/save listeners
+  wrap.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      navigator.clipboard.writeText(this.dataset.copy).then(() => {
+        this.textContent = '✓ Copied!';
+        setTimeout(() => { this.textContent = 'Copy'; }, 1800);
+      });
+    });
+  });
+
+  wrap.querySelectorAll('[data-save-id]').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const id     = this.dataset.saveId;
+      const saved  = this.dataset.saved !== 'true';
+      this.dataset.saved = saved;
+      this.className = 'btn-save' + (saved ? ' saved' : '');
+      this.innerHTML = saved ? '★ Saved' : '☆ Save';
+      await fetch('/api/library', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
+        body: JSON.stringify({ id, saved })
+      });
+    });
+  });
+
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function switchTab(i) {
+  document.querySelectorAll('.batch-tab').forEach((t, j) => {
+    t.className = 'batch-tab' + (j === i ? ' active' : '');
+    document.getElementById(`panel-${j}`).style.display = j === i ? 'block' : 'none';
+  });
+}
+
+function buildResultCards(d, idx) {
+  const maxTok    = Math.max(...(d.breakdown || []).map(b => b.tokens), 1);
+  const savings   = d.savings_percent || 0;
+  const effTokens = d.efficient_tokens || Math.round((d.estimated_tokens || 0) * (1 - savings / 100));
+  const cost      = typeof d.cost_estimate_usd === 'number' ? '$' + d.cost_estimate_usd.toFixed(5) : 'N/A';
+  const isPro     = currentPlan === 'pro';
+  const histId    = d.history_id || null;
+
+  const breakdownHTML = (d.breakdown || []).map((item, i) => {
+    const pct  = Math.round((item.tokens / Math.max(d.estimated_tokens, 1)) * 100);
+    const barW = Math.round((item.tokens / maxTok) * 100);
+    return `<div class="breakdown-row">
+      <div class="breakdown-left">
+        <div class="breakdown-name">${item.category}</div>
+        <div class="breakdown-detail">${item.detail}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:${COLORS[i % COLORS.length]}"></div></div>
+      </div>
+      <div class="breakdown-right">
+        <div class="breakdown-tokens">${item.tokens.toLocaleString()}</div>
+        <div class="breakdown-pct">${pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── Score card ──
+  const scores     = d.scores || {};
+  const scoreNotes = d.score_notes || {};
+  const scoreLabels = { clarity: 'Clarity', conciseness: 'Conciseness', structure: 'Structure', specificity: 'Specificity' };
+  const scoreColors = (s) => s >= 8 ? '#16a34a' : s >= 5 ? '#2563eb' : '#dc2626';
+
+  const scoreCardHTML = Object.keys(scoreLabels).length && d.scores ? `
+    <div class="score-grid">
+      ${Object.entries(scoreLabels).map(([key, label]) => {
+        const val  = scores[key] || 0;
+        const circ = 2 * Math.PI * 20; // r=20
+        const pct  = val / 10;
+        const dash = circ * pct;
+        const color = scoreColors(val);
+        return `<div class="score-item">
+          <div class="score-label">${label}</div>
+          <div class="score-ring">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle class="score-ring-bg" cx="26" cy="26" r="20"/>
+              <circle class="score-ring-fill" cx="26" cy="26" r="20"
+                stroke="${color}"
+                stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}"
+                stroke-dashoffset="0"/>
+            </svg>
+            <div class="score-ring-num" style="color:${color}">${val}</div>
+          </div>
+          <div class="score-note">${scoreNotes[key] || ''}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  // ── Reasons with lessons ──
+  const reasonsHTML = (d.reasons || []).map((r, i) => {
+    // Handle both old string format and new object format
+    if (typeof r === 'string') {
+      return `<div class="reason-card">
+        <div class="reason-change"><div class="reason-change-num">${i+1}</div>${r}</div>
+      </div>`;
+    }
+    return `<div class="reason-card">
+      <div class="reason-change"><div class="reason-change-num">${i+1}</div>${r.change || ''}</div>
+      ${r.principle ? `<div class="reason-principle">📌 ${r.principle}</div>` : ''}
+      ${r.lesson    ? `<div class="reason-lesson">💡 ${r.lesson}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const optimizationSection = d.optimization_locked ? `
+    <div style="position:relative;margin-bottom:12px;">
+      <div class="efficient-prompt" style="margin-bottom:0">${d.efficient_prompt_teaser || ''}…</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:0 0 var(--radius-lg) var(--radius-lg);padding:16px;text-align:center;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px;">🔒 Full optimization is a Plus/Pro feature</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Upgrade to see the complete rewrite and scoring.</div>
+        <button class="btn-upgrade-cta" style="padding:9px 22px;font-size:13px;" onclick="goToCheckout(this)">Upgrade to Plus →</button>
+      </div>
+    </div>` : `
+    <div class="efficient-prompt">${d.efficient_prompt || ''}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-copy" data-copy="${escHtml(d.efficient_prompt || '')}">Copy</button>
+      ${isPro ? `<button class="btn-save" data-save-id="${histId || idx}" data-saved="false">☆ Save to library</button>` : ''}
+    </div>`;
+
+  return `
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#eff6ff">📊</div>Token summary</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${isPro ? '<span class="priority-badge">⚡ Priority</span>' : ''}
+          ${d.level ? `<span class="slider-value ${d.level}" style="font-size:10px;">${(LEVEL_CONFIG[d.level]?.label || d.level)} optimization</span>` : ''}
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-label">Input tokens</div><div class="stat-value">${(d.estimated_tokens||0).toLocaleString()}</div><div class="stat-sub">your prompt</div></div>
+          <div class="stat-box"><div class="stat-label">Est. cost</div><div class="stat-value">${cost}</div><div class="stat-sub">Sonnet input rate</div></div>
+          <div class="stat-box"><div class="stat-label">Optimized to</div><div class="stat-value">${effTokens.toLocaleString()}</div><div class="stat-sub" style="color:var(--green);font-weight:500">${savings}% reduction</div></div>
+        </div>
+      </div>
+    </div>
+
+    ${d.scores ? `
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#f0fdf4">🎯</div>Prompt score card</div>
+        <span style="font-size:11px;color:var(--dim);">Before optimization</span>
+      </div>
+      <div class="rc-body">${scoreCardHTML}</div>
+    </div>` : ''}
+
+    <div class="result-card">
+      <div class="rc-header"><div class="rc-title"><div class="rc-icon" style="background:#f0fdf4">🔍</div>Token breakdown</div></div>
+      <div class="rc-body">${breakdownHTML}</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#eff6ff">✨</div>Efficient alternative</div>
+        <span class="savings-badge">−${savings}% tokens</span>
+      </div>
+      <div class="rc-body">${optimizationSection}</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#fefce8">💡</div>What you can learn from this</div>
+      </div>
+      <div class="rc-body">${reasonsHTML}</div>
+    </div>`;
+}
+
+// ── LIMIT REACHED ─────────────────────────────────
+function renderLimitReached(data) {
+  const plan   = data.plan;
+  const isPlus = plan === 'plus';
+  const isPro  = plan === 'pro';
+  document.getElementById('results').innerHTML = `
+    <div class="upgrade-card">
+      <div class="upgrade-icon">${isPro || isPlus ? '📊' : '⏱️'}</div>
+      <div class="upgrade-title">${isPro ? 'Fair use limit reached' : isPlus ? 'Monthly limit reached' : 'Daily limit reached'}</div>
+      <div class="upgrade-sub">
+        ${isPro ? `You've used ${data.used} of your ~600 monthly Pro analyses. Resets in <strong>${data.resets_in}</strong>.`
+        : isPlus ? `You've used all 120 Plus analyses this period. Resets in <strong>${data.resets_in}</strong> — or upgrade to Pro.`
+        : `You've used all 3 free analyses today. Resets in <strong>${data.resets_in}</strong> — or upgrade.`}
+      </div>
+      ${!isPro ? `
+      <div class="pricing-grid">
+        ${!isPlus ? `<div class="pricing-card">
+          <div class="pricing-name">Plus</div><div class="pricing-price">$9 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> 120 / month</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Full optimization</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ Batch mode</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ History & library</div>
+        </div>` : ''}
+        <div class="pricing-card featured">
+          <div class="featured-badge">Recommended</div>
+          <div class="pricing-name" style="color:var(--accent2)">Pro</div><div class="pricing-price">$29 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> ~600 / month</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Full optimization</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Batch mode (15 prompts)</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> History & library</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Priority processing</div>
+        </div>
+      </div>
+      <button class="btn-upgrade-cta" onclick="goToCheckout(this)">Upgrade to Pro — $29/mo</button>
+      <p style="font-size:12px;color:var(--dim);margin-top:12px">Stripe · Cancel anytime</p>` : ''}
+    </div>`;
+}
+
+// ── UPGRADE ───────────────────────────────────────
+function showUpgrade() {
+  document.getElementById('results').innerHTML = `
+    <div class="upgrade-card">
+      <div class="upgrade-icon">⚡</div>
+      <div class="upgrade-title">Choose your plan</div>
+      <div class="upgrade-sub">Start free and upgrade as you grow.</div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-name">Free</div><div class="pricing-price">$0 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> 3 analyses / day</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Token breakdown</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ Full optimization</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ Batch mode</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ History & library</div>
+        </div>
+        <div class="pricing-card featured">
+          <div class="featured-badge">Most popular</div>
+          <div class="pricing-name" style="color:var(--accent)">Plus</div><div class="pricing-price">$9 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> 120 analyses / month</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Token breakdown</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Full optimization</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ Batch mode</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ History & library</div>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-name">Pro</div><div class="pricing-price">$29 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> ~600 analyses / month</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Token breakdown</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Full optimization</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Batch mode (15 prompts)</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> History & library</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Priority processing</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-upgrade-cta" onclick="goToCheckout(this)">Upgrade to Plus — $9/mo</button>
+        <button class="btn-upgrade-cta" style="background:linear-gradient(135deg,#7c52e0,#5b3fc4)" onclick="goToCheckout(this)">Upgrade to Pro — $29/mo</button>
+      </div>
+      <p style="font-size:12px;color:var(--dim);margin-top:12px">Secure payment via Stripe · Cancel anytime</p>
+    </div>`;
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── AUTH MODAL ────────────────────────────────────
+let selectedSignupPlan = 'free';
+
+function openModal(mode, plan) {
+  selectedSignupPlan = plan || 'free';
+  document.getElementById('modal').style.display = 'flex';
+  document.getElementById('modal-box').className = mode === 'login' ? 'modal' : 'modal wide';
+  renderModal(mode);
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+function closeModalOnOverlay(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+
+function selectPlan(plan) {
+  selectedSignupPlan = plan;
+  document.querySelectorAll('.plan-select-card').forEach(c => {
+    c.className = 'plan-select-card' + (c.dataset.plan === plan ? (' selected' + (plan === 'pro' ? ' pro' : '')) : '');
+  });
+  const btn = document.getElementById('auth-submit');
+  if (!btn) return;
+  if (plan === 'free') { btn.textContent = 'Create free account'; btn.style.background = ''; }
+  else if (plan === 'plus') { btn.textContent = 'Sign up & checkout — $9/mo'; btn.style.background = 'var(--accent)'; }
+  else { btn.textContent = 'Sign up & checkout — $29/mo'; btn.style.background = 'linear-gradient(135deg,#7c52e0,#5b3fc4)'; }
+}
+
+function renderModal(mode) {
+  const isLogin = mode === 'login';
+
+  const planSelector = !isLogin ? `
+    <div style="margin-bottom:1.25rem;">
+      <div class="form-label" style="margin-bottom:8px;">Choose your plan</div>
+      <div class="plan-select-grid">
+        <div class="plan-select-card ${selectedSignupPlan === 'free' ? 'selected' : ''}" data-plan="free" onclick="selectPlan('free')">
+          <div class="plan-select-name">Free</div>
+          <div class="plan-select-price">$0 / month</div>
+          <div class="plan-select-feature">3 analyses / day<br>Token breakdown<br>1,500 char limit</div>
+        </div>
+        <div class="plan-select-card ${selectedSignupPlan === 'plus' ? 'selected' : ''}" data-plan="plus" onclick="selectPlan('plus')">
+          <div class="plan-select-name" style="color:var(--accent)">Plus</div>
+          <div class="plan-select-price">$9 / month</div>
+          <div class="plan-select-feature">120 analyses / month<br>Full optimization<br>5,000 char limit</div>
+        </div>
+        <div class="plan-select-card ${selectedSignupPlan === 'pro' ? 'selected pro' : ''}" data-plan="pro" onclick="selectPlan('pro')">
+          <div class="plan-select-name" style="color:var(--accent2)">Pro</div>
+          <div class="plan-select-price">$29 / month</div>
+          <div class="plan-select-feature">High volume<br>Batch + library<br>7,500 char limit</div>
+        </div>
+      </div>
+    </div>` : '';
+
+  const btnLabel = isLogin ? 'Log in'
+    : selectedSignupPlan === 'free' ? 'Create free account'
+    : selectedSignupPlan === 'plus' ? 'Sign up & checkout — $9/mo'
+    : 'Sign up & checkout — $29/mo';
+
+  const btnStyle = !isLogin && selectedSignupPlan === 'pro'
+    ? 'background:linear-gradient(135deg,#7c52e0,#5b3fc4)' : '';
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-title">${isLogin ? 'Welcome back' : 'Create your account'}</div>
+    <div class="modal-sub" style="margin-bottom:1.25rem">${isLogin ? 'Log in to continue.' : 'Start free or choose a plan below.'}</div>
+    <div id="modal-msg"></div>
+    ${planSelector}
+    <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="auth-email" placeholder="you@example.com" autocomplete="email"></div>
+    <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="auth-password" placeholder="••••••••" autocomplete="${isLogin ? 'current-password' : 'new-password'}"></div>
+    ${isLogin ? `<div style="text-align:right;margin-top:-6px;margin-bottom:10px;"><a href="/reset" style="font-size:12px;color:var(--accent);text-decoration:none;">Forgot password?</a></div>` : ''}
+    <button class="btn-full btn-primary-full" id="auth-submit" style="${btnStyle}" onclick="${isLogin ? 'submitLogin()' : 'submitSignup()'}">
+      ${btnLabel}
+    </button>
+    <div class="modal-switch">
+      ${isLogin
+        ? `No account? <a onclick="openModal('signup')">Sign up free</a>`
+        : `Already have one? <a onclick="openModal('login')">Log in</a>`}
+    </div>`;
+
+  setTimeout(() => document.getElementById('auth-email')?.focus(), 50);
+  document.getElementById('auth-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') isLogin ? submitLogin() : submitSignup();
+  });
+}
+
+function setModalMsg(msg, type) {
+  document.getElementById('modal-msg').innerHTML = `<div class="modal-${type}">${msg}</div>`;
+}
+
+async function submitLogin() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-password').value;
+  if (!email || !pass) { setModalMsg('Please fill in all fields.', 'error'); return; }
+  const btn = document.getElementById('auth-submit');
+  btn.disabled = true; btn.textContent = 'Logging in…';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { setModalMsg(error.message, 'error'); btn.disabled = false; btn.textContent = 'Log in'; }
+}
+
+async function submitSignup() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-password').value;
+  if (!email || !pass) { setModalMsg('Please fill in all fields.', 'error'); return; }
+  if (pass.length < 6) { setModalMsg('Password must be at least 6 characters.', 'error'); return; }
+
+  const btn  = document.getElementById('auth-submit');
+  const plan = selectedSignupPlan;
+  btn.disabled = true;
+  btn.textContent = plan === 'free' ? 'Creating account…' : 'Creating account…';
+
+  const { error } = await sb.auth.signUp({ email, password: pass });
+
+  if (error) {
+    setModalMsg(error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = plan === 'free' ? 'Create free account' : 'Sign up & checkout';
+    return;
+  }
+
+  if (plan !== 'free') {
+    setModalMsg('Account created! Redirecting to checkout…', 'success');
+    // Poll for session — Supabase may need a moment
+    let attempts = 0;
+    const poll = setInterval(async () => {
+      attempts++;
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        clearInterval(poll);
+        currentSession = session;
+        currentUser    = session.user;
+        try {
+          const res  = await fetch('/api/checkout', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + session.access_token },
+            body: JSON.stringify({ plan })
+          });
+          const d = await res.json();
+          if (d.url) { window.location.href = d.url; return; }
+        } catch(e) {}
+        setModalMsg('Account created! Please log in and upgrade from your Account page.', 'success');
+        btn.disabled = false;
+      } else if (attempts > 10) {
+        clearInterval(poll);
+        setModalMsg('Account created! Check your email to confirm, then log in and upgrade.', 'success');
+        btn.disabled = false;
+      }
+    }, 500);
+  } else {
+    setModalMsg('Account created! Check your email to confirm, then log in.', 'success');
+    btn.disabled = false;
+    btn.textContent = 'Create free account';
+  }
+}
+
+init();
+</script>
+</body>
+</html>

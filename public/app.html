@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokenLens — Prompt Token Estimator</title>
+<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #f8f9fb;
+  --white: #ffffff;
+  --surface2: #f3f4f6;
+  --border: #e5e7eb;
+  --border2: #d1d5db;
+  --text: #111827;
+  --muted: #6b7280;
+  --dim: #9ca3af;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --accent-dark: #1d4ed8;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Geist', sans-serif; font-weight: 400; min-height: 100vh; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* NAV */
+nav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+.nav-logo { display: flex; align-items: center; gap: 0; text-decoration: none; }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.usage-pill { display: flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 5px 12px; font-size: 12px; color: var(--muted); font-family: 'Geist Mono', monospace; }
+.usage-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.usage-dot.warn { background: var(--amber); }
+.usage-dot.danger { background: var(--red); }
+.btn-nav { background: transparent; border: 1px solid var(--border2); border-radius: var(--radius); padding: 7px 16px; font-size: 13px; font-weight: 500; font-family: 'Geist', sans-serif; color: var(--text); cursor: pointer; transition: all 0.15s; }
+.btn-nav:hover { background: var(--surface2); }
+.btn-nav-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-nav-primary:hover { background: var(--accent-dark); }
+
+/* PAGE */
+.page { max-width: 820px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* HERO */
+.hero { text-align: center; padding: 4rem 1.5rem 2.5rem; max-width: 640px; margin: 0 auto; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-light); color: var(--accent); border: 1px solid #bfdbfe; border-radius: 99px; padding: 4px 12px; font-size: 12px; font-weight: 500; margin-bottom: 1.25rem; }
+.hero-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 1rem; }
+h1 span { color: var(--accent); }
+.hero-sub { font-size: 16px; color: var(--muted); max-width: 420px; margin: 0 auto; }
+
+/* AUTH MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.15s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal { background: var(--white); border-radius: var(--radius-xl); box-shadow: var(--shadow); width: 100%; max-width: 400px; padding: 2rem; animation: slideUp 0.2s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.modal-title { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+.modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--text); display: block; margin-bottom: 5px; }
+.form-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'Geist', sans-serif; font-size: 14px; padding: 10px 12px; transition: border-color 0.15s, box-shadow 0.15s; }
+.form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+.btn-full { width: 100%; padding: 11px; border-radius: var(--radius); font-size: 14px; font-weight: 500; font-family: 'Geist', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-primary-full { background: var(--accent); color: white; }
+.btn-primary-full:hover { background: var(--accent-dark); }
+.btn-primary-full:disabled { opacity: 0.5; cursor: not-allowed; }
+.modal-switch { text-align: center; margin-top: 1rem; font-size: 13px; color: var(--muted); }
+.modal-switch a { color: var(--accent); text-decoration: none; cursor: pointer; font-weight: 500; }
+.modal-switch a:hover { text-decoration: underline; }
+.modal-error { background: var(--red-light); border: 1px solid #fecaca; border-radius: var(--radius); padding: 10px 12px; font-size: 12px; color: var(--red); margin-bottom: 14px; }
+.modal-success { background: var(--green-light); border: 1px solid #bbf7d0; border-radius: var(--radius); padding: 10px 12px; font-size: 12px; color: var(--green); margin-bottom: 14px; }
+
+/* MAIN CARD */
+.main-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow); margin-bottom: 1.5rem; overflow: hidden; }
+.card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
+.card-header-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.card-header-sub { font-size: 12px; color: var(--dim); margin-top: 2px; }
+.card-body { padding: 1.5rem; }
+textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); color: var(--text); font-family: 'Geist', sans-serif; font-size: 14px; padding: 14px 16px; min-height: 160px; resize: vertical; line-height: 1.7; transition: border-color 0.15s, box-shadow 0.15s; }
+textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); background: var(--white); }
+textarea::placeholder { color: var(--dim); }
+.input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.char-count { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--dim); }
+.btn-analyze { background: var(--accent); color: white; border: none; border-radius: var(--radius); padding: 10px 22px; font-size: 14px; font-weight: 500; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 8px; }
+.btn-analyze:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
+.btn-analyze:active { transform: translateY(0); }
+.btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* GATE (logged out state) */
+.gate-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow); padding: 3rem 2rem; text-align: center; margin-bottom: 2rem; }
+.gate-icon { font-size: 32px; margin-bottom: 1rem; }
+.gate-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.gate-sub { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; max-width: 340px; margin-left: auto; margin-right: auto; }
+.gate-buttons { display: flex; gap: 10px; justify-content: center; }
+
+/* RESULTS */
+.results-wrap { display: flex; flex-direction: column; gap: 12px; padding-bottom: 4rem; }
+.result-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); overflow: hidden; animation: slideUp 0.3s ease both; }
+.result-card:nth-child(2) { animation-delay: 0.06s; }
+.result-card:nth-child(3) { animation-delay: 0.12s; }
+.result-card:nth-child(4) { animation-delay: 0.18s; }
+.rc-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.rc-title { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.rc-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.rc-body { padding: 1.25rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stat-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+.stat-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 600; color: var(--text); line-height: 1; letter-spacing: -0.02em; }
+.stat-sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
+.breakdown-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.breakdown-row:first-child { padding-top: 0; }
+.breakdown-row:last-child { border-bottom: none; padding-bottom: 0; }
+.breakdown-left { flex: 1; min-width: 0; }
+.breakdown-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.breakdown-detail { font-size: 11px; color: var(--dim); }
+.breakdown-right { text-align: right; flex-shrink: 0; }
+.breakdown-tokens { font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); }
+.breakdown-pct { font-size: 11px; color: var(--dim); }
+.bar-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.bar-fill { height: 100%; border-radius: 2px; }
+.efficient-prompt { background: var(--accent-light); border: 1px solid #bfdbfe; border-radius: var(--radius-lg); padding: 16px; font-size: 14px; color: #1e40af; line-height: 1.7; margin-bottom: 12px; font-style: italic; }
+.savings-badge { display: inline-flex; align-items: center; background: var(--green-light); color: var(--green); border: 1px solid #bbf7d0; border-radius: 99px; font-size: 11px; font-weight: 600; padding: 3px 10px; }
+.btn-copy { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: 'Geist', sans-serif; color: var(--text); cursor: pointer; transition: all 0.15s; }
+.btn-copy:hover { background: var(--border2); }
+.reason-row { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.reason-row:first-child { padding-top: 0; }
+.reason-row:last-child { border-bottom: none; padding-bottom: 0; }
+.reason-num { width: 22px; height: 22px; background: var(--accent-light); color: var(--accent); border-radius: 50%; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.reason-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.loading-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 3rem; color: var(--muted); font-size: 14px; }
+.spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.75s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-state { background: var(--red-light); border: 1px solid #fecaca; border-radius: var(--radius-lg); padding: 14px 16px; font-size: 13px; color: var(--red); }
+.error-state strong { display: block; font-weight: 600; margin-bottom: 3px; }
+.limit-banner { background: var(--amber-light); border: 1px solid #fde68a; border-radius: var(--radius-lg); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; margin-bottom: 12px; }
+.limit-banner-text { color: #92400e; }
+.limit-banner-text strong { font-weight: 600; }
+.btn-upgrade-inline { background: var(--amber); color: white; border: none; border-radius: var(--radius); padding: 7px 16px; font-size: 12px; font-weight: 600; font-family: 'Geist', sans-serif; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.btn-upgrade-inline:hover { opacity: 0.85; }
+
+/* UPGRADE CARD */
+.upgrade-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow); padding: 3rem 2rem; text-align: center; margin-bottom: 2rem; }
+.upgrade-icon { font-size: 32px; margin-bottom: 1rem; }
+.upgrade-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.upgrade-sub { font-size: 14px; color: var(--muted); max-width: 360px; margin: 0 auto 1.75rem; }
+.pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 460px; margin: 0 auto 1.5rem; text-align: left; }
+.pricing-card { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; }
+.pricing-card.featured { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+.pricing-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.pricing-price { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px; }
+.pricing-price span { font-size: 13px; font-weight: 400; color: var(--muted); }
+.pricing-feature { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.pricing-feature::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 11px; flex-shrink: 0; }
+.plan-feature-check { color: var(--green); font-weight: 700; font-size: 11px; flex-shrink: 0; }
+.btn-upgrade-cta { background: var(--accent); color: white; border: none; border-radius: var(--radius); padding: 12px 32px; font-size: 15px; font-weight: 500; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.15s; }
+.btn-upgrade-cta:hover { background: var(--accent-dark); }
+
+footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--dim); border-top: 1px solid var(--border); margin-top: 2rem; }
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--text); }
+
+@media (max-width: 560px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  nav { padding: 0 1rem; }
+  .gate-buttons { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+  </a>
+  <div class="nav-right">
+    <div class="usage-pill" id="usage-pill" style="display:none">
+      <div class="usage-dot" id="usage-dot"></div>
+      <span id="usage-label">— analyses left</span>
+    </div>
+    <button class="btn-nav" id="btn-logout" style="display:none" onclick="logout()">Log out</button>
+    <button class="btn-nav" id="btn-login" onclick="openModal('login')">Log in</button>
+    <button class="btn-nav btn-nav-primary" id="btn-signup" onclick="openModal('signup')">Sign up free</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-badge"><div class="hero-badge-dot"></div>Powered by Claude</div>
+    <h1>Understand your <span>prompt costs</span><br>before they add up</h1>
+    <p class="hero-sub">Get a token breakdown, cost estimate, and a leaner rewrite — instantly.</p>
+  </div>
+
+  <div id="app-body"></div>
+</div>
+
+<footer>
+  TokenLens · Powered by <a href="https://anthropic.com" target="_blank">Anthropic Claude</a> · <a href="#" onclick="showUpgrade()">Upgrade to Pro</a>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="modal" style="display:none" onclick="closeModalOnOverlay(event)">
+  <div class="modal">
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ── Supabase init ─────────────────────────────────
+const { createClient } = supabase;
+let sb;
+
+const COLORS = ['#2563eb','#16a34a','#d97706','#dc2626','#7c3aed','#0891b2'];
+let currentUser = null;
+let currentSession = null;
+
+// ── Boot ──────────────────────────────────────────
+async function boot() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    currentSession = session;
+    await onLoggedIn();
+  } else {
+    onLoggedOut();
+  }
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (session) {
+      currentUser = session.user;
+      currentSession = session;
+      await onLoggedIn();
+    } else {
+      currentUser = null;
+      currentSession = null;
+      onLoggedOut();
+    }
+  });
+}
+
+async function onLoggedIn() {
+  closeModal();
+  document.getElementById('btn-login').style.display = 'none';
+  document.getElementById('btn-signup').style.display = 'none';
+  document.getElementById('btn-logout').style.display = 'block';
+  document.getElementById('usage-pill').style.display = 'flex';
+  await refreshUsage();
+  renderAnalyzer();
+}
+
+function onLoggedOut() {
+  document.getElementById('btn-login').style.display = 'block';
+  document.getElementById('btn-signup').style.display = 'block';
+  document.getElementById('btn-logout').style.display = 'none';
+  document.getElementById('usage-pill').style.display = 'none';
+  renderGate();
+}
+
+async function refreshUsage() {
+  if (!currentUser) return;
+  const { data } = await sb.from('users').select('plan, analyses_today, last_analysis_at').eq('id', currentUser.id).single();
+  if (!data) return;
+
+  const plan = data.plan || 'free';
+  const dot = document.getElementById('usage-dot');
+  const lbl = document.getElementById('usage-label');
+
+  if (plan === 'free') {
+    const now = new Date();
+    const lastAt = data.last_analysis_at ? new Date(data.last_analysis_at) : null;
+    const hoursSinceLast = lastAt ? (now - lastAt) / (1000 * 60 * 60) : 999;
+    const usedToday = hoursSinceLast >= 24 ? 0 : (data.analyses_today || 0);
+    const remaining = Math.max(0, 3 - usedToday);
+    if (remaining > 1) { dot.className = 'usage-dot'; }
+    else if (remaining === 1) { dot.className = 'usage-dot warn'; }
+    else { dot.className = 'usage-dot danger'; }
+    lbl.textContent = remaining + ' / 3 today';
+  } else {
+    dot.className = 'usage-dot';
+    lbl.textContent = plan.charAt(0).toUpperCase() + plan.slice(1) + ' plan';
+  }
+  return data;
+}
+
+async function logout() {
+  await sb.auth.signOut();
+}
+
+// ── RENDER STATES ─────────────────────────────────
+function renderGate() {
+  document.getElementById('app-body').innerHTML = `
+    <div class="gate-card">
+      <div class="gate-icon">🔍</div>
+      <div class="gate-title">Sign up to start analyzing</div>
+      <div class="gate-sub">Create a free account to get 3 analyses included. No credit card required.</div>
+      <div class="gate-buttons">
+        <button class="btn-nav btn-nav-primary" style="padding:10px 24px;font-size:14px;" onclick="openModal('signup')">Create free account</button>
+        <button class="btn-nav" style="padding:10px 24px;font-size:14px;" onclick="openModal('login')">Log in</button>
+      </div>
+    </div>`;
+}
+
+function renderAnalyzer() {
+  document.getElementById('app-body').innerHTML = `
+    <div class="main-card">
+      <div class="card-header">
+        <div class="card-header-title">Analyze a prompt</div>
+        <div class="card-header-sub">Paste any prompt — the wordier the better to see the savings</div>
+      </div>
+      <div class="card-body">
+        <textarea id="prompt-input" placeholder="e.g. You are a helpful assistant. I was wondering if you could please help me write a detailed, comprehensive summary…"></textarea>
+        <div class="input-footer">
+          <span class="char-count" id="char-count">0 characters</span>
+          <button class="btn-analyze" id="analyze-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Analyze prompt
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="results"></div>`;
+
+  document.getElementById('prompt-input').addEventListener('input', function() {
+    document.getElementById('char-count').textContent = this.value.length.toLocaleString() + ' characters';
+  });
+  document.getElementById('analyze-btn').addEventListener('click', analyze);
+  document.getElementById('prompt-input').addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') analyze();
+  });
+}
+
+// ── ANALYZE ───────────────────────────────────────
+async function analyze() {
+  const prompt = document.getElementById('prompt-input')?.value.trim();
+  if (!prompt) return;
+  if (!currentSession) { openModal('login'); return; }
+
+  const btn = document.getElementById('analyze-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Analyzing…';
+
+  document.getElementById('results').innerHTML = `
+    <div class="result-card">
+      <div class="loading-state"><div class="spinner"></div><span>Claude is analyzing your prompt…</span></div>
+    </div>`;
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer ' + currentSession.access_token
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    const data = await res.json();
+
+    if (res.status === 403 && data.error === 'limit_reached') {
+      document.getElementById('results').innerHTML = `
+        <div class="upgrade-card">
+          <div class="upgrade-icon">⏱️</div>
+          <div class="upgrade-title">Daily limit reached</div>
+          <div class="upgrade-sub">You've used all 3 free analyses for today. Your limit resets in <strong>${data.resets_in}</strong> — or upgrade to Pro for unlimited access.</div>
+          <div class="pricing-grid">
+            <div class="pricing-card">
+              <div class="pricing-name">Free</div>
+              <div class="pricing-price">$0 <span>/ month</span></div>
+              <div class="pricing-feature"><span class="plan-feature-check">✓</span> 3 analyses per day</div>
+              <div class="pricing-feature"><span class="plan-feature-check">✓</span> Token breakdown</div>
+              <div class="pricing-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+              <div class="pricing-feature" style="opacity:0.4">✗ Full optimization</div>
+            </div>
+            <div class="pricing-card featured">
+              <div class="pricing-name" style="color:var(--accent)">Pro</div>
+              <div class="pricing-price">$9 <span>/ month</span></div>
+              <div class="pricing-feature"><span class="plan-feature-check">✓</span> Unlimited analyses</div>
+              <div class="pricing-feature"><span class="plan-feature-check">✓</span> Token breakdown</div>
+              <div class="pricing-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+              <div class="pricing-feature"><span class="plan-feature-check">✓</span> Full optimization</div>
+            </div>
+          </div>
+          <button class="btn-upgrade-cta" onclick="alert('Stripe coming soon!')">Upgrade to Pro — $9/mo</button>
+        </div>`;
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Analyze prompt';
+      return;
+    }
+
+    if (!res.ok) throw new Error(data.error || 'Server error ' + res.status);
+
+    await refreshUsage();
+    renderResults(data);
+
+    // Show banner based on remaining uses
+    if (data.usage && data.usage.remaining === 0) {
+      const banner = document.createElement('div');
+      banner.className = 'limit-banner';
+      banner.innerHTML = `
+        <div class="limit-banner-text"><strong>That was your last free analysis today.</strong> Resets in 24 hours — or upgrade for unlimited.</div>
+        <button class="btn-upgrade-inline" onclick="showUpgrade()">Upgrade to Pro</button>`;
+      document.getElementById('results').prepend(banner);
+    } else if (data.usage && data.usage.remaining === 1) {
+      const banner = document.createElement('div');
+      banner.className = 'limit-banner';
+      banner.innerHTML = `
+        <div class="limit-banner-text"><strong>1 free analysis remaining today.</strong> Upgrade for unlimited access.</div>
+        <button class="btn-upgrade-inline" onclick="showUpgrade()">Upgrade to Pro</button>`;
+      document.getElementById('results').prepend(banner);
+    }
+
+  } catch(err) {
+    document.getElementById('results').innerHTML =
+      `<div class="error-state"><strong>Something went wrong</strong>${err.message}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Analyze prompt';
+}
+
+// ── RENDER RESULTS ────────────────────────────────
+function renderResults(d) {
+  const maxTok = Math.max(...d.breakdown.map(b => b.tokens), 1);
+  const savings = d.savings_percent || 0;
+  const effTokens = d.efficient_tokens || Math.round((d.estimated_tokens || 0) * (1 - savings / 100));
+  const cost = typeof d.cost_estimate_usd === 'number' ? '$' + d.cost_estimate_usd.toFixed(5) : 'N/A';
+
+  const breakdownHTML = d.breakdown.map((item, i) => {
+    const pct = Math.round((item.tokens / Math.max(d.estimated_tokens, 1)) * 100);
+    const barW = Math.round((item.tokens / maxTok) * 100);
+    return `<div class="breakdown-row">
+      <div class="breakdown-left">
+        <div class="breakdown-name">${item.category}</div>
+        <div class="breakdown-detail">${item.detail}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:${COLORS[i % COLORS.length]}"></div></div>
+      </div>
+      <div class="breakdown-right">
+        <div class="breakdown-tokens">${item.tokens.toLocaleString()}</div>
+        <div class="breakdown-pct">${pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const reasonsHTML = (d.reasons || []).map((r, i) => `
+    <div class="reason-row">
+      <div class="reason-num">${i + 1}</div>
+      <div class="reason-text">${r}</div>
+    </div>`).join('');
+
+  document.getElementById('results').innerHTML = `
+    <div class="results-wrap">
+      <div class="result-card">
+        <div class="rc-header"><div class="rc-title"><div class="rc-icon" style="background:#eff6ff">📊</div>Token summary</div></div>
+        <div class="rc-body">
+          <div class="stats-grid">
+            <div class="stat-box"><div class="stat-label">Input tokens</div><div class="stat-value">${(d.estimated_tokens||0).toLocaleString()}</div><div class="stat-sub">your prompt</div></div>
+            <div class="stat-box"><div class="stat-label">Est. cost</div><div class="stat-value">${cost}</div><div class="stat-sub">Sonnet input rate</div></div>
+            <div class="stat-box"><div class="stat-label">Optimized to</div><div class="stat-value">${effTokens.toLocaleString()}</div><div class="stat-sub" style="color:var(--green);font-weight:500">${savings}% reduction</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="rc-header"><div class="rc-title"><div class="rc-icon" style="background:#f0fdf4">🔍</div>Token breakdown</div></div>
+        <div class="rc-body">${breakdownHTML}</div>
+      </div>
+      <div class="result-card">
+        <div class="rc-header"><div class="rc-title"><div class="rc-icon" style="background:#eff6ff">✨</div>Efficient alternative</div><span class="savings-badge">−${savings}% tokens</span></div>
+        <div class="rc-body">
+          ${d.optimization_locked ? `
+            <div style="position:relative;margin-bottom:12px;">
+              <div class="efficient-prompt" style="margin-bottom:0">${d.efficient_prompt_teaser}…</div>
+              <div style="position:relative;margin-top:-2px;height:80px;background:linear-gradient(to bottom,rgba(239,246,255,0.4),rgba(239,246,255,1));border-radius:0 0 var(--radius-lg) var(--radius-lg);display:flex;align-items:flex-end;justify-content:center;padding-bottom:0;"></div>
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;text-align:center;margin-top:0;">
+                <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">🔒 Full optimization is a Pro feature</div>
+                <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Upgrade to see the complete rewrite and why each change was made.</div>
+                <button class="btn-upgrade-cta" style="padding:9px 22px;font-size:13px;" onclick="showUpgrade()">Upgrade to Pro →</button>
+              </div>
+            </div>` : `
+            <div class="efficient-prompt" id="efficient-text">${d.efficient_prompt}</div>
+            <button class="btn-copy" id="copy-btn">Copy alternative</button>`}
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="rc-header"><div class="rc-title"><div class="rc-icon" style="background:#fefce8">💡</div>Why it works better</div></div>
+        <div class="rc-body">${reasonsHTML}</div>
+      </div>
+    </div>`;
+
+  if (!d.optimization_locked) {
+    document.getElementById('copy-btn').addEventListener('click', function() {
+      const txt = document.getElementById('efficient-text')?.textContent;
+      if (!txt) return;
+      navigator.clipboard.writeText(txt).then(() => {
+        this.textContent = '✓ Copied!';
+        setTimeout(() => { this.textContent = 'Copy alternative'; }, 1800);
+      });
+    });
+  }
+
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── UPGRADE ───────────────────────────────────────
+function showUpgrade() {
+  document.getElementById('results').innerHTML = `
+    <div class="upgrade-card">
+      <div class="upgrade-icon">⚡</div>
+      <div class="upgrade-title">Upgrade to Pro</div>
+      <div class="upgrade-sub">You've used all your free analyses. Upgrade for unlimited access.</div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-name">Free</div>
+          <div class="pricing-price">$0 <span>/ month</span></div>
+          <div class="pricing-feature">3 analyses total</div>
+          <div class="pricing-feature">Token breakdown</div>
+          <div class="pricing-feature">Efficient rewrite</div>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-name" style="color:var(--accent)">Pro</div>
+          <div class="pricing-price">$9 <span>/ month</span></div>
+          <div class="pricing-feature">Unlimited analyses</div>
+          <div class="pricing-feature">Token breakdown</div>
+          <div class="pricing-feature">Efficient rewrite</div>
+          <div class="pricing-feature">Priority processing</div>
+          <div class="pricing-feature">Usage history</div>
+        </div>
+      </div>
+      <button class="btn-upgrade-cta" onclick="alert('Connect Stripe here!')">Upgrade to Pro — $9/mo</button>
+      <p style="font-size:12px;color:var(--dim);margin-top:12px">Secure payment via Stripe · Cancel anytime</p>
+    </div>`;
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── AUTH MODAL ────────────────────────────────────
+function openModal(mode) {
+  document.getElementById('modal').style.display = 'flex';
+  renderModal(mode);
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+function renderModal(mode) {
+  const isLogin = mode === 'login';
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-title">${isLogin ? 'Welcome back' : 'Create your account'}</div>
+    <div class="modal-sub">${isLogin ? 'Log in to continue analyzing prompts.' : 'Free account includes 3 analyses. No credit card needed.'}</div>
+    <div id="modal-msg"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" type="email" id="auth-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" type="password" id="auth-password" placeholder="••••••••" autocomplete="${isLogin ? 'current-password' : 'new-password'}">
+    </div>
+    <button class="btn-full btn-primary-full" id="auth-submit" onclick="${isLogin ? 'submitLogin()' : 'submitSignup()'}">
+      ${isLogin ? 'Log in' : 'Create account'}
+    </button>
+    <div class="modal-switch">
+      ${isLogin
+        ? `Don't have an account? <a onclick="renderModal('signup')">Sign up free</a>`
+        : `Already have an account? <a onclick="renderModal('login')">Log in</a>`}
+    </div>`;
+
+  setTimeout(() => document.getElementById('auth-email')?.focus(), 50);
+
+  document.getElementById('auth-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') isLogin ? submitLogin() : submitSignup();
+  });
+}
+
+function setModalMsg(msg, type) {
+  document.getElementById('modal-msg').innerHTML =
+    `<div class="modal-${type}">${msg}</div>`;
+}
+
+async function submitLogin() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  if (!email || !password) { setModalMsg('Please fill in all fields.', 'error'); return; }
+
+  const btn = document.getElementById('auth-submit');
+  btn.disabled = true;
+  btn.textContent = 'Logging in…';
+
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    setModalMsg(error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Log in';
+  }
+}
+
+async function submitSignup() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  if (!email || !password) { setModalMsg('Please fill in all fields.', 'error'); return; }
+  if (password.length < 6) { setModalMsg('Password must be at least 6 characters.', 'error'); return; }
+
+  const btn = document.getElementById('auth-submit');
+  btn.disabled = true;
+  btn.textContent = 'Creating account…';
+
+  const { error } = await sb.auth.signUp({ email, password });
+  if (error) {
+    setModalMsg(error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Create account';
+  } else {
+    setModalMsg('Account created! Check your email to confirm, then log in.', 'success');
+    btn.disabled = false;
+    btn.textContent = 'Create account';
+  }
+}
+
+async function init() {
+  const res = await fetch('/api/config');
+  const { supabaseUrl, supabaseAnonKey } = await res.json();
+  sb = createClient(supabaseUrl, supabaseAnonKey);
+  boot();
+}
+
+init();
+</script>
+</body>
+</html>
