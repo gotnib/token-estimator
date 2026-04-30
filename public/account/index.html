@@ -240,7 +240,7 @@ async function init() {
     .eq('id', session.user.id).single();
   profile = data;
 
-  if (profile?.plan === 'pro') document.getElementById('nav-library').style.display = 'block';
+  if (profile?.plan === 'pro') { document.getElementById('nav-library').style.display = 'block'; document.getElementById('mobile-nav-library').style.display = 'block'; }
   renderNavPill(profile?.plan || 'free');
 
   // Show success banner if redirected after upgrade
