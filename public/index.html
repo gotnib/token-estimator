@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://tokenlens.live/">
 <meta property="og:title" content="TokenLens — AI Prompt Token Estimator & Optimizer">
 <meta property="og:description" content="See exactly where your AI prompt tokens are going, what they cost, and how to cut them down — without losing any meaning. Free token breakdown and optimized rewrite instantly.">
-<meta property="og:image" content="https://tokenlens.live/og-image.png?v=2">
+<meta property="og:image" content="https://tokenlens.live/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:site_name" content="TokenLens">
@@ -389,6 +389,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
   .how-steps { grid-template-columns: 1fr; }
   .how-steps::before { display: none; }
   .pricing-grid { grid-template-columns: 1fr; }
+  #pricing-grid { grid-template-columns: 1fr !important; max-width: 100% !important; }
   .testimonials-grid { grid-template-columns: 1fr; }
   .stats-inner { grid-template-columns: 1fr; gap: 2rem; }
   .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
@@ -549,7 +550,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
   <div class="section-title">Simple, honest pricing</div>
   <div class="section-sub" style="margin:0 auto">Start free. Upgrade when you're ready. No tricks, no hidden fees.</div>
 
-  <div class="pricing-grid" style="grid-template-columns:repeat(3,1fr);max-width:900px;align-items:stretch;">
+  <div class="pricing-grid" style="grid-template-columns:repeat(3,1fr);max-width:900px;align-items:stretch;" id="pricing-grid">
 
     <div class="pricing-card" style="display:flex;flex-direction:column;">
       <div>
