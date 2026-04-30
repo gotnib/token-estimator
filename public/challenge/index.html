@@ -401,7 +401,7 @@ async function init() {
       .eq('id', session.user.id).single();
     userPlan = profile?.plan || 'free';
 
-    if (userPlan === 'pro') document.getElementById('nav-library').style.display = 'block';
+    if (userPlan === 'pro') { document.getElementById('nav-library').style.display = 'block'; document.getElementById('mobile-nav-library').style.display = 'block'; }
     renderNavPill(userPlan);
     updateCounter(profile);
 
