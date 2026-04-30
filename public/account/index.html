@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account | TokenLens</title>
+<meta name="description" content="Manage your TokenLens account, plan, and billing.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://tokenlens.live/account">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tokenlens.live/account">
+<meta property="og:title" content="Account | TokenLens">
+<meta property="og:description" content="Manage your TokenLens account, plan, and billing.">
+<meta property="og:image" content="https://tokenlens.live/og-image.png">
+<meta property="og:site_name" content="TokenLens">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Account | TokenLens">
+<meta name="twitter:description" content="Manage your TokenLens account, plan, and billing.">
+<meta name="twitter:image" content="https://tokenlens.live/og-image.png">
+<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#f8f9fb;--white:#fff;--surface2:#f3f4f6;--border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;--dim:#9ca3af;
+  --accent:#2563eb;--accent-light:#eff6ff;--accent-dark:#1d4ed8;--accent2:#7c52e0;
+  --green:#16a34a;--green-light:#f0fdf4;--amber:#d97706;--amber-light:#fffbeb;
+  --red:#dc2626;--red-light:#fef2f2;--gold:#b45309;--gold-light:#fef3c7;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+.nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;text-decoration:none;}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+.nav-link.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.btn-nav:hover{background:var(--surface2);}
+
+.page{max-width:700px;margin:0 auto;padding:2.5rem 1.5rem 6rem;}
+.page-header{margin-bottom:2rem;}
+.page-title{font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-bottom:4px;}
+.page-sub{font-size:14px;color:var(--muted);}
+
+.section{margin-bottom:1.25rem;}
+.section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:8px;font-family:'Geist Mono',monospace;}
+
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);overflow:hidden;}
+
+.plan-header{padding:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.plan-badge-wrap{display:flex;align-items:center;gap:12px;}
+.plan-icon{width:48px;height:48px;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.plan-name-text{font-size:18px;font-weight:600;letter-spacing:-0.01em;}
+.plan-desc-text{font-size:13px;color:var(--muted);margin-top:2px;}
+.status-pill{display:inline-flex;align-items:center;gap:5px;border-radius:99px;font-size:11px;font-weight:600;padding:4px 12px;}
+.status-pill.active{background:var(--green-light);color:var(--green);border:1px solid #bbf7d0;}
+.status-pill.cancelling{background:var(--amber-light);color:var(--amber);border:1px solid #fde68a;}
+.status-pill.free{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+
+.plan-divider{height:1px;background:var(--border);}
+.plan-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.plan-stat{padding:1.25rem 1.5rem;border-right:1px solid var(--border);text-align:center;}
+.plan-stat:last-child{border-right:none;}
+.plan-stat-value{font-size:22px;font-weight:600;letter-spacing:-0.02em;margin-bottom:3px;}
+.plan-stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
+.plan-stat-sub{font-size:11px;color:var(--dim);margin-top:2px;font-family:'Geist Mono',monospace;}
+
+.usage-section{padding:1.25rem 1.5rem;}
+.usage-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.usage-label-text{font-size:13px;font-weight:500;}
+.usage-numbers{font-size:12px;color:var(--muted);font-family:'Geist Mono',monospace;}
+.usage-bar-track{height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+.usage-bar-fill{height:100%;border-radius:99px;transition:width 0.6s cubic-bezier(0.16,1,0.3,1);}
+.usage-reset{font-size:11px;color:var(--dim);margin-top:6px;font-family:'Geist Mono',monospace;}
+
+.detail-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid var(--border);gap:12px;}
+.detail-row:last-child{border-bottom:none;}
+.detail-label{font-size:13px;color:var(--muted);flex-shrink:0;}
+.detail-value{font-size:13px;font-weight:500;color:var(--text);text-align:right;}
+.detail-value.mono{font-family:'Geist Mono',monospace;font-size:12px;}
+
+/* UPGRADE BANNER */
+.upgrade-banner{background:linear-gradient(135deg,var(--accent-light),#f5f3ff);border:1px solid #c4b5fd;border-radius:var(--radius-xl);padding:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.upgrade-banner-text h3{font-size:15px;font-weight:600;margin-bottom:4px;}
+.upgrade-banner-text p{font-size:13px;color:var(--muted);}
+.upgrade-banner-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
+.btn-upgrade-plus{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:9px 18px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-upgrade-plus:hover{background:var(--accent-dark);}
+.btn-upgrade-plus:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-upgrade-pro{background:linear-gradient(135deg,#7c52e0,#5b3fc4);color:white;border:none;border-radius:var(--radius);padding:9px 18px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-upgrade-pro:hover{opacity:0.9;}
+.btn-upgrade-pro:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* CANCELLING NOTICE */
+.cancelling-notice{background:var(--amber-light);border:1px solid #fde68a;border-radius:var(--radius-lg);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.cancelling-notice p{font-size:13px;color:#92400e;}
+.cancelling-notice strong{font-weight:600;}
+
+/* BUTTONS */
+.btn-cancel-plan{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.btn-cancel-plan:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-light);}
+.btn-cancel-plan:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-danger{background:transparent;border:1px solid #fecaca;border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--red);cursor:pointer;transition:all 0.15s;}
+.btn-danger:hover{background:var(--red-light);border-color:var(--red);}
+
+/* FEATURE ROWS */
+.feature-check-yes{font-size:13px;font-weight:600;color:var(--green);}
+.feature-check-no{font-size:13px;font-weight:600;color:var(--dim);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.modal{background:var(--white);border-radius:var(--radius-xl);box-shadow:var(--shadow);width:100%;max-width:420px;padding:2rem;}
+.modal-title{font-size:18px;font-weight:600;margin-bottom:8px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem;line-height:1.6;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.btn-modal-cancel{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:9px 18px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--muted);cursor:pointer;}
+.btn-modal-cancel:hover{background:var(--surface2);}
+.btn-modal-confirm{background:var(--red);color:white;border:none;border-radius:var(--radius);padding:9px 18px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;}
+.btn-modal-confirm:hover{opacity:0.85;}
+.btn-modal-confirm:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* SUCCESS BANNER */
+.success-banner{background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius-lg);padding:14px 16px;font-size:13px;color:var(--green);margin-bottom:1.25rem;font-weight:500;}
+
+.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.75s linear infinite;margin:4rem auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--dim);border-top:1px solid var(--border);}
+footer a{color:var(--muted);text-decoration:none;}
+
+@media(max-width:560px){
+  .plan-stats{grid-template-columns:1fr;}
+  .plan-stat{border-right:none;border-bottom:1px solid var(--border);}
+  .plan-stat:last-child{border-bottom:none;}
+  nav{padding:0 1rem;}
+}
+
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:var(--radius);}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;position:absolute;top:60px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:99;padding:0.75rem 1.25rem 1rem;}
+.mobile-menu.open{display:block;}
+.mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:var(--radius);border:none;background:none;font-family:'Geist',sans-serif;cursor:pointer;transition:background 0.15s;}
+.mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface2);}
+.mobile-menu a.active{color:var(--accent);background:var(--accent-light);}
+.mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
+.mobile-plan-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:12px;color:var(--muted);}
+@media(max-width:640px){
+  .nav-links,.nav-right .btn-nav{display:none!important;}
+  .hamburger{display:flex;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+  <a class="nav-logo" href="/">
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="/app">Analyzer</a>
+    <a class="nav-link" href="/challenge">Challenge</a>
+    <a class="nav-link" href="/library" id="nav-library" style="display:none">Library</a>
+    <a class="nav-link active" href="/account">Account</a>
+  </div>
+  <div class="nav-right">
+    <div id="nav-plan-pill"></div>
+    <button class="btn-nav" onclick="logout()">Log out</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-plan-row"><span id="mobile-plan-pill"></span></div>
+  <div class="mobile-menu-divider"></div>
+  <a href="/app">Analyzer</a>
+  <a href="/challenge">Challenge</a>
+  <a href="/library" id="mobile-nav-library" style="display:none">Library</a>
+  <a href="/account" class="active">Account</a>
+  <div class="mobile-menu-divider"></div>
+  <button onclick="logout();toggleMobileMenu()">Log out</button>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">Account</div>
+    <div class="page-sub">Manage your plan and account settings</div>
+  </div>
+  <div id="content"><div class="spinner"></div></div>
+</div>
+
+<footer>TokenLens · <a href="/app">Back to Analyzer</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></footer>
+
+<div class="modal-overlay" id="modal" style="display:none">
+  <div class="modal"><div id="modal-body"></div></div>
+</div>
+
+<script>
+const { createClient } = supabase;
+let sb, session, profile;
+
+const PLAN_CONFIG = {
+  free:  { label: 'Free',  icon: '🔍', desc: 'Basic access · 3 analyses per day',       limit: 3,   period: 'day',   charLimit: '1,500' },
+  plus:  { label: 'Plus',  icon: '⚡', desc: 'Regular access · 120 analyses per month',  limit: 120, period: 'month', charLimit: '5,000' },
+  pro:   { label: 'Pro',   icon: '🚀', desc: 'High volume · Priority processing',        limit: 600, period: 'month', charLimit: '7,500' }
+};
+
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn  = document.getElementById('hamburger');
+  const open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  const pill = document.getElementById('nav-plan-pill');
+  if (pill) document.getElementById('mobile-plan-pill').innerHTML = pill.innerHTML;
+}
+
+async function init() {
+  const cfgRes = await fetch('/api/config');
+  const { supabaseUrl, supabaseAnonKey } = await cfgRes.json();
+  sb = createClient(supabaseUrl, supabaseAnonKey);
+
+  const { data: { session: s } } = await sb.auth.getSession();
+  if (!s) { window.location.href = '/app'; return; }
+  session = s;
+
+  const { data } = await sb.from('users')
+    .select('plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
+    .eq('id', session.user.id).single();
+  profile = data;
+
+  if (profile?.plan === 'pro') document.getElementById('nav-library').style.display = 'block';
+  renderNavPill(profile?.plan || 'free');
+
+  // Show success banner if redirected after upgrade
+  if (window.location.search.includes('upgraded=true')) {
+    window.history.replaceState({}, '', '/account');
+  }
+
+  renderContent();
+}
+
+async function logout() { await sb.auth.signOut(); window.location.href = '/'; }
+
+function renderNavPill(plan) {
+  const styles = { free: 'color:#111827', plus: 'color:#7c52e0', pro: 'color:#b45309' };
+  const labels = { free: 'FREE', plus: 'PLUS', pro: 'PRO' };
+  document.getElementById('nav-plan-pill').innerHTML =
+    `<span style="${styles[plan] || styles.free};font-weight:600;font-size:13px;">${labels[plan] || 'FREE'}</span>`;
+}
+
+function renderContent() {
+  const plan    = profile?.plan || 'free';
+  const cfg     = PLAN_CONFIG[plan];
+  const status  = profile?.subscription_status || (plan === 'free' ? 'free' : 'active');
+  const now     = new Date();
+  const email   = session.user.email;
+  const joined  = new Date(session.user.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const expiresAt = profile?.plan_expires_at ? new Date(profile.plan_expires_at) : null;
+
+  // ── Usage ──
+  let used = 0, resetStr = '';
+  if (plan === 'free') {
+    const lastAt = profile?.last_analysis_at ? new Date(profile.last_analysis_at) : null;
+    const hrs    = lastAt ? (now - lastAt) / 3600000 : 999;
+    used = hrs >= 24 ? 0 : (profile?.analyses_today || 0);
+    resetStr = lastAt && hrs < 24
+      ? `Resets in ${formatTimeUntil(new Date(lastAt.getTime() + 86400000))}`
+      : 'Resets every 24 hours';
+  } else if (plan === 'plus') {
+    const start = profile?.period_start_at ? new Date(profile.period_start_at) : null;
+    const days  = start ? (now - start) / 86400000 : 999;
+    used = days >= 30 ? 0 : (profile?.analyses_this_period || 0);
+    resetStr = start && days < 30
+      ? `Resets in ${formatDaysUntil(new Date(start.getTime() + 30 * 86400000))}`
+      : 'Resets every 30 days';
+  } else {
+    const start = profile?.pro_period_start_at ? new Date(profile.pro_period_start_at) : null;
+    const days  = start ? (now - start) / 86400000 : 999;
+    used = days >= 30 ? 0 : (profile?.pro_analyses_this_period || 0);
+    resetStr = start && days < 30
+      ? `Resets in ${formatDaysUntil(new Date(start.getTime() + 30 * 86400000))}`
+      : 'Resets every 30 days';
+  }
+
+  const limit     = cfg.limit;
+  const remaining = Math.max(0, limit - used);
+  const pct       = Math.min(100, Math.round((used / limit) * 100));
+  const barColor  = pct >= 90 ? 'var(--red)' : pct >= 70 ? 'var(--amber)' : 'var(--accent)';
+
+  // ── Status pill ──
+  const statusPill = status === 'cancelling'
+    ? `<span class="status-pill cancelling">⚠ Cancels ${expiresAt ? expiresAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'soon'}</span>`
+    : plan === 'free'
+    ? `<span class="status-pill free">Free plan</span>`
+    : `<span class="status-pill active">● Active</span>`;
+
+  // ── Cancelling notice ──
+  const cancellingNotice = status === 'cancelling' && expiresAt ? `
+    <div class="cancelling-notice">
+      <p>Your <strong>${cfg.label}</strong> plan is cancelled and will remain active until <strong>${expiresAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</strong>. After that you'll be moved to Free.</p>
+    </div>` : '';
+
+  // ── Upgrade prompt if redirected ──
+  const upgradedBanner = window.location.search.includes('upgraded=true')
+    ? `<div class="success-banner">🎉 Welcome to ${cfg.label}! Your plan has been upgraded.</div>` : '';
+
+  // ── Upgrade banner ──
+  let upgradeBanner = '';
+  if (plan === 'free') {
+    upgradeBanner = `
+      <div class="section">
+        <div class="upgrade-banner">
+          <div class="upgrade-banner-text">
+            <h3>Unlock more with Plus or Pro</h3>
+            <p>Full optimization, higher limits, batch processing and more.</p>
+          </div>
+          <div class="upgrade-banner-actions">
+            <button class="btn-upgrade-plus" onclick="startCheckout('plus')">Upgrade to Plus — $9/mo</button>
+            <button class="btn-upgrade-pro" onclick="startCheckout('pro')">Upgrade to Pro — $29/mo</button>
+          </div>
+        </div>
+      </div>`;
+  } else if (plan === 'plus' && status !== 'cancelling') {
+    upgradeBanner = `
+      <div class="section">
+        <div class="card" style="overflow:hidden;">
+          <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="font-size:13px;font-weight:600;">Upgrade to Pro</div>
+              <div style="font-size:12px;color:var(--dim);margin-top:2px;">Get more power for high-volume work</div>
+            </div>
+            <button class="btn-upgrade-pro" onclick="startCheckout('pro')">Upgrade to Pro — $29/mo</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+            <div style="padding:1.25rem 1.5rem;border-right:1px solid var(--border);">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:12px;font-family:'Geist Mono',monospace;">Your current — Plus</div>
+              ${compareRow('120 analyses / month', true)}
+              ${compareRow('Full optimization', true)}
+              ${compareRow('5,000 char limit', true)}
+              ${compareRow('Batch optimization', false)}
+              ${compareRow('Prompt history & library', false)}
+              ${compareRow('Priority processing', false)}
+              ${compareRow('7,500 char limit', false)}
+            </div>
+            <div style="padding:1.25rem 1.5rem;background:linear-gradient(160deg,rgba(124,82,224,0.03),transparent);">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2);margin-bottom:12px;font-family:'Geist Mono',monospace;">Pro plan</div>
+              ${compareRow('High volume usage', true, true)}
+              ${compareRow('Full optimization', true, true)}
+              ${compareRow('7,500 char limit', true, true)}
+              ${compareRow('Batch optimization (15 prompts)', true, true)}
+              ${compareRow('Prompt history & library', true, true)}
+              ${compareRow('Priority processing', true, true)}
+              ${compareRow('Challenge mode — unlimited', true, true)}
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('content').innerHTML = `
+    ${upgradedBanner}
+    ${cancellingNotice}
+    ${upgradeBanner}
+
+    <div class="section">
+      <div class="section-label">Your plan</div>
+      <div class="card">
+        <div class="plan-header">
+          <div class="plan-badge-wrap">
+            <div class="plan-icon" style="background:${plan === 'pro' ? 'var(--gold-light)' : plan === 'plus' ? 'var(--accent-light)' : 'var(--surface2)'}">
+              ${cfg.icon}
+            </div>
+            <div>
+              <div class="plan-name-text">${cfg.label}</div>
+              <div class="plan-desc-text">${cfg.desc}</div>
+            </div>
+          </div>
+          ${statusPill}
+        </div>
+        <div class="plan-divider"></div>
+        <div class="plan-stats">
+          <div class="plan-stat">
+            ${plan === 'pro'
+              ? `<div class="plan-stat-value" style="color:var(--gold);font-size:17px;margin-bottom:6px;">High Volume</div>
+                 <div class="plan-stat-label">Usage type</div>
+                 <div class="plan-stat-sub">fair use policy</div>`
+              : `<div class="plan-stat-value" style="color:var(--accent)">${remaining.toLocaleString()}</div>
+                 <div class="plan-stat-label">Analyses left</div>
+                 <div class="plan-stat-sub">of ${limit} / ${cfg.period}</div>`}
+          </div>
+          <div class="plan-stat">
+            <div class="plan-stat-value">${used.toLocaleString()}</div>
+            <div class="plan-stat-label">Used</div>
+            <div class="plan-stat-sub">this ${cfg.period}</div>
+          </div>
+          <div class="plan-stat">
+            <div class="plan-stat-value">${cfg.charLimit}</div>
+            <div class="plan-stat-label">Char limit</div>
+            <div class="plan-stat-sub">per prompt</div>
+          </div>
+        </div>
+        <div class="plan-divider"></div>
+        ${plan === 'pro'
+          ? `<div class="usage-section">
+               <div class="usage-row">
+                 <span class="usage-label-text">Usage this month</span>
+                 <span class="usage-numbers">${used.toLocaleString()} analyses</span>
+               </div>
+               <div class="usage-reset">${resetStr}</div>
+             </div>`
+          : `<div class="usage-section">
+               <div class="usage-row">
+                 <span class="usage-label-text">Usage this ${cfg.period}</span>
+                 <span class="usage-numbers">${used} / ${limit}</span>
+               </div>
+               <div class="usage-bar-track">
+                 <div class="usage-bar-fill" style="width:${pct}%;background:${barColor}"></div>
+               </div>
+               <div class="usage-reset">${resetStr}</div>
+             </div>`}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Account details</div>
+      <div class="card">
+        <div class="detail-row">
+          <span class="detail-label">Email</span>
+          <span class="detail-value">${email}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Member since</span>
+          <span class="detail-value">${joined}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Plan</span>
+          <span class="detail-value">${cfg.label}</span>
+        </div>
+        ${expiresAt && status === 'cancelling' ? `
+        <div class="detail-row">
+          <span class="detail-label">Access until</span>
+          <span class="detail-value">${expiresAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+        </div>` : ''}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Plan features</div>
+      <div class="card">
+        ${featureRow('Token breakdown', true)}
+        ${featureRow('Cost estimate', true)}
+        ${featureRow('Full optimization', plan === 'plus' || plan === 'pro')}
+        ${featureRow('Batch optimization (15 prompts)', plan === 'pro')}
+        ${featureRow('Prompt history & library', plan === 'pro')}
+        ${featureRow('Priority processing', plan === 'pro')}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Billing & subscription</div>
+      <div class="card">
+        ${plan !== 'free' && status !== 'cancelling' ? `
+        <div class="detail-row">
+          <div>
+            <div style="font-size:13px;font-weight:500;">Cancel subscription</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">You'll keep access until the end of your billing period.</div>
+          </div>
+          <button class="btn-cancel-plan" onclick="confirmCancel()">Cancel plan</button>
+        </div>` : ''}
+        ${status === 'cancelling' ? `
+        <div class="detail-row">
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--amber);">Subscription cancelling</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">Access continues until ${expiresAt ? expiresAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : 'end of period'}.</div>
+          </div>
+        </div>` : ''}
+        <div class="detail-row">
+          <div>
+            <div style="font-size:13px;font-weight:500;">Billing portal</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">View invoices and manage payment methods via Stripe.</div>
+          </div>
+          <button class="btn-cancel-plan" id="billing-portal-btn" onclick="openBillingPortal()">Manage billing</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Danger zone</div>
+      <div class="card" style="border-color:#fecaca;">
+        <div class="detail-row">
+          <div>
+            <div style="font-size:13px;font-weight:500;">Deactivate account</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">Blocks access and cancels your subscription. Your data is kept but not accessible.</div>
+          </div>
+          <button class="btn-danger" onclick="confirmDeactivate()">Deactivate</button>
+        </div>
+        <div class="detail-row">
+          <div>
+            <div style="font-size:13px;font-weight:500;">Sign out</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">End your current session.</div>
+          </div>
+          <button class="btn-danger" onclick="logout()">Sign out</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function compareRow(label, included, isPro) {
+  const color = included ? (isPro ? 'var(--accent2)' : 'var(--green)') : 'var(--dim)';
+  const icon  = included ? '✓' : '✗';
+  return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+    <span style="font-size:11px;font-weight:700;color:${color};flex-shrink:0;">${icon}</span>
+    <span style="font-size:12px;color:${included ? 'var(--text)' : 'var(--dim)'};">${label}</span>
+  </div>`;
+}
+
+function featureRow(label, enabled) {
+  return `<div class="detail-row">
+    <span class="detail-label">${label}</span>
+    <span class="${enabled ? 'feature-check-yes' : 'feature-check-no'}">${enabled ? '✓ Included' : '✗ Not on your plan'}</span>
+  </div>`;
+}
+
+function formatTimeUntil(date) {
+  const ms   = date - new Date();
+  const h    = Math.floor(ms / 3600000);
+  const m    = Math.ceil((ms % 3600000) / 60000);
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+function formatDaysUntil(date) {
+  const days = Math.ceil((date - new Date()) / 86400000);
+  return `${days} day${days !== 1 ? 's' : ''}`;
+}
+
+// ── STRIPE CHECKOUT / UPGRADE ─────────────────────
+async function startCheckout(plan) {
+  const btns = document.querySelectorAll('.btn-upgrade-plus, .btn-upgrade-pro');
+  btns.forEach(b => { b.disabled = true; b.textContent = 'Loading…'; });
+
+  try {
+    const res  = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ plan })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    if (data.upgraded) {
+      // Instant plan swap — no redirect needed, just reload
+      const { data: updated } = await sb.from('users')
+        .select('plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
+        .eq('id', session.user.id).single();
+      profile = updated;
+      renderNavPill(profile?.plan || 'free');
+      renderContent();
+      // Show success flash
+      const flash = document.createElement('div');
+      flash.style.cssText = 'position:fixed;top:80px;right:24px;background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius-lg);padding:12px 20px;font-size:13px;color:var(--green);font-weight:500;z-index:200;box-shadow:var(--shadow);';
+      flash.textContent = `✓ Upgraded to ${plan.charAt(0).toUpperCase() + plan.slice(1)}!`;
+      document.body.appendChild(flash);
+      setTimeout(() => flash.remove(), 3000);
+    } else if (data.url) {
+      window.location.href = data.url;
+    }
+  } catch(err) {
+    alert('Could not start checkout: ' + err.message);
+    btns.forEach(b => { b.disabled = false; });
+    renderContent();
+  }
+}
+
+// ── BILLING PORTAL ────────────────────────────────
+async function openBillingPortal() {
+  const btn = document.getElementById('billing-portal-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+
+  try {
+    const res  = await fetch('/api/portal', {
+      method: 'POST',
+      headers: { 'authorization': 'Bearer ' + session.access_token }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    window.location.href = data.url;
+  } catch(err) {
+    alert('Could not open billing portal: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Manage billing'; }
+  }
+}
+function confirmCancel() {
+  const plan = profile?.plan || 'free';
+  const cfg  = PLAN_CONFIG[plan];
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-title">Cancel ${cfg.label} plan?</div>
+    <div class="modal-sub">
+      Your plan will stay active until the end of your current billing period.
+      After that you'll be moved to the Free plan automatically.
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal()">Keep my plan</button>
+      <button class="btn-modal-confirm" id="confirm-cancel-btn" onclick="doCancel()">Yes, cancel</button>
+    </div>`;
+  document.getElementById('modal').style.display = 'flex';
+}
+
+async function doCancel() {
+  const btn = document.getElementById('confirm-cancel-btn');
+  btn.disabled = true;
+  btn.textContent = 'Cancelling…';
+
+  try {
+    const res  = await fetch('/api/cancel', {
+      method: 'POST',
+      headers: { 'authorization': 'Bearer ' + session.access_token }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    // Refresh profile
+    const { data: updated } = await sb.from('users')
+      .select('plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
+      .eq('id', session.user.id).single();
+    profile = updated;
+
+    closeModal();
+    renderContent();
+  } catch(err) {
+    alert('Error: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = 'Yes, cancel';
+  }
+}
+
+// ── DEACTIVATE ACCOUNT ────────────────────────────
+function confirmDeactivate() {
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-title">Deactivate your account?</div>
+    <div class="modal-sub">
+      This will immediately block access to your account and cancel any active subscription.
+      Your data will be kept but you won't be able to log in. This cannot be undone without contacting support.
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal()">Go back</button>
+      <button class="btn-modal-confirm" id="confirm-deactivate-btn" onclick="doDeactivate()">Deactivate account</button>
+    </div>`;
+  document.getElementById('modal').style.display = 'flex';
+}
+
+async function doDeactivate() {
+  const btn = document.getElementById('confirm-deactivate-btn');
+  btn.disabled = true;
+  btn.textContent = 'Deactivating…';
+
+  try {
+    const res = await fetch('/api/deactivate', {
+      method: 'POST',
+      headers: { 'authorization': 'Bearer ' + session.access_token }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    window.location.href = '/?deactivated=true';
+  } catch(err) {
+    alert('Error: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = 'Deactivate account';
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+init();
+</script>
+</body>
+</html>
