@@ -1,795 +1,442 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Challenge Mode — Test Your Prompt Engineering Skills | TokenLens</title>
-<meta name="description" content="Practice prompt engineering with AI-generated challenges. Optimize bad prompts, get scored, and learn what you missed. Available on Plus and Pro plans.">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://tokenlens.live/challenge">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://tokenlens.live/challenge">
-<meta property="og:title" content="Challenge Mode — Test Your Prompt Engineering Skills | TokenLens">
-<meta property="og:description" content="Practice prompt engineering with AI-generated challenges. Optimize bad prompts, get scored, and learn what you missed. Available on Plus and Pro plans.">
-<meta property="og:image" content="https://tokenlens.live/og-image.png">
-<meta property="og:site_name" content="TokenLens">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Challenge Mode — Test Your Prompt Engineering Skills | TokenLens">
-<meta name="twitter:description" content="Practice prompt engineering with AI-generated challenges. Optimize bad prompts, get scored, and learn what you missed. Available on Plus and Pro plans.">
-<meta name="twitter:image" content="https://tokenlens.live/og-image.png">
-<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root {
-  --bg:#f8f9fb;--white:#fff;--surface2:#f3f4f6;--border:#e5e7eb;--border2:#d1d5db;
-  --text:#111827;--muted:#6b7280;--dim:#9ca3af;
-  --accent:#2563eb;--accent-light:#eff6ff;--accent-dark:#1d4ed8;--accent2:#7c52e0;
-  --green:#16a34a;--green-light:#f0fdf4;--amber:#d97706;--amber-light:#fffbeb;
-  --red:#dc2626;--red-light:#fef2f2;--gold:#b45309;--gold-light:#fef3c7;
-  --radius:8px;--radius-lg:12px;--radius-xl:16px;
-  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
+import { createClient } from "@supabase/supabase-js";
 
-nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
-.nav-logo{display:flex;align-items:center;text-decoration:none;}
-.nav-links{display:flex;align-items:center;gap:4px;}
-.nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
-.nav-link:hover{color:var(--text);background:var(--surface2);}
-.nav-link.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
-.nav-right{display:flex;align-items:center;gap:10px;}
-.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
-.btn-nav:hover{background:var(--surface2);}
+export const config = { maxDuration: 30 };
 
-.page{max-width:820px;margin:0 auto;padding:2rem 1.5rem 6rem;}
+const CHALLENGE_LIMIT_PLUS = 5;
 
-/* HERO */
-.challenge-hero{text-align:center;padding:2rem 0 2.5rem;}
-.challenge-hero h1{font-size:28px;font-weight:600;letter-spacing:-0.02em;margin-bottom:8px;}
-.challenge-hero p{font-size:15px;color:var(--muted);max-width:480px;margin:0 auto 1.5rem;}
-.challenge-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent-light),#f5f3ff);border:1px solid #c4b5fd;border-radius:99px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:1rem;}
+const GENERAL_TOPICS = [
+  "writing a villain origin story",
+  "brainstorming names for a coffee shop",
+  "writing a product launch announcement",
+  "creating a children bedtime story",
+  "writing a movie pitch",
+  "brainstorming team building activities",
+  "writing a wedding toast speech",
+  "creating a travel blog post",
+  "brainstorming startup ideas",
+  "writing a horror story opening",
+  "researching cryptocurrency history",
+  "finding information about intermittent fasting",
+  "researching electric vehicle trends",
+  "finding the best project management frameworks",
+  "researching remote work productivity",
+  "finding information about ADHD in adults",
+  "emailing a client about a missed deadline",
+  "writing a cold outreach email",
+  "sending a follow up after a job interview",
+  "writing a performance review",
+  "emailing a vendor about pricing",
+  "writing a project status update",
+  "explaining how to make sourdough bread",
+  "giving advice on learning guitar",
+  "explaining how to start running",
+  "giving tips for better sleep",
+  "comparing two project management tools",
+  "deciding between two job offers",
+  "recommending books on personal finance",
+  "explaining the pros and cons of remote work",
+  "summarizing recent AI news",
+  "explaining climate change for a teenager",
+  "giving advice on public speaking anxiety",
+  "explaining how to negotiate a salary"
+];
 
-/* TYPE SELECTOR */
-.type-selector{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:1.5rem;margin-bottom:1.5rem;}
-.type-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:10px;font-family:'Geist Mono',monospace;}
-.type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem;}
-.type-card{border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;}
-.type-card:hover{border-color:var(--border2);}
-.type-card.active{border-color:var(--accent);background:var(--accent-light);}
-.type-card.active.technical{border-color:var(--accent2);background:#f5f3ff;}
-.type-icon{font-size:18px;flex-shrink:0;}
-.type-name{font-size:13px;font-weight:600;color:var(--text);}
-.type-desc{font-size:11px;color:var(--muted);margin-top:2px;}
-.subcat-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem;}
-.subcat-pill{padding:5px 12px;border:1.5px solid var(--border);border-radius:99px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;background:var(--white);transition:all 0.15s;}
-.subcat-pill:hover{border-color:var(--border2);color:var(--text);}
-.subcat-pill.active{background:var(--accent);color:white;border-color:var(--accent);}
-.subcat-pill.active.technical{background:var(--accent2);border-color:var(--accent2);}
-.btn-start{width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:var(--radius-lg);font-size:14px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-start:hover{background:var(--accent-dark);transform:translateY(-1px);}
-.btn-start:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+const TECHNICAL_TOPICS = [
+  "reviewing a function that handles user authentication",
+  "debugging a slow database query",
+  "reviewing an async function with poor error handling",
+  "debugging a memory leak in a loop",
+  "reviewing a REST API endpoint for security issues",
+  "explaining how promises work in JavaScript",
+  "explaining the difference between SQL joins",
+  "explaining what Docker containers do",
+  "explaining how HTTP caching works",
+  "explaining recursion with a simple example",
+  "writing technical docs for an internal API",
+  "documenting a complex function",
+  "writing a README for an open source project",
+  "analyzing CSV data for sales trends",
+  "designing a simple REST API for a todo app"
+];
 
-/* CARDS */
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1rem;}
-.card-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.card-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
-.card-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;}
-.card-body{padding:1.5rem;}
-
-/* BAD PROMPT DISPLAY */
-.bad-prompt-box{background:var(--red-light);border:1px solid #fecaca;border-radius:var(--radius-lg);padding:16px;font-size:14px;color:var(--text);line-height:1.75;margin-bottom:1rem;position:relative;}
-.bad-prompt-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);margin-bottom:8px;font-family:'Geist Mono',monospace;}
-.hint-box{background:var(--amber-light);border:1px solid #fde68a;border-radius:var(--radius);padding:10px 14px;font-size:12px;color:#92400e;display:flex;align-items:flex-start;gap:8px;margin-bottom:1rem;}
-
-/* USER ATTEMPT */
-.attempt-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;font-family:'Geist Mono',monospace;}
-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);color:var(--text);font-family:'Geist',sans-serif;font-size:14px;padding:14px 16px;min-height:130px;resize:vertical;line-height:1.7;transition:border-color 0.15s,box-shadow 0.15s;}
-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);background:var(--white);}
-textarea::placeholder{color:var(--dim);}
-.attempt-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
-.char-hint{font-size:11px;color:var(--dim);font-family:'Geist Mono',monospace;}
-
-/* BUTTONS */
-.btn-primary{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:8px;}
-.btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.25);}
-.btn-primary:active{transform:translateY(0);}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
-.btn-secondary{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 18px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
-.btn-secondary:hover{background:var(--border2);}
-.btn-secondary:disabled{opacity:0.4;cursor:not-allowed;}
-.btn-pro{background:linear-gradient(135deg,#7c52e0,#5b3fc4);color:white;border:none;border-radius:var(--radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;}
-.btn-pro:hover{opacity:0.9;transform:translateY(-1px);}
-
-/* SCORE DISPLAY */
-.score-reveal{animation:slideUp 0.4s ease both;}
-@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-
-.score-hero{text-align:center;padding:2rem 1rem;border-bottom:1px solid var(--border);}
-.score-grade{font-size:64px;font-weight:700;letter-spacing:-0.04em;line-height:1;}
-.score-num{font-size:18px;font-weight:500;color:var(--muted);margin-top:4px;}
-.score-summary{font-size:14px;color:var(--muted);max-width:440px;margin:1rem auto 0;line-height:1.65;}
-
-.score-lists{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1.25rem;border-bottom:1px solid var(--border);}
-.score-list-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-family:'Geist Mono',monospace;}
-.score-list-title.good{color:var(--green);}
-.score-list-title.miss{color:var(--red);}
-.score-list-item{font-size:13px;color:var(--muted);display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;line-height:1.5;}
-.score-list-item.good::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
-.score-list-item.miss::before{content:'✗';color:var(--red);font-weight:700;flex-shrink:0;}
-
-.ideal-reveal{padding:1.25rem;}
-.ideal-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);margin-bottom:8px;font-family:'Geist Mono',monospace;}
-.ideal-box{background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius-lg);padding:14px;font-size:14px;color:#14532d;line-height:1.7;font-style:italic;margin-bottom:8px;}
-.comparison-note{font-size:12px;color:var(--muted);line-height:1.55;padding:10px;background:var(--surface2);border-radius:var(--radius);}
-
-/* LIMITS */
-.limit-state{text-align:center;padding:3rem 2rem;}
-.limit-icon{font-size:36px;margin-bottom:1rem;}
-.limit-title{font-size:18px;font-weight:600;margin-bottom:8px;}
-.limit-sub{font-size:14px;color:var(--muted);margin-bottom:1.5rem;max-width:360px;margin-left:auto;margin-right:auto;}
-
-/* GATE */
-.gate-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:3rem 2rem;text-align:center;}
-.gate-icon{font-size:36px;margin-bottom:1rem;}
-
-/* LOADING */
-.loading-state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:3rem;color:var(--muted);font-size:14px;}
-.code-block{background:#1e2d4a;border-radius:var(--radius-lg);padding:14px 16px;font-family:'Geist Mono',monospace;font-size:12px;color:#e2e8f0;line-height:1.7;overflow-x:auto;white-space:pre;margin-bottom:1rem;}
-.code-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;font-family:'Geist Mono',monospace;display:flex;align-items:center;justify-content:space-between;}
-.code-lang-badge{background:var(--accent2);color:white;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:0.06em;}
-
-/* COUNTERS */
-.challenge-counter{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:4px 12px;font-size:12px;color:var(--muted);font-family:'Geist Mono',monospace;}
-.counter-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
-.counter-dot.warn{background:var(--amber);}
-.counter-dot.danger{background:var(--red);}
-
-footer{text-align:center;padding:2rem;font-size:12px;color:var(--dim);border-top:1px solid var(--border);}
-footer a{color:var(--muted);text-decoration:none;}
-
-@media(max-width:560px){
-  nav{padding:0 1rem;}
-  .score-lists{grid-template-columns:1fr;}
-}
-</style>
-</head>
-<body>
-
-<nav>
-  <a class="nav-logo" href="/">
-    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
-  </a>
-  <div class="nav-links">
-    <a class="nav-link" href="/app">Analyzer</a>
-    <a class="nav-link active" href="/challenge">Challenge</a>
-    <a class="nav-link" href="/library" id="nav-library" style="display:none">Library</a>
-    <a class="nav-link" href="/account">Account</a>
-  </div>
-  <div class="nav-right">
-    <div id="nav-plan-pill"></div>
-    <button class="btn-nav" onclick="logout()">Log out</button>
-  </div>
-</nav>
-
-<div class="page">
-  <div class="challenge-hero">
-    <div class="challenge-badge">🎯 Challenge Mode</div>
-    <h1>Test your prompt engineering skills</h1>
-    <p>Pick a prompt type, hit Start, and optimize the generated prompt. Claude scores your attempt and shows you what you missed.</p>
-    <div id="counter-wrap"></div>
-  </div>
-
-  <div class="type-selector" id="type-selector">
-    <div class="type-section-label">Step 1 — Choose a prompt type</div>
-    <div class="type-grid" style="grid-template-columns:repeat(3,1fr);">
-      <div class="type-card active" id="type-general" onclick="selectType('general')">
-        <div class="type-icon">💬</div>
-        <div>
-          <div class="type-name">General</div>
-          <div class="type-desc">Writing, research, advice, email</div>
-        </div>
-      </div>
-      <div class="type-card" id="type-technical" onclick="selectType('technical')">
-        <div class="type-icon">⚙️</div>
-        <div>
-          <div class="type-name">Technical</div>
-          <div class="type-desc">Code review, docs, debugging</div>
-        </div>
-      </div>
-      <div class="type-card" id="type-code" onclick="selectType('code')" style="position:relative;">
-        <div class="type-icon">💻</div>
-        <div>
-          <div class="type-name">Code <span id="pro-code-badge" style="font-size:9px;background:linear-gradient(135deg,#7c52e0,#5b3fc4);color:white;padding:2px 6px;border-radius:99px;font-weight:600;vertical-align:middle;">PRO</span></div>
-          <div class="type-desc">Generate real code output</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="subcat-section">
-      <div class="type-section-label" style="margin-top:1.25rem;">Step 2 — Pick a category</div>
-      <div class="subcat-wrap" id="subcat-wrap"></div>
-    </div>
-
-    <div id="lang-section" style="display:none;">
-      <div class="type-section-label" style="margin-top:1.25rem;">Step 2 — Choose a language</div>
-      <div class="subcat-wrap" id="lang-wrap"></div>
-    </div>
-
-    <div id="code-gate" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:1rem;text-align:center;">
-      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Code challenges are Pro only</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">See real code output from both prompts — before and after optimization.</div>
-      <button class="btn-pro" style="padding:8px 20px;font-size:13px;" onclick="window.location.href='/account'">Upgrade to Pro</button>
-    </div>
-
-    <button class="btn-start" id="start-btn" onclick="startChallenge()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      Generate challenge
-    </button>
-  </div>
-
-  <div id="content" style="display:none"></div>
-</div>
-
-<footer>TokenLens · <a href="/app">Analyzer</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></footer>
-
-<script>
-const { createClient } = supabase;
-let sb, session, userPlan;
-let currentChallenge = null;
-let selectedType = 'general';
-let selectedCat  = '';
-let selectedLang = 'python';
-let hintUsed     = false;
-
-const CATEGORIES = {
+const MISTAKE_POOLS = {
   general: [
-    { label: 'Any',           value: '' },
-    { label: 'Creative',      value: 'creative writing or brainstorming' },
-    { label: 'Research',      value: 'research or fact-finding' },
-    { label: 'Email',         value: 'email or professional communication' },
-    { label: 'Instructions',  value: 'step-by-step instructions' },
-    { label: 'Comparison',    value: 'comparison or decision making' },
-    { label: 'Summarization', value: 'data analysis or summarization' },
-    { label: 'Advice',        value: 'personal advice or recommendations' },
+    "excessive politeness and hedging",
+    "vague output format with no structure specified",
+    "asking multiple unrelated things in one prompt",
+    "over explaining obvious context the AI already knows",
+    "unnecessary role setting preamble",
+    "hedging every request with if possible or sort of",
+    "apologizing for asking",
+    "repeating the same requirement three different ways",
+    "using passive voice and indirect language throughout"
   ],
   technical: [
-    { label: 'Any',           value: '' },
-    { label: 'Code review',   value: 'code review or debugging task' },
-    { label: 'Write code',    value: 'code generation or implementation' },
-    { label: 'Explain code',  value: 'code explanation or documentation' },
-    { label: 'SQL / Data',    value: 'SQL query or data processing task' },
-    { label: 'API design',    value: 'API or system design request' },
-    { label: 'Regex',         value: 'regex or text parsing task' },
-    { label: 'Tech docs',     value: 'technical documentation request' },
+    "not specifying the programming language or framework",
+    "vague requirements without clear inputs and outputs",
+    "no mention of error handling or edge cases",
+    "requesting explanation and code without separating concerns",
+    "no performance or complexity requirements stated",
+    "contradictory requirements in the same prompt",
+    "asking for a review without specifying what to look for",
+    "no context about the codebase or existing patterns"
   ]
 };
 
-const LANGUAGES = [
-  { label: 'Python',      value: 'python' },
-  { label: 'JavaScript',  value: 'javascript' },
-  { label: 'SQL',         value: 'sql' },
-  { label: 'HTML/CSS',    value: 'html' },
-  { label: 'Regex',       value: 'regex' },
-  { label: 'Bash',        value: 'bash' },
+const CODE_TOPICS = {
+  python: [
+    "validates an email address format",
+    "counts word frequency in a string",
+    "converts celsius to fahrenheit with edge cases",
+    "finds and removes duplicates from a list",
+    "generates a random password of given length",
+    "checks if a string is a palindrome",
+    "flattens a nested list of arbitrary depth",
+    "retries a function call up to N times on failure",
+    "sorts a list of dictionaries by a specified key"
+  ],
+  javascript: [
+    "debounces a function call by a given delay",
+    "deep clones a nested object",
+    "formats a number as currency",
+    "truncates a string to a max length with ellipsis",
+    "groups an array of objects by a property",
+    "converts a query string to a key value object",
+    "throttles a scroll event handler",
+    "validates a credit card number format"
+  ],
+  sql: [
+    "finds the top 5 customers by total order value",
+    "calculates monthly revenue totals for the past year",
+    "finds users who registered but never made a purchase",
+    "gets the most recent order for each customer",
+    "counts orders grouped by status",
+    "finds products with zero sales in the last 30 days"
+  ],
+  html: [
+    "a pricing card with a featured plan highlight",
+    "a notification badge on a bell icon",
+    "a progress bar showing 65% completion",
+    "a simple toggle switch component",
+    "a star rating display out of five",
+    "a tooltip that appears on hover"
+  ],
+  regex: [
+    "validates a standard email address",
+    "matches a US phone number in multiple formats",
+    "extracts all URLs from a block of text",
+    "validates a strong password",
+    "matches an IPv4 address",
+    "validates a date in MM/DD/YYYY format"
+  ],
+  bash: [
+    "backs up a directory with a timestamp in the name",
+    "finds and lists files older than 30 days",
+    "renames all files in a folder to lowercase",
+    "counts total lines across all .log files in a directory",
+    "extracts unique IP addresses from an access log"
+  ]
+};
+
+const LANG_LABELS = {
+  python: "Python",
+  javascript: "JavaScript",
+  sql: "SQL",
+  html: "HTML/CSS",
+  regex: "Regex",
+  bash: "Bash"
+};
+
+const BAD_CODE_PATTERNS = [
+  "no error handling or input validation",
+  "overly verbose variable names that repeat context",
+  "redundant intermediate variables that add no clarity",
+  "no comments or documentation",
+  "inefficient logic that could be simplified",
+  "magic numbers with no explanation",
+  "repeated code that could be extracted to a helper",
+  "inconsistent naming conventions",
+  "doing multiple things in one function",
+  "no type hints or type safety considerations"
 ];
 
-function selectType(type) {
-  selectedType = type;
-  selectedCat  = '';
-
-  document.getElementById('type-general').className   = 'type-card' + (type === 'general'   ? ' active' : '');
-  document.getElementById('type-technical').className = 'type-card' + (type === 'technical' ? ' active technical' : '');
-  document.getElementById('type-code').className      = 'type-card' + (type === 'code'      ? ' active technical' : '');
-
-  const isCode   = type === 'code';
-  const canCode  = (userPlan || '') === 'pro';
-  const subSec   = document.getElementById('subcat-section');
-  const langSec  = document.getElementById('lang-section');
-  const codeGate = document.getElementById('code-gate');
-  const startBtn = document.getElementById('start-btn');
-
-  renderLangs();
-
-  if (isCode && !canCode) {
-    subSec.style.display   = 'none';
-    langSec.style.display  = 'none';
-    codeGate.style.display = 'block';
-    startBtn.style.display = 'none';
-    return;
-  }
-
-  codeGate.style.display = 'none';
-  startBtn.style.display = 'flex';
-
-  if (isCode) {
-    subSec.style.display  = 'none';
-    langSec.style.display = 'block';
-  } else {
-    subSec.style.display  = 'block';
-    langSec.style.display = 'none';
-    renderSubcats();
-  }
+function randomFrom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function renderSubcats() {
-  try {
-    const cats   = CATEGORIES[selectedType] || [];
-    const isTech = selectedType === 'technical';
-    document.getElementById('subcat-wrap').innerHTML = cats.map(c => `
-      <div class="subcat-pill${c.value === selectedCat ? (' active' + (isTech ? ' technical' : '')) : ''}"
-           onclick="selectSubcat('${c.value}')">${c.label}</div>
-    `).join('');
-  } catch(e) {
-    document.getElementById('subcat-wrap').innerHTML = `<div style="color:red;font-size:12px;">Error: ${e.message}</div>`;
-  }
+function randomMistakes(pool, count) {
+  return [...pool].sort(() => Math.random() - 0.5).slice(0, count);
 }
 
-function renderLangs() {
-  try {
-    document.getElementById('lang-wrap').innerHTML = LANGUAGES.map(l => `
-      <div class="subcat-pill${l.value === selectedLang ? ' active technical' : ''}"
-           onclick="selectLang('${l.value}')">${l.label}</div>
-    `).join('');
-  } catch(e) {
-    document.getElementById('lang-wrap').innerHTML = `<div style="color:red;font-size:12px;">Error: ${e.message}</div>`;
-  }
+async function getUser(req) {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+
+  if (!token) return { error: "Not logged in." };
+
+  const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY,
+    {
+      global: { headers: { Authorization: `Bearer ${token}` } }
+    }
+  );
+
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (error || !data?.user) return { error: "Invalid session." };
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("plan, challenges_today, last_challenge_at, deactivated")
+    .eq("id", data.user.id)
+    .single();
+
+  return { user: data.user, profile, supabase, token };
 }
 
-function selectSubcat(val) { selectedCat = val; renderSubcats(); }
-function selectLang(val)   { selectedLang = val; renderLangs(); }
+async function claude(apiKey, system, userMsg, maxTokens = 700) {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-5",
+      max_tokens: maxTokens,
+      system,
+      messages: [{ role: "user", content: userMsg }]
+    })
+  });
 
-async function init() {
-  try {
-    const cfgRes = await fetch('/api/config');
-    const { supabaseUrl, supabaseAnonKey } = await cfgRes.json();
-    sb = createClient(supabaseUrl, supabaseAnonKey);
-
-    const { data: { session: s } } = await sb.auth.getSession();
-    if (!s) { window.location.href = '/app'; return; }
-    session = s;
-
-    const { data: profile } = await sb.from('users')
-      .select('plan, challenges_today, last_challenge_at')
-      .eq('id', session.user.id).single();
-    userPlan = profile?.plan || 'free';
-
-    if (userPlan === 'pro') document.getElementById('nav-library').style.display = 'block';
-    renderNavPill(userPlan);
-    updateCounter(profile);
-
-    if (userPlan === 'free') { renderGate(); return; }
-
-    selectType('general');
-  } catch(e) {
-    document.getElementById('type-selector').innerHTML =
-      `<div style="color:red;padding:1rem;font-size:13px;">Init error: ${e.message}</div>`;
+  if (!response.ok) {
+    throw new Error("Claude API error " + response.status);
   }
+
+  const data = await response.json();
+  const raw = (data.content || []).map((c) => c.text || "").join("");
+
+  return raw
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
 }
 
-function renderNavPill(plan) {
-  const styles = { free:'color:#111827', plus:'color:#7c52e0', pro:'color:#b45309' };
-  const labels = { free:'FREE', plus:'PLUS', pro:'PRO' };
-  document.getElementById('nav-plan-pill').innerHTML =
-    `<span style="${styles[plan]||styles.free};font-weight:600;font-size:13px;">${labels[plan]||'FREE'}</span>`;
+async function generatePromptChallenge(apiKey, category) {
+  const isTechnical =
+    category &&
+    (category.includes("code") ||
+      category.includes("debug") ||
+      category.includes("technical") ||
+      category.includes("documentation") ||
+      category.includes("API") ||
+      category.includes("SQL") ||
+      category.includes("data"));
+
+  const topic = isTechnical
+    ? randomFrom(TECHNICAL_TOPICS)
+    : randomFrom(GENERAL_TOPICS);
+
+  const mistakeKey = isTechnical ? "technical" : "general";
+  const mistakes = randomMistakes(
+    MISTAKE_POOLS[mistakeKey],
+    2 + Math.floor(Math.random() * 2)
+  );
+
+  const raw = await claude(
+    apiKey,
+    `You generate intentionally inefficient AI prompts for a prompt engineering training exercise. Return ONLY valid JSON: { "category": "<specific topic>", "bad_prompt": "<inefficient prompt about: ${topic}>", "hint": "<vague hint about the inefficiency, do not name it>", "ideal_prompt": "<tight, precise optimized version>" } Bad prompt MUST include: ${mistakes.join("; ")}. Bad prompt: 80 to 200 words. Ideal prompt: 15 to 50 words. Topic: ${topic}.`,
+    "Generate the challenge now."
+  );
+
+  return JSON.parse(raw);
 }
 
-function updateCounter(profile) {
-  const wrap = document.getElementById('counter-wrap');
-  if (!wrap) return;
-  if (userPlan === 'pro') {
-    wrap.innerHTML = `<div class="challenge-counter"><div class="counter-dot"></div>Unlimited challenges</div>`;
-    return;
-  }
-  if (userPlan === 'plus') {
-    const now    = new Date();
-    const lastAt = profile?.last_challenge_at ? new Date(profile.last_challenge_at) : null;
-    const hrs    = lastAt ? (now - lastAt) / 3600000 : 999;
-    const used   = hrs >= 24 ? 0 : (profile?.challenges_today || 0);
-    const rem    = Math.max(0, 5 - used);
-    const dotCls = rem > 2 ? '' : rem > 0 ? ' warn' : ' danger';
-    wrap.innerHTML = `<div class="challenge-counter"><div class="counter-dot${dotCls}"></div>${rem} / 5 challenges today</div>`;
-  }
+async function generateCodeChallenge(apiKey, codeLanguage) {
+  const topics = CODE_TOPICS[codeLanguage] || CODE_TOPICS.python;
+  const topic = randomFrom(topics);
+  const langLabel = LANG_LABELS[codeLanguage] || codeLanguage;
+  const patterns = randomMistakes(BAD_CODE_PATTERNS, 3);
+
+  const raw = await claude(
+    apiKey,
+    `You generate intentionally bad but functional ${langLabel} code for a code optimization training exercise. Return ONLY valid JSON: { "description": "<one sentence: what this code does>", "bad_code": "<bad but functional code>", "ideal_code": "<clean optimized version>", "issues": ["<issue 1>", "<issue 2>", "<issue 3>"] } Bad code MUST include: ${patterns.join("; ")}. Bad code: functional, 15 to 35 lines max. Ideal code: clean, max 25 lines. Task: ${langLabel} code that ${topic}.`,
+    "Generate the code challenge now.",
+    800
+  );
+
+  const parsed = JSON.parse(raw);
+
+  return { ...parsed, code_language: codeLanguage, lang_label: langLabel, topic };
 }
 
-async function logout() { await sb.auth.signOut(); window.location.href = '/'; }
+async function scorePromptAttempt(apiKey, badPrompt, userAttempt, idealPrompt) {
+  const raw = await claude(
+    apiKey,
+    `You are a prompt engineering instructor scoring a student's optimization attempt. Return ONLY valid JSON: { "score": <0-100>, "grade": "<A/B/C/D/F>", "summary": "<2 sentences>", "what_you_got_right": ["<thing 1>", "<thing 2>"], "what_you_missed": ["<thing 1>", "<thing 2>"], "comparison": "<one sentence vs ideal>" } A=90 to 100, B=75 to 89, C=60 to 74, D=40 to 59, F=0 to 39. Be encouraging but honest.`,
+    `Original:\n${badPrompt}\n\nStudent:\n${userAttempt}\n\nIdeal:\n${idealPrompt}`,
+    800
+  );
 
-let currentCodeChallenge = null;
+  return JSON.parse(raw);
+}
 
-async function startChallenge() {
-  hintUsed = false;
-  currentChallenge = null;
-  currentCodeChallenge = null;
+async function scoreCodeAttempt(
+  apiKey,
+  badCode,
+  userCode,
+  idealCode,
+  codeLanguage,
+  description
+) {
+  const langLabel = LANG_LABELS[codeLanguage] || codeLanguage;
 
-  const btn = document.getElementById('start-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Generating…';
+  const raw = await claude(
+    apiKey,
+    `You are a senior ${langLabel} developer scoring a student's code optimization attempt. Return ONLY valid JSON: { "score": <0-100>, "grade": "<A/B/C/D/F>", "summary": "<2 sentences>", "what_you_improved": ["<improvement 1>", "<improvement 2>"], "what_you_missed": ["<issue 1>", "<issue 2>"], "comparison": "<one sentence vs ideal>" } A=90 to 100, B=75 to 89, C=60 to 74, D=40 to 59, F=0 to 39. Be encouraging but honest.`,
+    `Task: ${description}\n\nOriginal:\n${badCode}\n\nStudent:\n${userCode}\n\nIdeal:\n${idealCode}`,
+    800
+  );
 
-  document.getElementById('type-selector').style.display = 'none';
-  document.getElementById('content').style.display = 'block';
-  document.getElementById('content').innerHTML = `
-    <div class="loading-state"><div class="spinner"></div><span>${selectedType === 'code' ? 'Generating code challenge…' : 'Generating your challenge…'}</span></div>`;
+  return JSON.parse(raw);
+}
 
-  // Code mode — completely separate flow
-  if (selectedType === 'code') {
+export default async function handler(req, res) {
+  if (!["POST", "GET"].includes(req.method)) {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { user, profile, supabase, error } = await getUser(req);
+
+  if (error) return res.status(401).json({ error });
+
+  if (profile?.deactivated) {
+    return res.status(403).json({ error: "Account deactivated." });
+  }
+
+  const plan = profile?.plan || "free";
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const action = req.query.action || "generate";
+
+  if (!apiKey) {
+    return res.status(500).json({ error: "Missing ANTHROPIC_API_KEY." });
+  }
+
+  if (plan === "free") {
+    return res.status(403).json({
+      error: "upgrade_required",
+      message: "Challenge mode is available on Plus and Pro plans."
+    });
+  }
+
+  const isCode =
+    action === "run-code" ||
+    !!req.query.code_language ||
+    !!req.body?.code_language;
+
+  if (isCode && plan !== "pro") {
+    return res.status(403).json({
+      error: "upgrade_required",
+      message: "Code challenges are available on Pro plan only."
+    });
+  }
+
+  if (req.method === "GET") {
+    if (plan === "plus") {
+      const lastAt = profile?.last_challenge_at
+        ? new Date(profile.last_challenge_at)
+        : null;
+
+      const hrs = lastAt ? (new Date() - lastAt) / 3600000 : 999;
+      const used = hrs >= 24 ? 0 : profile?.challenges_today || 0;
+
+      if (used >= CHALLENGE_LIMIT_PLUS) {
+        const resetsAt = new Date(lastAt.getTime() + 24 * 3600000);
+        const mins = Math.ceil((resetsAt - new Date()) / 60000);
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+
+        return res.status(403).json({
+          error: "limit_reached",
+          used,
+          limit: CHALLENGE_LIMIT_PLUS,
+          resets_in: h > 0 ? `${h}h ${m}m` : `${m}m`
+        });
+      }
+
+      await supabase
+        .from("users")
+        .update({
+          challenges_today: used + 1,
+          last_challenge_at: new Date().toISOString()
+        })
+        .eq("id", user.id);
+    }
+
     try {
-      const res  = await fetch(`/api/challenge?code_language=${encodeURIComponent(selectedLang)}`, {
-        headers: { 'authorization': 'Bearer ' + session.access_token }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to generate code challenge');
-      currentCodeChallenge = data.challenge;
-      renderCodeChallenge();
-    } catch(err) {
-      document.getElementById('type-selector').style.display = 'block';
-      document.getElementById('content').style.display = 'none';
-      btn.disabled = false;
-      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
-      alert('Error: ' + err.message);
+      const codeLanguage = req.query.code_language || null;
+
+      if (codeLanguage) {
+        const challenge = await generateCodeChallenge(apiKey, codeLanguage);
+        return res.status(200).json({ challenge, plan, is_code: true });
+      }
+
+      const challenge = await generatePromptChallenge(
+        apiKey,
+        req.query.category || null
+      );
+
+      return res.status(200).json({ challenge, plan, is_code: false });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
     }
-    return;
   }
 
-  // Prompt mode (general + technical)
-  const params = new URLSearchParams();
-  if (selectedCat) params.set('category', selectedCat);
-  const url = '/api/challenge' + ([...params].length ? '?' + params.toString() : '');
+  if (req.method === "POST") {
+    const body = req.body || {};
 
-  try {
-    const res = await fetch(url, {
-      headers: { 'authorization': 'Bearer ' + session.access_token }
-    });
-    const data = await res.json();
+    if (body.bad_code !== undefined) {
+      const { bad_code, user_code, ideal_code, code_language, description } =
+        body;
 
-    if (res.status === 403 && data.error === 'limit_reached') {
-      document.getElementById('type-selector').style.display = 'block';
-      document.getElementById('content').style.display = 'none';
-      renderLimitReached(data);
-      btn.disabled = false;
-      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
-      return;
+      if (!bad_code || !user_code || !ideal_code) {
+        return res.status(400).json({ error: "Missing required fields." });
+      }
+
+      try {
+        const result = await scoreCodeAttempt(
+          apiKey,
+          bad_code,
+          user_code,
+          ideal_code,
+          code_language,
+          description
+        );
+
+        return res.status(200).json({ result });
+      } catch (err) {
+        return res.status(500).json({ error: err.message });
+      }
     }
-    if (res.status === 403 && data.error === 'upgrade_required') { renderGate(); return; }
-    if (!res.ok) throw new Error(data.error || 'Failed to generate challenge');
 
-    currentChallenge = data.challenge;
+    const { bad_prompt, user_attempt, ideal_prompt } = body;
 
-    const { data: profile } = await sb.from('users')
-      .select('plan, challenges_today, last_challenge_at')
-      .eq('id', session.user.id).single();
-    updateCounter(profile);
+    if (!bad_prompt || !user_attempt || !ideal_prompt) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
 
-    renderChallenge();
-  } catch(err) {
-    document.getElementById('type-selector').style.display = 'block';
-    document.getElementById('content').style.display = 'none';
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
-    alert('Error: ' + err.message);
+    try {
+      const result = await scorePromptAttempt(
+        apiKey,
+        bad_prompt,
+        user_attempt,
+        ideal_prompt
+      );
+
+      return res.status(200).json({ result });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
   }
 }
-
-// ── CODE CHALLENGE RENDER ──────────────────────────
-function renderCodeChallenge() {
-  const c = currentCodeChallenge;
-  document.getElementById('content').innerHTML = `
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><div class="card-icon" style="background:var(--red-light)">💥</div>The bad code</div>
-        <span class="code-lang-badge">${c.lang_label}</span>
-      </div>
-      <div class="card-body">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:12px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius);border-left:3px solid var(--accent);">
-          <strong>Task:</strong> ${escHtml(c.description)}
-        </div>
-        <div class="code-block-label"><span>⚠️ This code works but is poorly written — rewrite it</span></div>
-        <div class="code-block">${escHtml(c.bad_code)}</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><div class="card-icon" style="background:var(--accent-light)">✏️</div>Your rewritten version</div>
-      </div>
-      <div class="card-body">
-        <div class="attempt-label">Rewrite the code above — fix the issues and improve quality</div>
-        <textarea id="user-code" placeholder="Write your improved version here…" style="font-family:'Geist Mono',monospace;font-size:13px;min-height:180px;" oninput="updateCharHint()"></textarea>
-        <div class="attempt-footer">
-          <span class="char-hint" id="char-hint">0 characters</span>
-          <div style="display:flex;gap:8px;">
-            <button class="btn-secondary" onclick="returnToSelector()">Skip →</button>
-            <button class="btn-primary" id="submit-btn" onclick="submitCodeAttempt()">
-              Submit for scoring
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-}
-
-async function submitCodeAttempt() {
-  const userCode = document.getElementById('user-code')?.value.trim();
-  if (!userCode || userCode.length < 10) {
-    alert('Please write your rewritten code first.');
-    return;
-  }
-
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Scoring…';
-
-  try {
-    const res  = await fetch('/api/challenge', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + session.access_token },
-      body: JSON.stringify({
-        bad_code:      currentCodeChallenge.bad_code,
-        user_code:     userCode,
-        ideal_code:    currentCodeChallenge.ideal_code,
-        code_language: currentCodeChallenge.code_language,
-        description:   currentCodeChallenge.description
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    renderCodeScore(data.result, userCode);
-  } catch(err) {
-    btn.disabled = false;
-    btn.innerHTML = 'Submit for scoring';
-    alert('Scoring failed: ' + err.message);
-  }
-}
-
-function renderCodeScore(result, userCode) {
-  const gradeColors = { A:'var(--green)', B:'#2563eb', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
-  const color = gradeColors[result.grade] || 'var(--text)';
-
-  const improvedHTML = (result.what_you_improved || []).map(item =>
-    `<div class="score-list-item good">${item}</div>`).join('');
-  const missedHTML = (result.what_you_missed || []).map(item =>
-    `<div class="score-list-item miss">${item}</div>`).join('');
-
-  document.getElementById('content').innerHTML = `
-    <div class="card score-reveal">
-      <div class="score-hero">
-        <div class="score-grade" style="color:${color}">${result.grade}</div>
-        <div class="score-num">${result.score} / 100</div>
-        <div class="score-summary">${result.summary}</div>
-      </div>
-      <div class="score-lists">
-        <div>
-          <div class="score-list-title good">What you improved</div>
-          ${improvedHTML || '<div class="score-list-item good" style="opacity:0.5">Keep practicing!</div>'}
-        </div>
-        <div>
-          <div class="score-list-title miss">What you missed</div>
-          ${missedHTML || '<div class="score-list-item miss" style="opacity:0.5">Nothing — great job!</div>'}
-        </div>
-      </div>
-      <div class="ideal-reveal">
-        <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1rem;">
-          <div>
-            <div class="code-block-label"><span>✏️ Your version</span><span class="code-lang-badge">${currentCodeChallenge.lang_label}</span></div>
-            <div class="code-block" style="max-height:320px;overflow-y:auto;">${escHtml(userCode)}</div>
-          </div>
-          <div>
-            <div class="code-block-label"><span>✅ Ideal version</span><span class="code-lang-badge">${currentCodeChallenge.lang_label}</span></div>
-            <div class="code-block" style="max-height:320px;overflow-y:auto;">${escHtml(currentCodeChallenge.ideal_code)}</div>
-          </div>
-        </div>
-        ${result.comparison ? `<div class="comparison-note">📊 ${result.comparison}</div>` : ''}
-      </div>
-    </div>
-
-    <div style="display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;">
-      <button class="btn-primary" onclick="returnToSelector()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-        Next challenge
-      </button>
-      <button class="btn-secondary" onclick="window.location.href='/app'">Go to Analyzer</button>
-    </div>`;
-}
-
-// ── PROMPT CHALLENGE RENDER ────────────────────────
-async function renderChallenge() {
-  const c = currentChallenge;
-  document.getElementById('content').innerHTML = `
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><div class="card-icon" style="background:var(--red-light)">💥</div>The bad prompt</div>
-        <span style="font-size:11px;font-weight:600;padding:3px 10px;background:var(--surface2);border-radius:99px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">${c.category}</span>
-      </div>
-      <div class="card-body">
-        <div class="bad-prompt-label">Optimize this prompt ↓</div>
-        <div class="bad-prompt-box">${escHtml(c.bad_prompt)}</div>
-        <div id="hint-area">
-          <button class="btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="showHint()">💡 Show hint</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><div class="card-icon" style="background:var(--accent-light)">✏️</div>Your optimized version</div>
-      </div>
-      <div class="card-body">
-        <div class="attempt-label">Rewrite the prompt above — make it as efficient as possible</div>
-        <textarea id="user-attempt" placeholder="Write your optimized version here…" oninput="updateCharHint()"></textarea>
-        <div class="attempt-footer">
-          <span class="char-hint" id="char-hint">0 characters</span>
-          <div style="display:flex;gap:8px;">
-            <button class="btn-secondary" onclick="returnToSelector()">Skip →</button>
-            <button class="btn-primary" id="submit-btn" onclick="submitAttempt()">
-              Submit for scoring
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-}
-
-function returnToSelector() {
-  document.getElementById('content').style.display = 'none';
-  document.getElementById('type-selector').style.display = 'block';
-  document.getElementById('content').innerHTML = '';
-  const btn = document.getElementById('start-btn');
-  btn.disabled = false;
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
-}
-
-function showHint() {
-  hintUsed = true;
-  document.getElementById('hint-area').innerHTML = `
-    <div class="hint-box">
-      <span>💡</span>
-      <span>${escHtml(currentChallenge.hint)}</span>
-    </div>`;
-}
-
-function updateCharHint() {
-  const len = document.getElementById('user-attempt')?.value.length || 0;
-  const el  = document.getElementById('char-hint');
-  if (el) el.textContent = len + ' characters';
-}
-
-async function submitAttempt() {
-  const attempt = document.getElementById('user-attempt')?.value.trim();
-  if (!attempt || attempt.length < 10) {
-    alert('Please write your optimized version first.');
-    return;
-  }
-
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Scoring…';
-
-  if (currentChallenge.is_code_challenge) {
-    btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Running both prompts…';
-  }
-
-  try {
-    const res  = await fetch('/api/challenge', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ' + session.access_token
-      },
-      body: JSON.stringify({
-        bad_prompt:        currentChallenge.bad_prompt,
-        user_attempt:      attempt,
-        ideal_prompt:      currentChallenge.ideal_prompt,
-        is_code_challenge: currentChallenge.is_code_challenge || false,
-        code_language:     currentChallenge.code_language || null
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-
-    renderScore(data.result, attempt);
-  } catch(err) {
-    btn.disabled = false;
-    btn.innerHTML = 'Submit for scoring';
-    alert('Scoring failed: ' + err.message);
-  }
-}
-
-function renderScore(result, userAttempt) {
-  const gradeColors = { A:'var(--green)', B:'#2563eb', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
-  const color = gradeColors[result.grade] || 'var(--text)';
-
-  const gotRightHTML = (result.what_you_got_right || []).map(item =>
-    `<div class="score-list-item good">${item}</div>`).join('');
-  const missedHTML = (result.what_you_missed || []).map(item =>
-    `<div class="score-list-item miss">${item}</div>`).join('');
-
-  document.getElementById('content').innerHTML = `
-    <div class="card score-reveal">
-      <div class="score-hero">
-        <div class="score-grade" style="color:${color}">${result.grade}</div>
-        <div class="score-num">${result.score} / 100</div>
-        <div class="score-summary">${result.summary}</div>
-      </div>
-      <div class="score-lists">
-        <div>
-          <div class="score-list-title good">What you got right</div>
-          ${gotRightHTML || '<div class="score-list-item good" style="opacity:0.5">Keep practicing!</div>'}
-        </div>
-        <div>
-          <div class="score-list-title miss">What you missed</div>
-          ${missedHTML || '<div class="score-list-item miss" style="opacity:0.5">Nothing — great job!</div>'}
-        </div>
-      </div>
-      <div class="ideal-reveal">
-        <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1rem;">
-          <div>
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2);margin-bottom:6px;font-family:'Geist Mono',monospace;">✏️ Your version</div>
-            <div style="background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius-lg);padding:12px;font-size:13px;color:#1e40af;line-height:1.65;">${escHtml(userAttempt)}</div>
-          </div>
-          <div>
-            <div class="ideal-label">✅ Ideal version</div>
-            <div class="ideal-box">${escHtml(currentChallenge.ideal_prompt)}</div>
-          </div>
-        </div>
-        ${result.comparison ? `<div class="comparison-note">📊 ${result.comparison}</div>` : ''}
-        ${result.code_impact ? `<div class="comparison-note" style="margin-top:8px;border-left:3px solid var(--accent2);background:#f5f3ff;">💻 ${result.code_impact}</div>` : ''}
-      </div>
-    </div>
-
-    <div style="display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;">
-      <button class="btn-primary" onclick="returnToSelector()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-        Next challenge
-      </button>
-      <button class="btn-secondary" onclick="window.location.href='/app'">Go to Analyzer</button>
-    </div>`;
-}
-
-function renderLimitReached(data) {
-  document.getElementById('content').innerHTML = `
-    <div class="card">
-      <div class="limit-state">
-        <div class="limit-icon">⏱️</div>
-        <div class="limit-title">Daily challenge limit reached</div>
-        <div class="limit-sub">You've used all 5 Plus challenges today. Resets in <strong>${data.resets_in}</strong> — or upgrade to Pro for unlimited challenges.</div>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <button class="btn-pro" onclick="window.location.href='/account'">Upgrade to Pro</button>
-          <button class="btn-secondary" onclick="window.location.href='/app'">Go to Analyzer</button>
-        </div>
-      </div>
-    </div>`;
-}
-
-function renderGate() {
-  document.getElementById('content').innerHTML = `
-    <div class="gate-card">
-      <div class="gate-icon">🎯</div>
-      <div style="font-size:20px;font-weight:600;margin-bottom:8px;">Challenge Mode</div>
-      <div style="font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 1.5rem;line-height:1.65;">
-        Test your prompt engineering skills with AI-generated challenges. Available on Plus (5/day) and Pro (unlimited).
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px;margin:0 auto 1.5rem;text-align:left;">
-        <div style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--accent);">Plus — $9/mo</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.6;">5 AI-generated challenges per day · Scoring and feedback</div>
-        </div>
-        <div style="border:1px solid var(--accent2);border-radius:var(--radius-lg);padding:1.25rem;background:#faf5ff;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--accent2);">Pro — $29/mo</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Unlimited challenges · All categories · Priority processing</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn-primary" onclick="window.location.href='/account'">Upgrade to Plus</button>
-        <button class="btn-pro" onclick="window.location.href='/account'">Upgrade to Pro</button>
-      </div>
-    </div>`;
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-init();
-</script>
-</body>
-</html>
