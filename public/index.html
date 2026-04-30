@@ -397,8 +397,12 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
   .social-proof { gap: 10px; }
   .proof-divider { display: none; }
 
-  /* Stats */
+  /* Social proof */
+  .social-proof { gap: 8px; justify-content: center; }
+  .proof-divider { display: none; }
+  .proof-item { font-size: 12px; }
   .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  #stats-inner { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* Features */
   .section { padding: 4rem 1.25rem; }
@@ -488,7 +492,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 
 <!-- STATS -->
 <div class="stats-strip">
-  <div class="stats-inner" style="grid-template-columns:repeat(4,1fr)">
+  <div class="stats-inner" id="stats-inner" style="grid-template-columns:repeat(4,1fr)">
     <div>
       <div class="stat-num">73%</div>
       <div class="stat-desc">Average token reduction on verbose prompts</div>
