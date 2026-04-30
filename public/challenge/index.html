@@ -206,7 +206,7 @@ footer a{color:var(--muted);text-decoration:none;}
   <a href="/library" id="mobile-nav-library" style="display:none">Library</a>
   <a href="/account">Account</a>
   <div class="mobile-menu-divider"></div>
-  <button onclick="logout();toggleMobileMenu()">Log out</button>
+  <button onclick="handleMobileLogout()">Log out</button>
 </div>
 
 <div class="page">
@@ -736,10 +736,21 @@ function updateCharHint() {
   if (el) el.textContent = len + ' characters';
 }
 
+function showToast(msg, type = 'error') {
+  const existing = document.getElementById('toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.id = 'toast';
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${type === 'error' ? '#dc2626' : '#16a34a'};color:white;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);white-space:nowrap;max-width:90vw;text-align:center;`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
 async function submitAttempt() {
   const attempt = document.getElementById('user-attempt')?.value.trim();
   if (!attempt || attempt.length < 10) {
-    alert('Please write your optimized version first.');
+    showToast('Please write your optimized version first.');
     return;
   }
 
