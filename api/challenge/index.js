@@ -160,6 +160,8 @@ return JSON.parse(cleaned);
 }
 
 // ── Main handler ───────────────────────────────────
+export const config = { maxDuration: 30 };
+
 export default async function handler(req, res) {
 if (![‘POST’, ‘GET’].includes(req.method)) {
 return res.status(405).json({ error: ‘Method not allowed’ });
