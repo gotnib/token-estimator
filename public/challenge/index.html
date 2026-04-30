@@ -182,25 +182,45 @@ footer a{color:var(--muted);text-decoration:none;}
 
   <div class="type-selector" id="type-selector">
     <div class="type-section-label">Step 1 — Choose a prompt type</div>
-    <div class="type-grid">
+    <div class="type-grid" style="grid-template-columns:repeat(3,1fr);">
       <div class="type-card active" id="type-general" onclick="selectType('general')">
         <div class="type-icon">💬</div>
         <div>
           <div class="type-name">General</div>
-          <div class="type-desc">Everyday prompts — writing, research, advice</div>
+          <div class="type-desc">Writing, research, advice, email</div>
         </div>
       </div>
       <div class="type-card" id="type-technical" onclick="selectType('technical')">
         <div class="type-icon">⚙️</div>
         <div>
           <div class="type-name">Technical</div>
-          <div class="type-desc">Code, data, documentation, debugging</div>
+          <div class="type-desc">Code review, docs, debugging</div>
+        </div>
+      </div>
+      <div class="type-card" id="type-code" onclick="selectType('code')" style="position:relative;">
+        <div class="type-icon">💻</div>
+        <div>
+          <div class="type-name">Code <span id="pro-code-badge" style="font-size:9px;background:linear-gradient(135deg,#7c52e0,#5b3fc4);color:white;padding:2px 6px;border-radius:99px;font-weight:600;vertical-align:middle;">PRO</span></div>
+          <div class="type-desc">Generate real code output</div>
         </div>
       </div>
     </div>
 
-    <div class="type-section-label">Step 2 — Pick a category</div>
-    <div class="subcat-wrap" id="subcat-wrap"></div>
+    <div id="subcat-section">
+      <div class="type-section-label" style="margin-top:1.25rem;">Step 2 — Pick a category</div>
+      <div class="subcat-wrap" id="subcat-wrap"></div>
+    </div>
+
+    <div id="lang-section" style="display:none;">
+      <div class="type-section-label" style="margin-top:1.25rem;">Step 2 — Choose a language</div>
+      <div class="subcat-wrap" id="lang-wrap"></div>
+    </div>
+
+    <div id="code-gate" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:1rem;text-align:center;">
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Code challenges are Pro only</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">See real code output from both prompts — before and after optimization.</div>
+      <button class="btn-pro" style="padding:8px 20px;font-size:13px;" onclick="window.location.href='/account'">Upgrade to Pro</button>
+    </div>
 
     <button class="btn-start" id="start-btn" onclick="startChallenge()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -219,6 +239,7 @@ let sb, session, userPlan;
 let currentChallenge = null;
 let selectedType = 'general';
 let selectedCat  = '';
+let selectedLang = 'python';
 let hintUsed     = false;
 
 const CATEGORIES = {
@@ -244,16 +265,54 @@ const CATEGORIES = {
   ]
 };
 
+const LANGUAGES = [
+  { label: 'Python',      value: 'python' },
+  { label: 'JavaScript',  value: 'javascript' },
+  { label: 'SQL',         value: 'sql' },
+  { label: 'HTML/CSS',    value: 'html' },
+  { label: 'Regex',       value: 'regex' },
+  { label: 'Bash',        value: 'bash' },
+];
+
 function selectType(type) {
   selectedType = type;
   selectedCat  = '';
+
   document.getElementById('type-general').className   = 'type-card' + (type === 'general'   ? ' active' : '');
   document.getElementById('type-technical').className = 'type-card' + (type === 'technical' ? ' active technical' : '');
-  renderSubcats();
+  document.getElementById('type-code').className      = 'type-card' + (type === 'code'      ? ' active technical' : '');
+
+  const isCode    = type === 'code';
+  const canCode   = userPlan === 'pro';
+  const subSec    = document.getElementById('subcat-section');
+  const langSec   = document.getElementById('lang-section');
+  const codeGate  = document.getElementById('code-gate');
+  const startBtn  = document.getElementById('start-btn');
+
+  if (isCode && !canCode) {
+    subSec.style.display   = 'none';
+    langSec.style.display  = 'none';
+    codeGate.style.display = 'block';
+    startBtn.style.display = 'none';
+    return;
+  }
+
+  codeGate.style.display = 'none';
+  startBtn.style.display = 'flex';
+
+  if (isCode) {
+    subSec.style.display  = 'none';
+    langSec.style.display = 'block';
+    renderLangs();
+  } else {
+    subSec.style.display  = 'block';
+    langSec.style.display = 'none';
+    renderSubcats();
+  }
 }
 
 function renderSubcats() {
-  const cats = CATEGORIES[selectedType];
+  const cats   = CATEGORIES[selectedType] || [];
   const isTech = selectedType === 'technical';
   document.getElementById('subcat-wrap').innerHTML = cats.map(c => `
     <div class="subcat-pill${c.value === selectedCat ? (' active' + (isTech ? ' technical' : '')) : ''}"
@@ -261,10 +320,15 @@ function renderSubcats() {
   `).join('');
 }
 
-function selectSubcat(val) {
-  selectedCat = val;
-  renderSubcats();
+function renderLangs() {
+  document.getElementById('lang-wrap').innerHTML = LANGUAGES.map(l => `
+    <div class="subcat-pill${l.value === selectedLang ? ' active technical' : ''}"
+         onclick="selectLang('${l.value}')">${l.label}</div>
+  `).join('');
 }
+
+function selectSubcat(val) { selectedCat = val; renderSubcats(); }
+function selectLang(val)   { selectedLang = val; renderLangs(); }
 
 async function init() {
   const cfgRes = await fetch('/api/config');
@@ -287,6 +351,11 @@ async function init() {
   if (userPlan === 'free') { renderGate(); return; }
 
   renderSubcats();
+  renderLangs();
+  // Hide code gate if not pro
+  if (userPlan !== 'pro') {
+    document.getElementById('pro-code-badge').style.display = 'inline';
+  }
 }
 
 function renderNavPill(plan) {
@@ -324,18 +393,22 @@ async function startChallenge() {
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Generating…';
 
-  // Build category string — combine type context with specific category
-  let cat = selectedCat;
-  if (!cat && selectedType === 'technical') cat = 'technical coding or development task';
-  if (!cat && selectedType === 'general')   cat = 'general everyday task';
+  // Build URL params
+  let url = '/api/challenge';
+  const params = new URLSearchParams();
+  if (selectedType === 'code') {
+    params.set('code_language', selectedLang);
+  } else if (selectedCat) {
+    params.set('category', selectedCat);
+  }
+  if ([...params].length) url += '?' + params.toString();
 
   document.getElementById('type-selector').style.display = 'none';
   document.getElementById('content').style.display = 'block';
   document.getElementById('content').innerHTML = `
-    <div class="loading-state"><div class="spinner"></div><span>Generating your challenge…</span></div>`;
+    <div class="loading-state"><div class="spinner"></div><span>${selectedType === 'code' ? 'Generating code challenge…' : 'Generating your challenge…'}</span></div>`;
 
   try {
-    const url = '/api/challenge' + (cat ? `?category=${encodeURIComponent(cat)}` : '');
     const res = await fetch(url, {
       headers: { 'authorization': 'Bearer ' + session.access_token }
     });
@@ -343,6 +416,7 @@ async function startChallenge() {
 
     if (res.status === 403 && data.error === 'limit_reached') {
       document.getElementById('type-selector').style.display = 'block';
+      document.getElementById('content').style.display = 'none';
       renderLimitReached(data);
       btn.disabled = false;
       btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
@@ -364,10 +438,11 @@ async function startChallenge() {
     renderChallenge();
   } catch(err) {
     document.getElementById('type-selector').style.display = 'block';
-    document.getElementById('content').innerHTML =
-      `<div style="text-align:center;padding:2rem;color:var(--red)">Error: ${err.message}</div>`;
+    document.getElementById('content').style.display = 'none';
+    document.getElementById('content').innerHTML = '';
     btn.disabled = false;
     btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
+    alert('Error: ' + err.message);
   }
 }
 
@@ -443,6 +518,10 @@ async function submitAttempt() {
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Scoring…';
 
+  if (currentChallenge.is_code_challenge) {
+    btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Running both prompts…';
+  }
+
   try {
     const res  = await fetch('/api/challenge', {
       method: 'POST',
@@ -451,9 +530,11 @@ async function submitAttempt() {
         'authorization': 'Bearer ' + session.access_token
       },
       body: JSON.stringify({
-        bad_prompt:   currentChallenge.bad_prompt,
-        user_attempt: attempt,
-        ideal_prompt: currentChallenge.ideal_prompt
+        bad_prompt:        currentChallenge.bad_prompt,
+        user_attempt:      attempt,
+        ideal_prompt:      currentChallenge.ideal_prompt,
+        is_code_challenge: currentChallenge.is_code_challenge || false,
+        code_language:     currentChallenge.code_language || null
       })
     });
     const data = await res.json();
@@ -505,6 +586,7 @@ function renderScore(result, userAttempt) {
           </div>
         </div>
         ${result.comparison ? `<div class="comparison-note">📊 ${result.comparison}</div>` : ''}
+        ${result.code_impact ? `<div class="comparison-note" style="margin-top:8px;border-left:3px solid var(--accent2);background:#f5f3ff;">💻 ${result.code_impact}</div>` : ''}
       </div>
     </div>
 
