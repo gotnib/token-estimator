@@ -187,7 +187,7 @@ messages: [{ role: ‘user’, content: userMsg }]
 if (!res.ok) throw new Error(‘Claude API error ’ + res.status);
 const data = await res.json();
 const raw  = (data.content || []).map(c => c.text || ‘’).join(’’);
-return raw.replace(/^`(?:json)?\s*/, '').replace(/\s*`$/, ‘’).trim();
+return raw.replace(/^`(?:json)?\s*/, "").replace(/\s*`$/, ‘’).trim();
 }
 
 // ── Generate prompt challenge ──────────────────────
@@ -202,7 +202,7 @@ const mistakeKey = isTechnical ? ‘technical’ : ‘general’;
 const mistakes   = randomMistakes(MISTAKE_POOLS[mistakeKey], 2 + Math.floor(Math.random() * 2));
 
 const raw = await claude(apiKey,
-`You generate intentionally inefficient AI prompts for a prompt engineering training exercise. Return ONLY valid JSON: { "category": "<specific topic>", "bad_prompt": "<inefficient prompt about: ${topic}>", "hint": "<vague hint about the inefficiency, do not name it>", "ideal_prompt": "<tight, precise optimized version>" } Bad prompt MUST include: ${mistakes.join('; ')}. Bad prompt: 80-200 words. Ideal prompt: 15-50 words. Topic: ${topic}.`,
+`You generate intentionally inefficient AI prompts for a prompt engineering training exercise. Return ONLY valid JSON: { "category": "<specific topic>", "bad_prompt": "<inefficient prompt about: ${topic}>", "hint": "<vague hint about the inefficiency, do not name it>", "ideal_prompt": "<tight, precise optimized version>" } Bad prompt MUST include: ${mistakes.join("; ")}. Bad prompt: 80-200 words. Ideal prompt: 15-50 words. Topic: ${topic}.`,
 ‘Generate the challenge now.’
 );
 return JSON.parse(raw);
@@ -216,7 +216,7 @@ const langLabel = LANG_LABELS[codeLanguage] || codeLanguage;
 const patterns  = randomMistakes(BAD_CODE_PATTERNS, 3);
 
 const raw = await claude(apiKey,
-`You generate intentionally bad but functional ${langLabel} code for a code optimization training exercise. Return ONLY valid JSON: { "description": "<one sentence: what this code does>", "bad_code": "<bad but functional code>", "ideal_code": "<clean optimized version>", "issues": ["<issue 1>", "<issue 2>", "<issue 3>"] } Bad code MUST include: ${patterns.join('; ')}. Bad code: functional, 15-35 lines max. Ideal code: clean, max 25 lines. Task: ${langLabel} code that ${topic}.`,
+`You generate intentionally bad but functional ${langLabel} code for a code optimization training exercise. Return ONLY valid JSON: { "description": "<one sentence: what this code does>", "bad_code": "<bad but functional code>", "ideal_code": "<clean optimized version>", "issues": ["<issue 1>", "<issue 2>", "<issue 3>"] } Bad code MUST include: ${patterns.join("; ")}. Bad code: functional, 15-35 lines max. Ideal code: clean, max 25 lines. Task: ${langLabel} code that ${topic}.`,
 ‘Generate the code challenge now.’,
 800
 );
@@ -227,7 +227,7 @@ return { …parsed, code_language: codeLanguage, lang_label: langLabel, topic };
 // ── Score prompt attempt ───────────────────────────
 async function scorePromptAttempt(apiKey, badPrompt, userAttempt, idealPrompt) {
 const raw = await claude(apiKey,
-`You are a prompt engineering instructor scoring a student's optimization attempt. Return ONLY valid JSON: { "score": <0-100>, "grade": "<A/B/C/D/F>", "summary": "<2 sentences>", "what_you_got_right": ["<thing 1>", "<thing 2>"], "what_you_missed": ["<thing 1>", "<thing 2>"], "comparison": "<one sentence vs ideal>" } A=90-100, B=75-89, C=60-74, D=40-59, F=0-39. Be encouraging but honest.`,
+`You are a prompt engineering instructor scoring a student"s optimization attempt. Return ONLY valid JSON: { "score": <0-100>, "grade": "<A/B/C/D/F>", "summary": "<2 sentences>", "what_you_got_right": ["<thing 1>", "<thing 2>"], "what_you_missed": ["<thing 1>", "<thing 2>"], "comparison": "<one sentence vs ideal>" } A=90-100, B=75-89, C=60-74, D=40-59, F=0-39. Be encouraging but honest.`,
 `Original:\n${badPrompt}\n\nStudent:\n${userAttempt}\n\nIdeal:\n${idealPrompt}`,
 800
 );
@@ -238,7 +238,7 @@ return JSON.parse(raw);
 async function scoreCodeAttempt(apiKey, badCode, userCode, idealCode, codeLanguage, description) {
 const langLabel = LANG_LABELS[codeLanguage] || codeLanguage;
 const raw = await claude(apiKey,
-`You are a senior ${langLabel} developer scoring a student's code optimization attempt. Return ONLY valid JSON: { "score": <0-100>, "grade": "<A/B/C/D/F>", "summary": "<2 sentences>", "what_you_improved": ["<improvement 1>", "<improvement 2>"], "what_you_missed": ["<issue 1>", "<issue 2>"], "comparison": "<one sentence vs ideal>" } A=90-100, B=75-89, C=60-74, D=40-59, F=0-39. Be encouraging but honest.`,
+`You are a senior ${langLabel} developer scoring a student"s code optimization attempt. Return ONLY valid JSON: { "score": <0-100>, "grade": "<A/B/C/D/F>", "summary": "<2 sentences>", "what_you_improved": ["<improvement 1>", "<improvement 2>"], "what_you_missed": ["<issue 1>", "<issue 2>"], "comparison": "<one sentence vs ideal>" } A=90-100, B=75-89, C=60-74, D=40-59, F=0-39. Be encouraging but honest.`,
 `Task: ${description}\n\nOriginal:\n${badCode}\n\nStudent:\n${userCode}\n\nIdeal:\n${idealCode}`,
 800
 );
@@ -283,16 +283,16 @@ const used     = hrs >= 24 ? 0 : (profile?.challenges_today || 0);
     const mins     = Math.ceil((resetsAt - new Date()) / 60000);
     const h = Math.floor(mins / 60), m = mins % 60;
     return res.status(403).json({
-      error: 'limit_reached', used, limit: CHALLENGE_LIMIT_PLUS,
+      error: "limit_reached", used, limit: CHALLENGE_LIMIT_PLUS,
       resets_in: h > 0 ? `${h}h ${m}m` : `${m}m`
     });
   }
 
   const prevUsed = hrs >= 24 ? 0 : (profile?.challenges_today || 0);
-  await supabase.from('users').update({
+  await supabase.from("users").update({
     challenges_today:  prevUsed + 1,
     last_challenge_at: new Date().toISOString()
-  }).eq('id', user.id);
+  }).eq("id", user.id);
 }
 
 try {
@@ -320,7 +320,7 @@ const body = req.body;
 if (body.bad_code !== undefined) {
   const { bad_code, user_code, ideal_code, code_language, description } = body;
   if (!bad_code || !user_code || !ideal_code) {
-    return res.status(400).json({ error: 'Missing required fields.' });
+    return res.status(400).json({ error: "Missing required fields." });
   }
   try {
     const result = await scoreCodeAttempt(apiKey, bad_code, user_code, ideal_code, code_language, description);
@@ -333,7 +333,7 @@ if (body.bad_code !== undefined) {
 // Prompt scoring
 const { bad_prompt, user_attempt, ideal_prompt } = body;
 if (!bad_prompt || !user_attempt || !ideal_prompt) {
-  return res.status(400).json({ error: 'Missing required fields.' });
+  return res.status(400).json({ error: "Missing required fields." });
 }
 try {
   const result = await scorePromptAttempt(apiKey, bad_prompt, user_attempt, ideal_prompt);
