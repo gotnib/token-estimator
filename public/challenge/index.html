@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -33,127 +34,128 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
 
-nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+nav{background:var(–white);border-bottom:1px solid var(–border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(–shadow-sm);}
 .nav-logo{display:flex;align-items:center;text-decoration:none;}
 .nav-links{display:flex;align-items:center;gap:4px;}
-.nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
-.nav-link:hover{color:var(--text);background:var(--surface2);}
-.nav-link.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
+.nav-link{font-size:13px;color:var(–muted);text-decoration:none;padding:6px 12px;border-radius:var(–radius);transition:all 0.15s;}
+.nav-link:hover{color:var(–text);background:var(–surface2);}
+.nav-link.active{color:var(–accent);background:var(–accent-light);font-weight:500;}
 .nav-right{display:flex;align-items:center;gap:10px;}
-.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
-.btn-nav:hover{background:var(--surface2);}
+.btn-nav{background:transparent;border:1px solid var(–border2);border-radius:var(–radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:‘Geist’,sans-serif;color:var(–text);cursor:pointer;transition:all 0.15s;}
+.btn-nav:hover{background:var(–surface2);}
 
 .page{max-width:820px;margin:0 auto;padding:2rem 1.5rem 6rem;}
 
 /* HERO */
 .challenge-hero{text-align:center;padding:2rem 0 2.5rem;}
 .challenge-hero h1{font-size:28px;font-weight:600;letter-spacing:-0.02em;margin-bottom:8px;}
-.challenge-hero p{font-size:15px;color:var(--muted);max-width:480px;margin:0 auto 1.5rem;}
-.challenge-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent-light),#f5f3ff);border:1px solid #c4b5fd;border-radius:99px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:1rem;}
+.challenge-hero p{font-size:15px;color:var(–muted);max-width:480px;margin:0 auto 1.5rem;}
+.challenge-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(–accent-light),#f5f3ff);border:1px solid #c4b5fd;border-radius:99px;padding:4px 14px;font-size:12px;font-weight:600;color:var(–accent2);margin-bottom:1rem;}
 
 /* TYPE SELECTOR */
-.type-selector{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:1.5rem;margin-bottom:1.5rem;}
-.type-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:10px;font-family:'Geist Mono',monospace;}
+.type-selector{background:var(–white);border:1px solid var(–border);border-radius:var(–radius-xl);box-shadow:var(–shadow-sm);padding:1.5rem;margin-bottom:1.5rem;}
+.type-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(–dim);margin-bottom:10px;font-family:‘Geist Mono’,monospace;}
 .type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem;}
-.type-card{border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;}
-.type-card:hover{border-color:var(--border2);}
-.type-card.active{border-color:var(--accent);background:var(--accent-light);}
-.type-card.active.technical{border-color:var(--accent2);background:#f5f3ff;}
+.type-card{border:1.5px solid var(–border);border-radius:var(–radius-lg);padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;}
+.type-card:hover{border-color:var(–border2);}
+.type-card.active{border-color:var(–accent);background:var(–accent-light);}
+.type-card.active.technical{border-color:var(–accent2);background:#f5f3ff;}
 .type-icon{font-size:18px;flex-shrink:0;}
-.type-name{font-size:13px;font-weight:600;color:var(--text);}
-.type-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+.type-name{font-size:13px;font-weight:600;color:var(–text);}
+.type-desc{font-size:11px;color:var(–muted);margin-top:2px;}
 .subcat-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem;}
-.subcat-pill{padding:5px 12px;border:1.5px solid var(--border);border-radius:99px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;background:var(--white);transition:all 0.15s;}
-.subcat-pill:hover{border-color:var(--border2);color:var(--text);}
-.subcat-pill.active{background:var(--accent);color:white;border-color:var(--accent);}
-.subcat-pill.active.technical{background:var(--accent2);border-color:var(--accent2);}
-.btn-start{width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:var(--radius-lg);font-size:14px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-start:hover{background:var(--accent-dark);transform:translateY(-1px);}
+.subcat-pill{padding:5px 12px;border:1.5px solid var(–border);border-radius:99px;font-size:12px;font-weight:500;color:var(–muted);cursor:pointer;background:var(–white);transition:all 0.15s;}
+.subcat-pill:hover{border-color:var(–border2);color:var(–text);}
+.subcat-pill.active{background:var(–accent);color:white;border-color:var(–accent);}
+.subcat-pill.active.technical{background:var(–accent2);border-color:var(–accent2);}
+.btn-start{width:100%;padding:12px;background:var(–accent);color:white;border:none;border-radius:var(–radius-lg);font-size:14px;font-weight:600;font-family:‘Geist’,sans-serif;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-start:hover{background:var(–accent-dark);transform:translateY(-1px);}
 .btn-start:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
 
 /* CARDS */
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1rem;}
-.card-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.card-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.card{background:var(–white);border:1px solid var(–border);border-radius:var(–radius-xl);box-shadow:var(–shadow-sm);overflow:hidden;margin-bottom:1rem;}
+.card-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(–border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.card-title{font-size:13px;font-weight:600;color:var(–text);display:flex;align-items:center;gap:8px;}
 .card-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;}
 .card-body{padding:1.5rem;}
 
 /* BAD PROMPT DISPLAY */
-.bad-prompt-box{background:var(--red-light);border:1px solid #fecaca;border-radius:var(--radius-lg);padding:16px;font-size:14px;color:var(--text);line-height:1.75;margin-bottom:1rem;position:relative;}
-.bad-prompt-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);margin-bottom:8px;font-family:'Geist Mono',monospace;}
-.hint-box{background:var(--amber-light);border:1px solid #fde68a;border-radius:var(--radius);padding:10px 14px;font-size:12px;color:#92400e;display:flex;align-items:flex-start;gap:8px;margin-bottom:1rem;}
+.bad-prompt-box{background:var(–red-light);border:1px solid #fecaca;border-radius:var(–radius-lg);padding:16px;font-size:14px;color:var(–text);line-height:1.75;margin-bottom:1rem;position:relative;}
+.bad-prompt-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(–red);margin-bottom:8px;font-family:‘Geist Mono’,monospace;}
+.hint-box{background:var(–amber-light);border:1px solid #fde68a;border-radius:var(–radius);padding:10px 14px;font-size:12px;color:#92400e;display:flex;align-items:flex-start;gap:8px;margin-bottom:1rem;}
 
 /* USER ATTEMPT */
-.attempt-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;font-family:'Geist Mono',monospace;}
-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);color:var(--text);font-family:'Geist',sans-serif;font-size:14px;padding:14px 16px;min-height:130px;resize:vertical;line-height:1.7;transition:border-color 0.15s,box-shadow 0.15s;}
-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);background:var(--white);}
-textarea::placeholder{color:var(--dim);}
+.attempt-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(–muted);margin-bottom:8px;font-family:‘Geist Mono’,monospace;}
+textarea{width:100%;background:var(–bg);border:1px solid var(–border);border-radius:var(–radius-lg);color:var(–text);font-family:‘Geist’,sans-serif;font-size:14px;padding:14px 16px;min-height:130px;resize:vertical;line-height:1.7;transition:border-color 0.15s,box-shadow 0.15s;}
+textarea:focus{outline:none;border-color:var(–accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);background:var(–white);}
+textarea::placeholder{color:var(–dim);}
 .attempt-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
-.char-hint{font-size:11px;color:var(--dim);font-family:'Geist Mono',monospace;}
+.char-hint{font-size:11px;color:var(–dim);font-family:‘Geist Mono’,monospace;}
 
 /* BUTTONS */
-.btn-primary{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:8px;}
-.btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.25);}
+.btn-primary{background:var(–accent);color:white;border:none;border-radius:var(–radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:‘Geist’,sans-serif;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary:hover{background:var(–accent-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.25);}
 .btn-primary:active{transform:translateY(0);}
 .btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
-.btn-secondary{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 18px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
-.btn-secondary:hover{background:var(--border2);}
+.btn-secondary{background:var(–surface2);border:1px solid var(–border);border-radius:var(–radius);padding:10px 18px;font-size:13px;font-weight:500;font-family:‘Geist’,sans-serif;color:var(–text);cursor:pointer;transition:all 0.15s;}
+.btn-secondary:hover{background:var(–border2);}
 .btn-secondary:disabled{opacity:0.4;cursor:not-allowed;}
-.btn-pro{background:linear-gradient(135deg,#7c52e0,#5b3fc4);color:white;border:none;border-radius:var(--radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;}
+.btn-pro{background:linear-gradient(135deg,#7c52e0,#5b3fc4);color:white;border:none;border-radius:var(–radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:‘Geist’,sans-serif;cursor:pointer;transition:all 0.15s;}
 .btn-pro:hover{opacity:0.9;transform:translateY(-1px);}
 
 /* SCORE DISPLAY */
 .score-reveal{animation:slideUp 0.4s ease both;}
 @keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-.score-hero{text-align:center;padding:2rem 1rem;border-bottom:1px solid var(--border);}
+.score-hero{text-align:center;padding:2rem 1rem;border-bottom:1px solid var(–border);}
 .score-grade{font-size:64px;font-weight:700;letter-spacing:-0.04em;line-height:1;}
-.score-num{font-size:18px;font-weight:500;color:var(--muted);margin-top:4px;}
-.score-summary{font-size:14px;color:var(--muted);max-width:440px;margin:1rem auto 0;line-height:1.65;}
+.score-num{font-size:18px;font-weight:500;color:var(–muted);margin-top:4px;}
+.score-summary{font-size:14px;color:var(–muted);max-width:440px;margin:1rem auto 0;line-height:1.65;}
 
-.score-lists{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1.25rem;border-bottom:1px solid var(--border);}
-.score-list-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-family:'Geist Mono',monospace;}
-.score-list-title.good{color:var(--green);}
-.score-list-title.miss{color:var(--red);}
-.score-list-item{font-size:13px;color:var(--muted);display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;line-height:1.5;}
-.score-list-item.good::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
-.score-list-item.miss::before{content:'✗';color:var(--red);font-weight:700;flex-shrink:0;}
+.score-lists{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1.25rem;border-bottom:1px solid var(–border);}
+.score-list-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;font-family:‘Geist Mono’,monospace;}
+.score-list-title.good{color:var(–green);}
+.score-list-title.miss{color:var(–red);}
+.score-list-item{font-size:13px;color:var(–muted);display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;line-height:1.5;}
+.score-list-item.good::before{content:‘✓’;color:var(–green);font-weight:700;flex-shrink:0;}
+.score-list-item.miss::before{content:‘✗’;color:var(–red);font-weight:700;flex-shrink:0;}
 
 .ideal-reveal{padding:1.25rem;}
-.ideal-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);margin-bottom:8px;font-family:'Geist Mono',monospace;}
-.ideal-box{background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius-lg);padding:14px;font-size:14px;color:#14532d;line-height:1.7;font-style:italic;margin-bottom:8px;}
-.comparison-note{font-size:12px;color:var(--muted);line-height:1.55;padding:10px;background:var(--surface2);border-radius:var(--radius);}
+.ideal-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(–green);margin-bottom:8px;font-family:‘Geist Mono’,monospace;}
+.ideal-box{background:var(–green-light);border:1px solid #bbf7d0;border-radius:var(–radius-lg);padding:14px;font-size:14px;color:#14532d;line-height:1.7;font-style:italic;margin-bottom:8px;}
+.comparison-note{font-size:12px;color:var(–muted);line-height:1.55;padding:10px;background:var(–surface2);border-radius:var(–radius);}
 
 /* LIMITS */
 .limit-state{text-align:center;padding:3rem 2rem;}
 .limit-icon{font-size:36px;margin-bottom:1rem;}
 .limit-title{font-size:18px;font-weight:600;margin-bottom:8px;}
-.limit-sub{font-size:14px;color:var(--muted);margin-bottom:1.5rem;max-width:360px;margin-left:auto;margin-right:auto;}
+.limit-sub{font-size:14px;color:var(–muted);margin-bottom:1.5rem;max-width:360px;margin-left:auto;margin-right:auto;}
 
 /* GATE */
-.gate-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:3rem 2rem;text-align:center;}
+.gate-card{background:var(–white);border:1px solid var(–border);border-radius:var(–radius-xl);box-shadow:var(–shadow);padding:3rem 2rem;text-align:center;}
 .gate-icon{font-size:36px;margin-bottom:1rem;}
 
 /* LOADING */
-.loading-state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:3rem;color:var(--muted);font-size:14px;}
-.code-block{background:#1e2d4a;border-radius:var(--radius-lg);padding:14px 16px;font-family:'Geist Mono',monospace;font-size:12px;color:#e2e8f0;line-height:1.7;overflow-x:auto;white-space:pre;margin-bottom:1rem;}
-.code-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;font-family:'Geist Mono',monospace;display:flex;align-items:center;justify-content:space-between;}
-.code-lang-badge{background:var(--accent2);color:white;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:0.06em;}
+.loading-state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:3rem;color:var(–muted);font-size:14px;}
+.code-block{background:#1e2d4a;border-radius:var(–radius-lg);padding:14px 16px;font-family:‘Geist Mono’,monospace;font-size:12px;color:#e2e8f0;line-height:1.7;overflow-x:auto;white-space:pre;margin-bottom:1rem;}
+.code-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(–muted);margin-bottom:6px;font-family:‘Geist Mono’,monospace;display:flex;align-items:center;justify-content:space-between;}
+.code-lang-badge{background:var(–accent2);color:white;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:0.06em;}
 
 /* COUNTERS */
-.challenge-counter{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:4px 12px;font-size:12px;color:var(--muted);font-family:'Geist Mono',monospace;}
-.counter-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
-.counter-dot.warn{background:var(--amber);}
-.counter-dot.danger{background:var(--red);}
+.challenge-counter{display:inline-flex;align-items:center;gap:6px;background:var(–surface2);border:1px solid var(–border);border-radius:99px;padding:4px 12px;font-size:12px;color:var(–muted);font-family:‘Geist Mono’,monospace;}
+.counter-dot{width:6px;height:6px;border-radius:50%;background:var(–green);}
+.counter-dot.warn{background:var(–amber);}
+.counter-dot.danger{background:var(–red);}
 
-footer{text-align:center;padding:2rem;font-size:12px;color:var(--dim);border-top:1px solid var(--border);}
-footer a{color:var(--muted);text-decoration:none;}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(–dim);border-top:1px solid var(–border);}
+footer a{color:var(–muted);text-decoration:none;}
 
 @media(max-width:560px){
-  nav{padding:0 1rem;}
-  .score-lists{grid-template-columns:1fr;}
+nav{padding:0 1rem;}
+.score-lists{grid-template-columns:1fr;}
 }
 </style>
+
 </head>
 <body>
 
@@ -207,26 +209,29 @@ footer a{color:var(--muted);text-decoration:none;}
       </div>
     </div>
 
-    <div id="subcat-section">
-      <div class="type-section-label" style="margin-top:1.25rem;">Step 2 — Pick a category</div>
-      <div class="subcat-wrap" id="subcat-wrap"></div>
-    </div>
+```
+<div id="subcat-section">
+  <div class="type-section-label" style="margin-top:1.25rem;">Step 2 — Pick a category</div>
+  <div class="subcat-wrap" id="subcat-wrap"></div>
+</div>
 
-    <div id="lang-section" style="display:none;">
-      <div class="type-section-label" style="margin-top:1.25rem;">Step 2 — Choose a language</div>
-      <div class="subcat-wrap" id="lang-wrap"></div>
-    </div>
+<div id="lang-section" style="display:none;">
+  <div class="type-section-label" style="margin-top:1.25rem;">Step 2 — Choose a language</div>
+  <div class="subcat-wrap" id="lang-wrap"></div>
+</div>
 
-    <div id="code-gate" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:1rem;text-align:center;">
-      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Code challenges are Pro only</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">See real code output from both prompts — before and after optimization.</div>
-      <button class="btn-pro" style="padding:8px 20px;font-size:13px;" onclick="window.location.href='/account'">Upgrade to Pro</button>
-    </div>
+<div id="code-gate" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:1rem;text-align:center;">
+  <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Code challenges are Pro only</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">See real code output from both prompts — before and after optimization.</div>
+  <button class="btn-pro" style="padding:8px 20px;font-size:13px;" onclick="window.location.href='/account'">Upgrade to Pro</button>
+</div>
 
-    <button class="btn-start" id="start-btn" onclick="startChallenge()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      Generate challenge
-    </button>
+<button class="btn-start" id="start-btn" onclick="startChallenge()">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+  Generate challenge
+</button>
+```
+
   </div>
 
   <div id="content" style="display:none"></div>
@@ -409,7 +414,28 @@ async function startChallenge() {
   document.getElementById('type-selector').style.display = 'none';
   document.getElementById('content').style.display = 'block';
   document.getElementById('content').innerHTML = `
-    <div class="loading-state"><div class="spinner"></div><span>${selectedType === 'code' ? 'Generating code challenge…' : 'Generating your challenge…'}</span></div>`;
+    <div class="loading-state"><div class="spinner"></div><span id="loading-msg">${selectedType === 'code' ? 'Generating code challenge…' : 'Generating your challenge…'}</span></div>`;
+
+  const genMessages = selectedType === 'code'
+    ? [
+        [3000,  'Choosing a topic and language…'],
+        [7000,  'Writing intentionally bad code…'],
+        [12000, 'Preparing the ideal solution…'],
+        [18000, 'Almost ready…'],
+      ]
+    : [
+        [3000,  'Picking a topic and crafting mistakes…'],
+        [7000,  'Writing the bad prompt…'],
+        [12000, 'Preparing the ideal version…'],
+        [18000, 'Almost ready…'],
+      ];
+
+  const genTimers = genMessages.map(([delay, text]) =>
+    setTimeout(() => {
+      const el = document.getElementById('loading-msg');
+      if (el) el.textContent = text;
+    }, delay)
+  );
 
   // Code mode — completely separate flow
   if (selectedType === 'code') {
@@ -418,10 +444,12 @@ async function startChallenge() {
         headers: { 'authorization': 'Bearer ' + session.access_token }
       });
       const data = await res.json();
+      genTimers.forEach(clearTimeout);
       if (!res.ok) throw new Error(data.error || 'Failed to generate code challenge');
       currentCodeChallenge = data.challenge;
       renderCodeChallenge();
     } catch(err) {
+      genTimers.forEach(clearTimeout);
       document.getElementById('type-selector').style.display = 'block';
       document.getElementById('content').style.display = 'none';
       btn.disabled = false;
@@ -441,6 +469,7 @@ async function startChallenge() {
       headers: { 'authorization': 'Bearer ' + session.access_token }
     });
     const data = await res.json();
+    genTimers.forEach(clearTimeout);
 
     if (res.status === 403 && data.error === 'limit_reached') {
       document.getElementById('type-selector').style.display = 'block';
@@ -495,301 +524,247 @@ function renderCodeChallenge() {
       <div class="card-body">
         <div class="attempt-label">Rewrite the code above — fix the issues and improve quality</div>
         <textarea id="user-code" placeholder="Write your improved version here…" style="font-family:'Geist Mono',monospace;font-size:13px;min-height:180px;" oninput="updateCharHint()"></textarea>
-        <div class="attempt-footer">
-          <span class="char-hint" id="char-hint">0 characters</span>
-          <div style="display:flex;gap:8px;">
-            <button class="btn-secondary" onclick="returnToSelector()">Skip →</button>
-            <button class="btn-primary" id="submit-btn" onclick="submitCodeAttempt()">
-              Submit for scoring
-            </button>
-          </div>
-        </div>
+
+```
+    <div class="attempt-footer">
+      <span class="char-hint" id="char-hint">0 characters</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-secondary" onclick="returnToSelector()">Skip →</button>
+        <button class="btn-primary" id="submit-btn" onclick="submitCodeAttempt()">
+          Submit for scoring
+        </button>
       </div>
-    </div>`;
+    </div>
+  </div>
+</div>`;
+```
+
 }
 
 async function submitCodeAttempt() {
-  const userCode = document.getElementById('user-code')?.value.trim();
-  if (!userCode || userCode.length < 10) {
-    alert('Please write your rewritten code first.');
-    return;
-  }
+const userCode = document.getElementById(‘user-code’)?.value.trim();
+if (!userCode || userCode.length < 10) {
+alert(‘Please write your rewritten code first.’);
+return;
+}
 
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Scoring…';
+const btn = document.getElementById(‘submit-btn’);
+btn.disabled = true;
+btn.innerHTML = ‘<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> <span id="score-msg">Scoring your code…</span>’;
 
-  try {
-    const res  = await fetch('/api/challenge', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + session.access_token },
-      body: JSON.stringify({
-        bad_code:      currentCodeChallenge.bad_code,
-        user_code:     userCode,
-        ideal_code:    currentCodeChallenge.ideal_code,
-        code_language: currentCodeChallenge.code_language,
-        description:   currentCodeChallenge.description
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    renderCodeScore(data.result, userCode);
-  } catch(err) {
-    btn.disabled = false;
-    btn.innerHTML = 'Submit for scoring';
-    alert('Scoring failed: ' + err.message);
-  }
+const scoreTimers = [
+[4000,  ‘Comparing to ideal solution…’],
+[9000,  ‘Analyzing improvements…’],
+[15000, ‘Almost done…’],
+].map(([delay, text]) =>
+setTimeout(() => {
+const el = document.getElementById(‘score-msg’);
+if (el) el.textContent = text;
+}, delay)
+);
+
+try {
+const res  = await fetch(’/api/challenge’, {
+method: ‘POST’,
+headers: { ‘content-type’: ‘application/json’, ‘authorization’: ’Bearer ’ + session.access_token },
+body: JSON.stringify({
+bad_code:      currentCodeChallenge.bad_code,
+user_code:     userCode,
+ideal_code:    currentCodeChallenge.ideal_code,
+code_language: currentCodeChallenge.code_language,
+description:   currentCodeChallenge.description
+})
+});
+const data = await res.json();
+scoreTimers.forEach(clearTimeout);
+if (!res.ok) throw new Error(data.error);
+renderCodeScore(data.result, userCode);
+} catch(err) {
+scoreTimers.forEach(clearTimeout);
+btn.disabled = false;
+btn.innerHTML = ‘Submit for scoring’;
+alert(’Scoring failed: ’ + err.message);
+}
 }
 
 function renderCodeScore(result, userCode) {
-  const gradeColors = { A:'var(--green)', B:'#2563eb', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
-  const color = gradeColors[result.grade] || 'var(--text)';
+const gradeColors = { A:‘var(–green)’, B:’#2563eb’, C:‘var(–amber)’, D:’#d97706’, F:‘var(–red)’ };
+const color = gradeColors[result.grade] || ‘var(–text)’;
 
-  const improvedHTML = (result.what_you_improved || []).map(item =>
-    `<div class="score-list-item good">${item}</div>`).join('');
-  const missedHTML = (result.what_you_missed || []).map(item =>
-    `<div class="score-list-item miss">${item}</div>`).join('');
+const improvedHTML = (result.what_you_improved || []).map(item =>
+`<div class="score-list-item good">${item}</div>`).join(’’);
+const missedHTML = (result.what_you_missed || []).map(item =>
+`<div class="score-list-item miss">${item}</div>`).join(’’);
 
-  document.getElementById('content').innerHTML = `
-    <div class="card score-reveal">
-      <div class="score-hero">
-        <div class="score-grade" style="color:${color}">${result.grade}</div>
-        <div class="score-num">${result.score} / 100</div>
-        <div class="score-summary">${result.summary}</div>
-      </div>
-      <div class="score-lists">
-        <div>
-          <div class="score-list-title good">What you improved</div>
-          ${improvedHTML || '<div class="score-list-item good" style="opacity:0.5">Keep practicing!</div>'}
-        </div>
-        <div>
-          <div class="score-list-title miss">What you missed</div>
-          ${missedHTML || '<div class="score-list-item miss" style="opacity:0.5">Nothing — great job!</div>'}
-        </div>
-      </div>
-      <div class="ideal-reveal">
-        <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1rem;">
-          <div>
-            <div class="code-block-label"><span>✏️ Your version</span><span class="code-lang-badge">${currentCodeChallenge.lang_label}</span></div>
-            <div class="code-block" style="max-height:320px;overflow-y:auto;">${escHtml(userCode)}</div>
-          </div>
-          <div>
-            <div class="code-block-label"><span>✅ Ideal version</span><span class="code-lang-badge">${currentCodeChallenge.lang_label}</span></div>
-            <div class="code-block" style="max-height:320px;overflow-y:auto;">${escHtml(currentCodeChallenge.ideal_code)}</div>
-          </div>
-        </div>
-        ${result.comparison ? `<div class="comparison-note">📊 ${result.comparison}</div>` : ''}
-      </div>
-    </div>
+document.getElementById(‘content’).innerHTML = `<div class="card score-reveal"> <div class="score-hero"> <div class="score-grade" style="color:${color}">${result.grade}</div> <div class="score-num">${result.score} / 100</div> <div class="score-summary">${result.summary}</div> </div> <div class="score-lists"> <div> <div class="score-list-title good">What you improved</div> ${improvedHTML || '<div class="score-list-item good" style="opacity:0.5">Keep practicing!</div>'} </div> <div> <div class="score-list-title miss">What you missed</div> ${missedHTML || '<div class="score-list-item miss" style="opacity:0.5">Nothing — great job!</div>'} </div> </div> <div class="ideal-reveal"> <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1rem;"> <div> <div class="code-block-label"><span>✏️ Your version</span><span class="code-lang-badge">${currentCodeChallenge.lang_label}</span></div> <div class="code-block" style="max-height:320px;overflow-y:auto;">${escHtml(userCode)}</div> </div> <div> <div class="code-block-label"><span>✅ Ideal version</span><span class="code-lang-badge">${currentCodeChallenge.lang_label}</span></div> <div class="code-block" style="max-height:320px;overflow-y:auto;">${escHtml(currentCodeChallenge.ideal_code)}</div> </div> </div> ${result.comparison ?`<div class="comparison-note">📊 ${result.comparison}</div>` : ‘’}
+</div>
+</div>
 
-    <div style="display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;">
-      <button class="btn-primary" onclick="returnToSelector()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-        Next challenge
-      </button>
-      <button class="btn-secondary" onclick="window.location.href='/app'">Go to Analyzer</button>
-    </div>`;
+```
+<div style="display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;">
+  <button class="btn-primary" onclick="returnToSelector()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+    Next challenge
+  </button>
+  <button class="btn-secondary" onclick="window.location.href='/app'">Go to Analyzer</button>
+</div>`;
+```
+
 }
 
 // ── PROMPT CHALLENGE RENDER ────────────────────────
 async function renderChallenge() {
-  const c = currentChallenge;
-  document.getElementById('content').innerHTML = `
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><div class="card-icon" style="background:var(--red-light)">💥</div>The bad prompt</div>
-        <span style="font-size:11px;font-weight:600;padding:3px 10px;background:var(--surface2);border-radius:99px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">${c.category}</span>
-      </div>
-      <div class="card-body">
-        <div class="bad-prompt-label">Optimize this prompt ↓</div>
-        <div class="bad-prompt-box">${escHtml(c.bad_prompt)}</div>
-        <div id="hint-area">
-          <button class="btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="showHint()">💡 Show hint</button>
-        </div>
+const c = currentChallenge;
+document.getElementById(‘content’).innerHTML = `
+<div class="card">
+<div class="card-header">
+<div class="card-title"><div class="card-icon" style="background:var(--red-light)">💥</div>The bad prompt</div>
+<span style="font-size:11px;font-weight:600;padding:3px 10px;background:var(--surface2);border-radius:99px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">${c.category}</span>
+</div>
+<div class="card-body">
+<div class="bad-prompt-label">Optimize this prompt ↓</div>
+<div class="bad-prompt-box">${escHtml(c.bad_prompt)}</div>
+<div id="hint-area">
+<button class="btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="showHint()">💡 Show hint</button>
+</div>
+</div>
+</div>
+
+```
+<div class="card">
+  <div class="card-header">
+    <div class="card-title"><div class="card-icon" style="background:var(--accent-light)">✏️</div>Your optimized version</div>
+  </div>
+  <div class="card-body">
+    <div class="attempt-label">Rewrite the prompt above — make it as efficient as possible</div>
+    <textarea id="user-attempt" placeholder="Write your optimized version here…" oninput="updateCharHint()"></textarea>
+    <div class="attempt-footer">
+      <span class="char-hint" id="char-hint">0 characters</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-secondary" onclick="returnToSelector()">Skip →</button>
+        <button class="btn-primary" id="submit-btn" onclick="submitAttempt()">
+          Submit for scoring
+        </button>
       </div>
     </div>
+  </div>
+</div>`;
+```
 
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><div class="card-icon" style="background:var(--accent-light)">✏️</div>Your optimized version</div>
-      </div>
-      <div class="card-body">
-        <div class="attempt-label">Rewrite the prompt above — make it as efficient as possible</div>
-        <textarea id="user-attempt" placeholder="Write your optimized version here…" oninput="updateCharHint()"></textarea>
-        <div class="attempt-footer">
-          <span class="char-hint" id="char-hint">0 characters</span>
-          <div style="display:flex;gap:8px;">
-            <button class="btn-secondary" onclick="returnToSelector()">Skip →</button>
-            <button class="btn-primary" id="submit-btn" onclick="submitAttempt()">
-              Submit for scoring
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>`;
 }
 
 function returnToSelector() {
-  document.getElementById('content').style.display = 'none';
-  document.getElementById('type-selector').style.display = 'block';
-  document.getElementById('content').innerHTML = '';
-  const btn = document.getElementById('start-btn');
-  btn.disabled = false;
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
+document.getElementById(‘content’).style.display = ‘none’;
+document.getElementById(‘type-selector’).style.display = ‘block’;
+document.getElementById(‘content’).innerHTML = ‘’;
+const btn = document.getElementById(‘start-btn’);
+btn.disabled = false;
+btn.innerHTML = ‘<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge’;
 }
 
 function showHint() {
-  hintUsed = true;
-  document.getElementById('hint-area').innerHTML = `
-    <div class="hint-box">
-      <span>💡</span>
-      <span>${escHtml(currentChallenge.hint)}</span>
-    </div>`;
+hintUsed = true;
+document.getElementById(‘hint-area’).innerHTML = ` <div class="hint-box"> <span>💡</span> <span>${escHtml(currentChallenge.hint)}</span> </div>`;
 }
 
 function updateCharHint() {
-  const len = document.getElementById('user-attempt')?.value.length || 0;
-  const el  = document.getElementById('char-hint');
-  if (el) el.textContent = len + ' characters';
+const len = document.getElementById(‘user-attempt’)?.value.length || 0;
+const el  = document.getElementById(‘char-hint’);
+if (el) el.textContent = len + ’ characters’;
 }
 
 async function submitAttempt() {
-  const attempt = document.getElementById('user-attempt')?.value.trim();
-  if (!attempt || attempt.length < 10) {
-    alert('Please write your optimized version first.');
-    return;
-  }
+const attempt = document.getElementById(‘user-attempt’)?.value.trim();
+if (!attempt || attempt.length < 10) {
+alert(‘Please write your optimized version first.’);
+return;
+}
 
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Scoring…';
+const btn = document.getElementById(‘submit-btn’);
+btn.disabled = true;
+btn.innerHTML = ‘<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> <span id="score-msg">Scoring your attempt…</span>’;
 
-  if (currentChallenge.is_code_challenge) {
-    btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Running both prompts…';
-  }
+const scoreTimers = [
+[4000,  ‘Comparing to ideal version…’],
+[9000,  ‘Analyzing what you caught…’],
+[15000, ‘Almost done…’],
+].map(([delay, text]) =>
+setTimeout(() => {
+const el = document.getElementById(‘score-msg’);
+if (el) el.textContent = text;
+}, delay)
+);
 
-  try {
-    const res  = await fetch('/api/challenge', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ' + session.access_token
-      },
-      body: JSON.stringify({
-        bad_prompt:        currentChallenge.bad_prompt,
-        user_attempt:      attempt,
-        ideal_prompt:      currentChallenge.ideal_prompt,
-        is_code_challenge: currentChallenge.is_code_challenge || false,
-        code_language:     currentChallenge.code_language || null
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
+try {
+const res  = await fetch(’/api/challenge’, {
+method: ‘POST’,
+headers: {
+‘content-type’: ‘application/json’,
+‘authorization’: ’Bearer ’ + session.access_token
+},
+body: JSON.stringify({
+bad_prompt:        currentChallenge.bad_prompt,
+user_attempt:      attempt,
+ideal_prompt:      currentChallenge.ideal_prompt,
+is_code_challenge: currentChallenge.is_code_challenge || false,
+code_language:     currentChallenge.code_language || null
+})
+});
+const data = await res.json();
+scoreTimers.forEach(clearTimeout);
+if (!res.ok) throw new Error(data.error);
 
-    renderScore(data.result, attempt);
-  } catch(err) {
-    btn.disabled = false;
-    btn.innerHTML = 'Submit for scoring';
-    alert('Scoring failed: ' + err.message);
-  }
+```
+renderScore(data.result, attempt);
+```
+
+} catch(err) {
+scoreTimers.forEach(clearTimeout);
+btn.disabled = false;
+btn.innerHTML = ‘Submit for scoring’;
+alert(’Scoring failed: ’ + err.message);
+}
 }
 
 function renderScore(result, userAttempt) {
-  const gradeColors = { A:'var(--green)', B:'#2563eb', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
-  const color = gradeColors[result.grade] || 'var(--text)';
+const gradeColors = { A:‘var(–green)’, B:’#2563eb’, C:‘var(–amber)’, D:’#d97706’, F:‘var(–red)’ };
+const color = gradeColors[result.grade] || ‘var(–text)’;
 
-  const gotRightHTML = (result.what_you_got_right || []).map(item =>
-    `<div class="score-list-item good">${item}</div>`).join('');
-  const missedHTML = (result.what_you_missed || []).map(item =>
-    `<div class="score-list-item miss">${item}</div>`).join('');
+const gotRightHTML = (result.what_you_got_right || []).map(item =>
+`<div class="score-list-item good">${item}</div>`).join(’’);
+const missedHTML = (result.what_you_missed || []).map(item =>
+`<div class="score-list-item miss">${item}</div>`).join(’’);
 
-  document.getElementById('content').innerHTML = `
-    <div class="card score-reveal">
-      <div class="score-hero">
-        <div class="score-grade" style="color:${color}">${result.grade}</div>
-        <div class="score-num">${result.score} / 100</div>
-        <div class="score-summary">${result.summary}</div>
-      </div>
-      <div class="score-lists">
-        <div>
-          <div class="score-list-title good">What you got right</div>
-          ${gotRightHTML || '<div class="score-list-item good" style="opacity:0.5">Keep practicing!</div>'}
-        </div>
-        <div>
-          <div class="score-list-title miss">What you missed</div>
-          ${missedHTML || '<div class="score-list-item miss" style="opacity:0.5">Nothing — great job!</div>'}
-        </div>
-      </div>
-      <div class="ideal-reveal">
-        <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1rem;">
-          <div>
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2);margin-bottom:6px;font-family:'Geist Mono',monospace;">✏️ Your version</div>
-            <div style="background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius-lg);padding:12px;font-size:13px;color:#1e40af;line-height:1.65;">${escHtml(userAttempt)}</div>
-          </div>
-          <div>
-            <div class="ideal-label">✅ Ideal version</div>
-            <div class="ideal-box">${escHtml(currentChallenge.ideal_prompt)}</div>
-          </div>
-        </div>
-        ${result.comparison ? `<div class="comparison-note">📊 ${result.comparison}</div>` : ''}
-        ${result.code_impact ? `<div class="comparison-note" style="margin-top:8px;border-left:3px solid var(--accent2);background:#f5f3ff;">💻 ${result.code_impact}</div>` : ''}
-      </div>
-    </div>
+document.getElementById(‘content’).innerHTML = `<div class="card score-reveal"> <div class="score-hero"> <div class="score-grade" style="color:${color}">${result.grade}</div> <div class="score-num">${result.score} / 100</div> <div class="score-summary">${result.summary}</div> </div> <div class="score-lists"> <div> <div class="score-list-title good">What you got right</div> ${gotRightHTML || '<div class="score-list-item good" style="opacity:0.5">Keep practicing!</div>'} </div> <div> <div class="score-list-title miss">What you missed</div> ${missedHTML || '<div class="score-list-item miss" style="opacity:0.5">Nothing — great job!</div>'} </div> </div> <div class="ideal-reveal"> <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1rem;"> <div> <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2);margin-bottom:6px;font-family:'Geist Mono',monospace;">✏️ Your version</div> <div style="background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius-lg);padding:12px;font-size:13px;color:#1e40af;line-height:1.65;">${escHtml(userAttempt)}</div> </div> <div> <div class="ideal-label">✅ Ideal version</div> <div class="ideal-box">${escHtml(currentChallenge.ideal_prompt)}</div> </div> </div> ${result.comparison ?`<div class="comparison-note">📊 ${result.comparison}</div>`: ''} ${result.code_impact ?`<div class="comparison-note" style="margin-top:8px;border-left:3px solid var(--accent2);background:#f5f3ff;">💻 ${result.code_impact}</div>` : ‘’}
+</div>
+</div>
 
-    <div style="display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;">
-      <button class="btn-primary" onclick="returnToSelector()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-        Next challenge
-      </button>
-      <button class="btn-secondary" onclick="window.location.href='/app'">Go to Analyzer</button>
-    </div>`;
+```
+<div style="display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;">
+  <button class="btn-primary" onclick="returnToSelector()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+    Next challenge
+  </button>
+  <button class="btn-secondary" onclick="window.location.href='/app'">Go to Analyzer</button>
+</div>`;
+```
+
 }
 
 function renderLimitReached(data) {
-  document.getElementById('content').innerHTML = `
-    <div class="card">
-      <div class="limit-state">
-        <div class="limit-icon">⏱️</div>
-        <div class="limit-title">Daily challenge limit reached</div>
-        <div class="limit-sub">You've used all 5 Plus challenges today. Resets in <strong>${data.resets_in}</strong> — or upgrade to Pro for unlimited challenges.</div>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <button class="btn-pro" onclick="window.location.href='/account'">Upgrade to Pro</button>
-          <button class="btn-secondary" onclick="window.location.href='/app'">Go to Analyzer</button>
-        </div>
-      </div>
-    </div>`;
+document.getElementById(‘content’).innerHTML = ` <div class="card"> <div class="limit-state"> <div class="limit-icon">⏱️</div> <div class="limit-title">Daily challenge limit reached</div> <div class="limit-sub">You've used all 5 Plus challenges today. Resets in <strong>${data.resets_in}</strong> — or upgrade to Pro for unlimited challenges.</div> <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"> <button class="btn-pro" onclick="window.location.href='/account'">Upgrade to Pro</button> <button class="btn-secondary" onclick="window.location.href='/app'">Go to Analyzer</button> </div> </div> </div>`;
 }
 
 function renderGate() {
-  document.getElementById('content').innerHTML = `
-    <div class="gate-card">
-      <div class="gate-icon">🎯</div>
-      <div style="font-size:20px;font-weight:600;margin-bottom:8px;">Challenge Mode</div>
-      <div style="font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 1.5rem;line-height:1.65;">
-        Test your prompt engineering skills with AI-generated challenges. Available on Plus (5/day) and Pro (unlimited).
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px;margin:0 auto 1.5rem;text-align:left;">
-        <div style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--accent);">Plus — $9/mo</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.6;">5 AI-generated challenges per day · Scoring and feedback</div>
-        </div>
-        <div style="border:1px solid var(--accent2);border-radius:var(--radius-lg);padding:1.25rem;background:#faf5ff;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--accent2);">Pro — $29/mo</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Unlimited challenges · All categories · Priority processing</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn-primary" onclick="window.location.href='/account'">Upgrade to Plus</button>
-        <button class="btn-pro" onclick="window.location.href='/account'">Upgrade to Pro</button>
-      </div>
-    </div>`;
+document.getElementById(‘content’).innerHTML = ` <div class="gate-card"> <div class="gate-icon">🎯</div> <div style="font-size:20px;font-weight:600;margin-bottom:8px;">Challenge Mode</div> <div style="font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 1.5rem;line-height:1.65;"> Test your prompt engineering skills with AI-generated challenges. Available on Plus (5/day) and Pro (unlimited). </div> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px;margin:0 auto 1.5rem;text-align:left;"> <div style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;"> <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--accent);">Plus — $9/mo</div> <div style="font-size:12px;color:var(--muted);line-height:1.6;">5 AI-generated challenges per day · Scoring and feedback</div> </div> <div style="border:1px solid var(--accent2);border-radius:var(--radius-lg);padding:1.25rem;background:#faf5ff;"> <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--accent2);">Pro — $29/mo</div> <div style="font-size:12px;color:var(--muted);line-height:1.6;">Unlimited challenges · All categories · Priority processing</div> </div> </div> <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"> <button class="btn-primary" onclick="window.location.href='/account'">Upgrade to Plus</button> <button class="btn-pro" onclick="window.location.href='/account'">Upgrade to Pro</button> </div> </div>`;
 }
 
 function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+return String(s).replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/”/g,’"’);
 }
 
 init();
 </script>
+
 </body>
 </html>
