@@ -318,19 +318,27 @@ function selectType(type) {
 }
 
 function renderSubcats() {
-  const cats   = CATEGORIES[selectedType] || [];
-  const isTech = selectedType === 'technical';
-  document.getElementById('subcat-wrap').innerHTML = cats.map(c => `
-    <div class="subcat-pill${c.value === selectedCat ? (' active' + (isTech ? ' technical' : '')) : ''}"
-         onclick="selectSubcat('${c.value}')">${c.label}</div>
-  `).join('');
+  try {
+    const cats   = CATEGORIES[selectedType] || [];
+    const isTech = selectedType === 'technical';
+    document.getElementById('subcat-wrap').innerHTML = cats.map(c => `
+      <div class="subcat-pill${c.value === selectedCat ? (' active' + (isTech ? ' technical' : '')) : ''}"
+           onclick="selectSubcat('${c.value}')">${c.label}</div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('subcat-wrap').innerHTML = `<div style="color:red;font-size:12px;">Error: ${e.message}</div>`;
+  }
 }
 
 function renderLangs() {
-  document.getElementById('lang-wrap').innerHTML = LANGUAGES.map(l => `
-    <div class="subcat-pill${l.value === selectedLang ? ' active technical' : ''}"
-         onclick="selectLang('${l.value}')">${l.label}</div>
-  `).join('');
+  try {
+    document.getElementById('lang-wrap').innerHTML = LANGUAGES.map(l => `
+      <div class="subcat-pill${l.value === selectedLang ? ' active technical' : ''}"
+           onclick="selectLang('${l.value}')">${l.label}</div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('lang-wrap').innerHTML = `<div style="color:red;font-size:12px;">Error: ${e.message}</div>`;
+  }
 }
 
 function selectSubcat(val) { selectedCat = val; renderSubcats(); }
