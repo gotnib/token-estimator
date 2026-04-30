@@ -249,6 +249,67 @@ async function init() {
   }
 
   renderContent();
+  loadChallengeStats();
+}
+
+async function loadChallengeStats() {
+  const el = document.getElementById('challenge-stats-card');
+  if (!el) return;
+
+  const { data, error } = await sb
+    .from('challenge_scores')
+    .select('score, grade, challenge_type, created_at')
+    .eq('user_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  if (error || !data || data.length === 0) {
+    el.innerHTML = `<div style="padding:1.5rem;text-align:center;color:var(--dim);font-size:13px;">
+      No challenges completed yet. <a href="/challenge" style="color:var(--accent);text-decoration:none;font-weight:500;">Start a challenge →</a>
+    </div>`;
+    return;
+  }
+
+  const total   = data.length;
+  const avg     = Math.round(data.reduce((s, r) => s + r.score, 0) / total);
+  const best    = Math.max(...data.map(r => r.score));
+  const grades  = { A:0, B:0, C:0, D:0, F:0 };
+  data.forEach(r => { if (grades[r.grade] !== undefined) grades[r.grade]++; });
+  const topGrade = Object.entries(grades).sort((a,b) => b[1]-a[1])[0][0];
+  const promptCount = data.filter(r => r.challenge_type !== 'code').length;
+  const codeCount   = data.filter(r => r.challenge_type === 'code').length;
+
+  const gradeColor = { A:'var(--green)', B:'var(--accent)', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--border);">
+      <div style="padding:1.25rem;text-align:center;border-right:1px solid var(--border);">
+        <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em;color:${gradeColor[topGrade]||'var(--text)'};">${avg}</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px;">Avg score</div>
+      </div>
+      <div style="padding:1.25rem;text-align:center;border-right:1px solid var(--border);">
+        <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em;color:var(--text);">${total}</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px;">Completed</div>
+      </div>
+      <div style="padding:1.25rem;text-align:center;">
+        <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em;color:${gradeColor[topGrade]||'var(--text)'};">${best}</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px;">Best score</div>
+      </div>
+    </div>
+    <div style="padding:1.25rem;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:10px;font-family:'Geist Mono',monospace;">Grade breakdown</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${Object.entries(grades).map(([g, count]) => `
+          <div style="display:flex;align-items:center;gap:6px;background:var(--surface2);border-radius:99px;padding:4px 12px;">
+            <span style="font-size:12px;font-weight:700;color:${gradeColor[g]||'var(--text)'};">${g}</span>
+            <span style="font-size:12px;color:var(--muted);">${count}</span>
+          </div>`).join('')}
+      </div>
+      ${codeCount > 0 ? `
+      <div style="display:flex;gap:12px;margin-top:12px;font-size:12px;color:var(--muted);">
+        <span>💬 ${promptCount} prompt</span>
+        <span>💻 ${codeCount} code</span>
+      </div>` : ''}
+    </div>`;
 }
 
 async function logout() { await sb.auth.signOut(); window.location.href = '/'; }
@@ -493,6 +554,13 @@ function renderContent() {
           </div>
           <button class="btn-cancel-plan" id="billing-portal-btn" onclick="openBillingPortal()">Manage billing</button>
         </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Challenge stats</div>
+      <div class="card" id="challenge-stats-card">
+        <div style="padding:1.25rem 1.5rem;text-align:center;color:var(--dim);font-size:13px;">Loading…</div>
       </div>
     </div>
 
