@@ -174,6 +174,8 @@ function resetIn(startAt, windowDays) {
   return `${mins}m`;
 }
 
+export const config = { maxDuration: 30 };
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -324,6 +326,20 @@ export default async function handler(req, res) {
         saved:            false
       }));
       await supabase.from('prompt_history').insert(historyRows);
+
+      // Enforce 100 entry cap — delete oldest entries beyond the limit
+      const { data: oldest } = await supabase
+        .from('prompt_history')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('saved', false)
+        .order('created_at', { ascending: true })
+        .limit(1000);
+
+      if (oldest && oldest.length > 100) {
+        const toDelete = oldest.slice(0, oldest.length - 100).map(r => r.id);
+        await supabase.from('prompt_history').delete().in('id', toDelete).eq('user_id', user.id);
+      }
     }
 
     // ── Build usage summary ────────────────────────────────
