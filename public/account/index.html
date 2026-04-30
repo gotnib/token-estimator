@@ -274,25 +274,20 @@ async function loadChallengeStats() {
   const best    = Math.max(...data.map(r => r.score));
   const grades  = { A:0, B:0, C:0, D:0, F:0 };
   data.forEach(r => { if (grades[r.grade] !== undefined) grades[r.grade]++; });
-  const topGrade = Object.entries(grades).sort((a,b) => b[1]-a[1])[0][0];
   const promptCount = data.filter(r => r.challenge_type !== 'code').length;
   const codeCount   = data.filter(r => r.challenge_type === 'code').length;
 
+  // Calculate average grade from average score
+  const avgGrade = avg >= 90 ? 'A' : avg >= 75 ? 'B' : avg >= 60 ? 'C' : avg >= 40 ? 'D' : 'F';
   const gradeColor = { A:'var(--green)', B:'var(--accent)', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
 
   el.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--border);">
-      <div style="padding:1.25rem;text-align:center;border-right:1px solid var(--border);">
-        <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em;color:${gradeColor[topGrade]||'var(--text)'};">${avg}</div>
-        <div style="font-size:11px;color:var(--dim);margin-top:2px;">Avg score</div>
-      </div>
-      <div style="padding:1.25rem;text-align:center;border-right:1px solid var(--border);">
-        <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em;color:var(--text);">${total}</div>
-        <div style="font-size:11px;color:var(--dim);margin-top:2px;">Completed</div>
-      </div>
-      <div style="padding:1.25rem;text-align:center;">
-        <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em;color:${gradeColor[topGrade]||'var(--text)'};">${best}</div>
-        <div style="font-size:11px;color:var(--dim);margin-top:2px;">Best score</div>
+    <div style="display:flex;align-items:center;gap:1.5rem;padding:1.5rem;border-bottom:1px solid var(--border);">
+      <div style="font-size:72px;font-weight:700;letter-spacing:-0.04em;line-height:1;color:${gradeColor[avgGrade]};flex-shrink:0;">${avgGrade}</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Average grade</div>
+        <div style="font-size:12px;color:var(--dim);">Across ${total} challenge${total === 1 ? '' : 's'} · avg score ${avg}/100</div>
+        <div style="font-size:12px;color:var(--dim);margin-top:2px;">Best score ${best}/100</div>
       </div>
     </div>
     <div style="padding:1.25rem;">
