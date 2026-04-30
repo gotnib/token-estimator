@@ -568,14 +568,14 @@ function renderCodeScore(result, userCode) {
         </div>
       </div>
       <div class="ideal-reveal">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1rem;">
           <div>
-            <div class="code-block-label"><span>Your version</span><span class="code-lang-badge">${currentCodeChallenge.lang_label}</span></div>
-            <div class="code-block">${escHtml(userCode)}</div>
+            <div class="code-block-label"><span>✏️ Your version</span><span class="code-lang-badge">${currentCodeChallenge.lang_label}</span></div>
+            <div class="code-block" style="max-height:320px;overflow-y:auto;">${escHtml(userCode)}</div>
           </div>
           <div>
             <div class="code-block-label"><span>✅ Ideal version</span><span class="code-lang-badge">${currentCodeChallenge.lang_label}</span></div>
-            <div class="code-block">${escHtml(currentCodeChallenge.ideal_code)}</div>
+            <div class="code-block" style="max-height:320px;overflow-y:auto;">${escHtml(currentCodeChallenge.ideal_code)}</div>
           </div>
         </div>
         ${result.comparison ? `<div class="comparison-note">📊 ${result.comparison}</div>` : ''}
@@ -721,13 +721,13 @@ function renderScore(result, userAttempt) {
         </div>
       </div>
       <div class="ideal-reveal">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1rem;">
           <div>
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2);margin-bottom:6px;font-family:'Geist Mono',monospace;">Your version</div>
-            <div style="background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius-lg);padding:12px;font-size:13px;color:#1e40af;line-height:1.65;font-style:italic;">${escHtml(userAttempt)}</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2);margin-bottom:6px;font-family:'Geist Mono',monospace;">✏️ Your version</div>
+            <div style="background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius-lg);padding:12px;font-size:13px;color:#1e40af;line-height:1.65;">${escHtml(userAttempt)}</div>
           </div>
           <div>
-            <div class="ideal-label">Ideal version</div>
+            <div class="ideal-label">✅ Ideal version</div>
             <div class="ideal-box">${escHtml(currentChallenge.ideal_prompt)}</div>
           </div>
         </div>
