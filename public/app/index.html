@@ -34,7 +34,8 @@
 body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;font-weight:400;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
 
 /* NAV */
-nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+.nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
 .nav-logo{display:flex;align-items:center;gap:0;text-decoration:none;}
 .nav-right{display:flex;align-items:center;gap:10px;}
 .nav-links{display:flex;align-items:center;gap:4px;margin-right:8px;}
@@ -260,6 +261,7 @@ footer a:hover{color:var(--text);}
 <body>
 
 <nav>
+  <div class="nav-inner">
   <a class="nav-logo" href="/">
     <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
   </a>
@@ -275,6 +277,7 @@ footer a:hover{color:var(--text);}
     <button class="btn-nav" id="btn-logout" style="display:none" onclick="logout()">Log out</button>
     <button class="btn-nav" id="btn-login" onclick="openModal('login')">Log in</button>
     <button class="btn-nav btn-nav-primary" id="btn-signup" onclick="openModal('signup')">Sign up free</button>
+  </div>
   </div>
 </nav>
 
