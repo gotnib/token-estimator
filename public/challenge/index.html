@@ -289,13 +289,12 @@ function selectType(type) {
   document.getElementById('type-code').className      = 'type-card' + (type === 'code'      ? ' active technical' : '');
 
   const isCode   = type === 'code';
-  const canCode  = userPlan === 'pro';
+  const canCode  = (userPlan || '') === 'pro';
   const subSec   = document.getElementById('subcat-section');
   const langSec  = document.getElementById('lang-section');
   const codeGate = document.getElementById('code-gate');
   const startBtn = document.getElementById('start-btn');
 
-  // Always render langs so they're ready
   renderLangs();
 
   if (isCode && !canCode) {
@@ -347,26 +346,31 @@ function selectSubcat(val) { selectedCat = val; renderSubcats(); }
 function selectLang(val)   { selectedLang = val; renderLangs(); }
 
 async function init() {
-  const cfgRes = await fetch('/api/config');
-  const { supabaseUrl, supabaseAnonKey } = await cfgRes.json();
-  sb = createClient(supabaseUrl, supabaseAnonKey);
+  try {
+    const cfgRes = await fetch('/api/config');
+    const { supabaseUrl, supabaseAnonKey } = await cfgRes.json();
+    sb = createClient(supabaseUrl, supabaseAnonKey);
 
-  const { data: { session: s } } = await sb.auth.getSession();
-  if (!s) { window.location.href = '/app'; return; }
-  session = s;
+    const { data: { session: s } } = await sb.auth.getSession();
+    if (!s) { window.location.href = '/app'; return; }
+    session = s;
 
-  const { data: profile } = await sb.from('users')
-    .select('plan, challenges_today, last_challenge_at')
-    .eq('id', session.user.id).single();
-  userPlan = profile?.plan || 'free';
+    const { data: profile } = await sb.from('users')
+      .select('plan, challenges_today, last_challenge_at')
+      .eq('id', session.user.id).single();
+    userPlan = profile?.plan || 'free';
 
-  if (userPlan === 'pro') document.getElementById('nav-library').style.display = 'block';
-  renderNavPill(userPlan);
-  updateCounter(profile);
+    if (userPlan === 'pro') document.getElementById('nav-library').style.display = 'block';
+    renderNavPill(userPlan);
+    updateCounter(profile);
 
-  if (userPlan === 'free') { renderGate(); return; }
+    if (userPlan === 'free') { renderGate(); return; }
 
-  selectType('general');
+    selectType('general');
+  } catch(e) {
+    document.getElementById('type-selector').innerHTML =
+      `<div style="color:red;padding:1rem;font-size:13px;">Init error: ${e.message}</div>`;
+  }
 }
 
 function renderNavPill(plan) {
