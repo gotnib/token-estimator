@@ -357,10 +357,11 @@ export default async function handler(req, res) {
       }
       try {
         const result = await scoreCodeAttempt(apiKey, bad_code, user_code, ideal_code, code_language, description);
-        // Save score in background
-        supabase.from('challenge_scores').insert({
+        // Save score using service key to bypass RLS
+        const svcClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+        await svcClient.from('challenge_scores').insert({
           user_id: user.id, score: result.score, grade: result.grade, challenge_type: 'code'
-        }).then(() => {});
+        });
         return res.status(200).json({ result });
       } catch(err) {
         return res.status(500).json({ error: err.message });
@@ -374,10 +375,11 @@ export default async function handler(req, res) {
     }
     try {
       const result = await scorePromptAttempt(apiKey, bad_prompt, user_attempt, ideal_prompt);
-      // Save score in background
-      supabase.from('challenge_scores').insert({
+      // Save score using service key to bypass RLS
+      const svcClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+      await svcClient.from('challenge_scores').insert({
         user_id: user.id, score: result.score, grade: result.grade, challenge_type: 'prompt'
-      }).then(() => {});
+      });
       return res.status(200).json({ result });
     } catch(err) {
       return res.status(500).json({ error: err.message });
