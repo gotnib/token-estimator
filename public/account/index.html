@@ -211,7 +211,7 @@ const { createClient } = supabase;
 let sb, session, profile;
 
 const PLAN_CONFIG = {
-  free:  { label: 'Free',  icon: '🔍', desc: 'Basic access · 3 analyses per day',       limit: 3,   period: 'day',   charLimit: '1,500' },
+  free:  { label: 'Free',  icon: '🔍', desc: 'Basic access · 5 analyses per day',       limit: 5,   period: 'day',   charLimit: '1,500' },
   plus:  { label: 'Plus',  icon: '⚡', desc: 'Regular access · 120 analyses per month',  limit: 120, period: 'month', charLimit: '5,000' },
   pro:   { label: 'Pro',   icon: '🚀', desc: 'High volume · Priority processing',        limit: 600, period: 'month', charLimit: '7,500' }
 };
