@@ -567,6 +567,15 @@ function renderAnalyzer() {
   document.getElementById('app-body').innerHTML = `
     <div class="main-card">
       <div class="card-header">
+        <div class="model-selector-wrap" style="border-top:none;border-bottom:1px solid var(--border);margin:-1px -1px 0;padding:10px 16px;background:var(--bg);border-radius:var(--radius-xl) var(--radius-xl) 0 0;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span class="model-selector-label" style="margin:0;white-space:nowrap;">Estimate costs for</span>
+            <div class="model-selector" id="model-selector"></div>
+            <span class="model-selector-note" style="margin:0;">±10% for non-Claude models</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-header" style="border-top:none;">
         <div class="card-header-left">
           <div class="card-header-title">Analyze ${isPro ? 'prompts' : 'a prompt'}${isPro ? ' <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;">— batch mode enabled</span>' : ''}</div>
           <div class="card-header-sub">${isPro ? 'Add up to 15 prompts — each counts as one analysis' : 'Paste any prompt — the wordier the better to see the savings'}</div>
@@ -585,11 +594,6 @@ function renderAnalyzer() {
           </button>
         </div>
         <div id="opt-slider" class="slider-wrap"></div>
-        <div class="model-selector-wrap">
-          <div class="model-selector-label">Estimate costs for</div>
-          <div class="model-selector" id="model-selector"></div>
-          <div class="model-selector-note">Token counts are estimated. Non-Claude models may vary ±10%.</div>
-        </div>
       </div>
     </div>
     <div id="results"></div>`;
