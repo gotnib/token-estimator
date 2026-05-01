@@ -150,6 +150,7 @@ textarea::placeholder{color:var(--dim);}
 .score-ring-bg{fill:none;stroke:var(--border);stroke-width:4;}
 .score-ring-fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1);}
 .score-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--text);}
+.score-tooltip{position:fixed;background:#1e2d4a;color:white;font-size:11px;line-height:1.5;padding:8px 12px;border-radius:8px;max-width:200px;z-index:9999;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
 .score-note{font-size:10px;color:var(--dim);line-height:1.4;}
 .score-delta{font-size:10px;font-weight:600;margin-top:4px;}
 .score-delta.up{color:var(--green);}
@@ -580,6 +581,36 @@ function renderPromptList() {
 
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// ── Tooltips ───────────────────────────────────────
+document.addEventListener('mouseover', e => {
+  const trigger = e.target.closest('.score-tooltip-trigger');
+  if (!trigger) return;
+  let tip = document.getElementById('score-tooltip');
+  if (!tip) { tip = document.createElement('div'); tip.id = 'score-tooltip'; tip.className = 'score-tooltip'; document.body.appendChild(tip); }
+  tip.textContent = trigger.dataset.tip;
+  const r = trigger.getBoundingClientRect();
+  tip.style.left = Math.min(r.left, window.innerWidth - 220) + 'px';
+  tip.style.top  = (r.bottom + 6) + 'px';
+  tip.style.display = 'block';
+});
+document.addEventListener('mouseout', e => {
+  if (!e.target.closest('.score-tooltip-trigger')) {
+    const tip = document.getElementById('score-tooltip');
+    if (tip) tip.style.display = 'none';
+  }
+});
+
+// ── Share results ──────────────────────────────────
+async function shareResults(prompt, savings, avgScore) {
+  const text = `I just analyzed a prompt on TokenLens:\n\n📊 ${savings}% token reduction\n🎯 Avg score: ${avgScore}/10\n\nTokenLens shows where your AI prompt tokens are going and how to fix it.\n\nhttps://tokenlens.live`;
+  if (navigator.share) {
+    try { await navigator.share({ title: 'My TokenLens analysis', text }); return; } catch(e) {}
+  }
+  await navigator.clipboard.writeText(text);
+  const btn = document.getElementById('share-btn');
+  if (btn) { btn.textContent = '✓ Copied'; setTimeout(() => { btn.textContent = '↗ Share'; }, 2000); }
+}
+
 async function reportBug(errorMsg) {
   try {
     const context = `Page: Analyzer
@@ -893,17 +924,26 @@ function buildResultCards(d, idx) {
   const scoreNotes = d.score_notes || {};
   const scoreLabels = { clarity: 'Clarity', conciseness: 'Conciseness', structure: 'Structure', specificity: 'Specificity' };
   const scoreColors = (s) => s >= 8 ? '#16a34a' : s >= 5 ? '#2563eb' : '#dc2626';
+  const scoreTooltips = {
+    clarity:     'How unambiguous is the instruction? A clear prompt leaves no room for misinterpretation.',
+    conciseness: 'How free of waste is it? A concise prompt has no filler, hedging, or repeated ideas.',
+    structure:   'How logically organized is it? A well-structured prompt flows naturally from context to instruction.',
+    specificity: 'How well-defined is the expected output? A specific prompt tells the AI exactly what format and scope to use.'
+  };
 
   const scoreCardHTML = Object.keys(scoreLabels).length && d.scores ? `
     <div class="score-grid">
       ${Object.entries(scoreLabels).map(([key, label]) => {
         const val  = scores[key] || 0;
-        const circ = 2 * Math.PI * 20; // r=20
+        const circ = 2 * Math.PI * 20;
         const pct  = val / 10;
         const dash = circ * pct;
         const color = scoreColors(val);
         return `<div class="score-item">
-          <div class="score-label">${label}</div>
+          <div class="score-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">
+            ${label}
+            <span class="score-tooltip-trigger" data-tip="${escHtml(scoreTooltips[key])}" style="width:13px;height:13px;border-radius:50%;background:var(--border2);color:var(--muted);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex-shrink:0;">?</span>
+          </div>
           <div class="score-ring">
             <svg width="52" height="52" viewBox="0 0 52 52">
               <circle class="score-ring-bg" cx="26" cy="26" r="20"/>
@@ -958,6 +998,7 @@ function buildResultCards(d, idx) {
         <div style="display:flex;align-items:center;gap:8px;">
           ${isPro ? '<span class="priority-badge">⚡ Priority</span>' : ''}
           ${d.level ? `<span class="slider-value ${d.level}" style="font-size:10px;">${(LEVEL_CONFIG[d.level]?.label || d.level)} optimization</span>` : ''}
+          <button id="share-btn" onclick="shareResults(${JSON.stringify(d.efficient_prompt||'').slice(0,50)}, ${savings}, ${Math.round(Object.values(d.scores||{}).reduce((a,b)=>a+b,0)/4)})" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:4px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Geist',sans-serif;">↗ Share</button>
         </div>
       </div>
       <div class="rc-body">
@@ -1213,6 +1254,13 @@ async function submitSignup() {
     btn.textContent = plan === 'free' ? 'Create free account' : 'Sign up & checkout';
     return;
   }
+
+  // Send welcome email in background
+  fetch('/api/welcome', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email, plan })
+  }).catch(() => {});
 
   if (plan !== 'free') {
     setModalMsg('Account created! Redirecting to checkout…', 'success');
