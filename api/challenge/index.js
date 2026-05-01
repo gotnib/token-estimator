@@ -193,17 +193,40 @@ async function claude(apiKey, system, userMsg, maxTokens = 700) {
   try {
     return JSON.parse(cleaned);
   } catch(e) {
-    // Try to extract just the JSON object — handles cases where Claude adds extra text
+    // Try to extract just the JSON object
     const match = cleaned.match(/\{[\s\S]*\}/);
     if (match) {
+      let attempt = match[0];
       try {
-        return JSON.parse(match[0]);
+        return JSON.parse(attempt);
       } catch(e2) {
-        // Last resort — sanitize common JSON-breaking characters in string values
-        const sanitized = match[0]
-          .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ') // control characters
-          .replace(/\\(?!["\\/bfnrtu])/g, '\\\\');        // unescaped backslashes
-        return JSON.parse(sanitized);
+        // Sanitize: replace unescaped double quotes inside string values
+        // Strategy: find string values and escape internal quotes
+        attempt = attempt
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ')
+          .replace(/\\(?!["\\/bfnrtu])/g, '\\\\');
+        try {
+          return JSON.parse(attempt);
+        } catch(e3) {
+          // Last resort: extract fields manually using regex
+          const get = (key) => {
+            const m = attempt.match(new RegExp(`"${key}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*[,}])`));
+            return m ? m[1] : '';
+          };
+          const getArr = (key) => {
+            const m = attempt.match(new RegExp(`"${key}"\\s*:\\s*\\[([\\s\\S]*?)\\]`));
+            if (!m) return [];
+            return (m[1].match(/"([^"]*)"/g) || []).map(s => s.replace(/"/g, ''));
+          };
+          // Try to build object from regex extraction
+          const keys = attempt.match(/"(\w+)"\s*:/g)?.map(k => k.replace(/[":]/g, '').trim()) || [];
+          const obj = {};
+          for (const key of keys) {
+            obj[key] = get(key) || getArr(key);
+          }
+          if (Object.keys(obj).length > 0) return obj;
+          throw new Error('Could not parse Claude response as JSON');
+        }
       }
     }
     throw new Error('Could not parse Claude response as JSON');
@@ -246,11 +269,16 @@ async function generateCodeChallenge(apiKey, codeLanguage) {
 
   const parsed = await claude(apiKey,
     `You generate intentionally bad but functional ${langLabel} code for a code optimization training exercise.
-Return ONLY valid JSON. IMPORTANT: All code in bad_code and ideal_code fields must have quotes escaped as \\" and backslashes escaped as \\\\.
+Return ONLY valid JSON. Critical rules for the code fields:
+- Use single quotes instead of double quotes in all code
+- Replace any backslash with a forward slash where possible
+- Keep code simple enough to avoid needing escape characters
+- No template literals, no regex with special chars, no multiline strings with quotes
+
 {
   "description": "<one sentence: what this code does>",
-  "bad_code": "<bad but functional code — escape all quotes and backslashes>",
-  "ideal_code": "<clean optimized version — escape all quotes and backslashes>",
+  "bad_code": "<bad but functional code using single quotes only>",
+  "ideal_code": "<clean optimized version using single quotes only>",
   "issues": ["<issue 1>", "<issue 2>", "<issue 3>"]
 }
 Bad code MUST include: ${patterns.join('; ')}.
