@@ -187,7 +187,27 @@ async function claude(apiKey, system, userMsg, maxTokens = 700) {
   if (!res.ok) throw new Error('Claude API error ' + res.status);
   const data = await res.json();
   const raw  = (data.content || []).map(c => c.text || '').join('');
-  return raw.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim();
+  const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+  // Try direct parse first
+  try {
+    return JSON.parse(cleaned);
+  } catch(e) {
+    // Try to extract just the JSON object — handles cases where Claude adds extra text
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (match) {
+      try {
+        return JSON.parse(match[0]);
+      } catch(e2) {
+        // Last resort — sanitize common JSON-breaking characters in string values
+        const sanitized = match[0]
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ') // control characters
+          .replace(/\\(?!["\\/bfnrtu])/g, '\\\\');        // unescaped backslashes
+        return JSON.parse(sanitized);
+      }
+    }
+    throw new Error('Could not parse Claude response as JSON');
+  }
 }
 
 // ── Generate prompt challenge ──────────────────────
@@ -201,7 +221,7 @@ async function generatePromptChallenge(apiKey, category) {
   const mistakeKey = isTechnical ? 'technical' : 'general';
   const mistakes   = randomMistakes(MISTAKE_POOLS[mistakeKey], 2 + Math.floor(Math.random() * 2));
 
-  const raw = await claude(apiKey,
+  const parsed = await claude(apiKey,
     `You generate intentionally inefficient AI prompts for a prompt engineering training exercise.
 Return ONLY valid JSON:
 {
@@ -214,7 +234,7 @@ Bad prompt MUST include: ${mistakes.join('; ')}.
 Bad prompt: 80-200 words. Ideal prompt: 15-50 words. Topic: ${topic}.`,
     'Generate the challenge now.'
   );
-  return JSON.parse(raw);
+  return parsed;
 }
 
 // ── Generate code challenge ────────────────────────
@@ -224,13 +244,13 @@ async function generateCodeChallenge(apiKey, codeLanguage) {
   const langLabel = LANG_LABELS[codeLanguage] || codeLanguage;
   const patterns  = randomMistakes(BAD_CODE_PATTERNS, 3);
 
-  const raw = await claude(apiKey,
+  const parsed = await claude(apiKey,
     `You generate intentionally bad but functional ${langLabel} code for a code optimization training exercise.
-Return ONLY valid JSON:
+Return ONLY valid JSON. IMPORTANT: All code in bad_code and ideal_code fields must have quotes escaped as \\" and backslashes escaped as \\\\.
 {
   "description": "<one sentence: what this code does>",
-  "bad_code": "<bad but functional code>",
-  "ideal_code": "<clean optimized version>",
+  "bad_code": "<bad but functional code — escape all quotes and backslashes>",
+  "ideal_code": "<clean optimized version — escape all quotes and backslashes>",
   "issues": ["<issue 1>", "<issue 2>", "<issue 3>"]
 }
 Bad code MUST include: ${patterns.join('; ')}.
@@ -239,13 +259,13 @@ Task: ${langLabel} code that ${topic}.`,
     'Generate the code challenge now.',
     800
   );
-  const parsed = JSON.parse(raw);
+  // parsed already returned as object
   return { ...parsed, code_language: codeLanguage, lang_label: langLabel, topic };
 }
 
 // ── Score prompt attempt ───────────────────────────
 async function scorePromptAttempt(apiKey, badPrompt, userAttempt, idealPrompt) {
-  const raw = await claude(apiKey,
+  const parsed = await claude(apiKey,
     `You are a prompt engineering instructor scoring a student's optimization attempt. Return ONLY valid JSON:
 {
   "score": <0-100>,
@@ -259,13 +279,13 @@ A=90-100, B=75-89, C=60-74, D=40-59, F=0-39. Be encouraging but honest.`,
     `Original:\n${badPrompt}\n\nStudent:\n${userAttempt}\n\nIdeal:\n${idealPrompt}`,
     800
   );
-  return JSON.parse(raw);
+  return parsed;
 }
 
 // ── Score code attempt ─────────────────────────────
 async function scoreCodeAttempt(apiKey, badCode, userCode, idealCode, codeLanguage, description) {
   const langLabel = LANG_LABELS[codeLanguage] || codeLanguage;
-  const raw = await claude(apiKey,
+  const parsed = await claude(apiKey,
     `You are a senior ${langLabel} developer scoring a student's code optimization attempt. Return ONLY valid JSON:
 {
   "score": <0-100>,
@@ -279,7 +299,7 @@ A=90-100, B=75-89, C=60-74, D=40-59, F=0-39. Be encouraging but honest.`,
     `Task: ${description}\n\nOriginal:\n${badCode}\n\nStudent:\n${userCode}\n\nIdeal:\n${idealCode}`,
     800
   );
-  return JSON.parse(raw);
+  return parsed;
 }
 
 // ── Main handler ───────────────────────────────────
