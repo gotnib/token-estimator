@@ -580,6 +580,32 @@ function renderPromptList() {
 
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+async function reportBug(errorMsg) {
+  try {
+    const context = `Page: Analyzer
+Error: ${errorMsg}
+Level: ${currentLevel || 'unknown'}
+Plan: ${currentPlan || 'unknown'}
+Time: ${new Date().toISOString()}
+User agent: ${navigator.userAgent}`;
+
+    await fetch('/api/support', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Bug Report (auto)',
+        email: currentSession?.user?.email || 'unknown',
+        message: context
+      })
+    });
+
+    const btn = document.querySelector('[onclick^="reportBug"]');
+    if (btn) { btn.textContent = '✓ Reported'; btn.disabled = true; }
+  } catch(e) {
+    console.error('Bug report failed:', e);
+  }
+}
+
 function onPromptInput(i, val) {
   prompts[i] = val;
   updateBatchInfo();
@@ -769,7 +795,10 @@ async function analyze() {
       <div class="error-state">
         <strong>Something went wrong</strong>${msg}
         <br><br>
-        <button onclick="analyze()" style="margin-top:8px;background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;">Try again</button>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="analyze()" style="background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;">Try again</button>
+          <button onclick="reportBug('${msg.replace(/'/g, "\\'")}')" style="background:transparent;color:var(--muted);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;">🐛 Report bug</button>
+        </div>
       </div>`;
     const b = document.getElementById('analyze-btn');
     if (b) {
