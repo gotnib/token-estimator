@@ -887,10 +887,10 @@ async function runDemo() {
   btn.innerHTML = '<div style="width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.75s linear infinite;display:inline-block;"></div> Analyzing…';
 
   try {
-    const res  = await fetch('/api/demo', {
+    const res  = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify({ prompt, demo: true })
     });
     const data = await res.json();
 
