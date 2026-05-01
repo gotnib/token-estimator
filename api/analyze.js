@@ -118,12 +118,18 @@ Code optimization rules:
 - Pricing: $3.00 per 1M input tokens. Max 3 breakdown items. Max 3 reasons.`
 };
 
-function getSystemPrompt(level, plan) {
-  // Gate levels by plan
-  if (plan === 'free') return SYSTEM_PROMPTS.fast;
-  if (plan === 'plus') return level === 'balanced' ? SYSTEM_PROMPTS.balanced : SYSTEM_PROMPTS.fast;
-  // Pro gets all three
-  return SYSTEM_PROMPTS[level] || SYSTEM_PROMPTS.balanced;
+function getSystemPrompt(level, plan, modelCfg) {
+  const model = modelCfg || { label: 'Claude Sonnet', price: 3.00 };
+  // Inject model-specific pricing into the prompt
+  const pricingNote = `Pricing: $${model.price.toFixed(2)} per 1M input tokens (${model.label}). Be precise.`;
+  const promptWithPricing = (p) => p.replace(
+    /Pricing: \$[\d.]+ per 1M input tokens \([^)]+\)\. (Be precise|Max 3 breakdown items)[^`]*/,
+    pricingNote + ' Max 3 breakdown items. Max 3 reasons. Max 3 missing_context items.'
+  );
+
+  if (plan === 'free') return promptWithPricing(SYSTEM_PROMPTS.fast);
+  if (plan === 'plus') return promptWithPricing(level === 'balanced' ? SYSTEM_PROMPTS.balanced : SYSTEM_PROMPTS.fast);
+  return promptWithPricing(SYSTEM_PROMPTS[level] || SYSTEM_PROMPTS.balanced);
 }
 
 async function analyzePrompt(prompt, apiKey, systemPrompt) {
@@ -290,11 +296,19 @@ export default async function handler(req, res) {
   try {
     // Get optimization level from request — gate by plan
     const rawLevel = req.body.level || 'balanced';
+    const rawModel = req.body.model || 'claude';
+    const MODEL_PRICES = {
+      claude: { label: 'Claude Sonnet', price: 3.00 },
+      gpt4o:  { label: 'GPT-4o',        price: 2.50 },
+      gemini: { label: 'Gemini Pro',    price: 1.25 },
+      llama:  { label: 'Llama 70B',     price: 0.59 },
+    };
+    const modelCfg   = MODEL_PRICES[rawModel] || MODEL_PRICES.claude;
     const allowedLevels = plan === 'free' ? ['fast']
       : plan === 'plus' ? ['fast', 'balanced']
       : ['fast', 'balanced', 'deep'];
     const level      = allowedLevels.includes(rawLevel) ? rawLevel : allowedLevels[allowedLevels.length - 1];
-    const systemPrompt = getSystemPrompt(level, plan);
+    const systemPrompt = getSystemPrompt(level, plan, modelCfg);
 
     const results = await Promise.all(prompts.map(p => analyzePrompt(p, anthropicKey, systemPrompt)));
     const now     = new Date();
