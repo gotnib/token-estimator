@@ -291,7 +291,33 @@ h1 {
 .proof-check { color: var(--green); font-size: 12px; }
 .proof-divider { width: 1px; height: 16px; background: var(--border); }
 
-/* ── STATS STRIP ── */
+/* ── DEMO ── */
+.demo-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 4rem 1.5rem; }
+.demo-inner { max-width: 680px; margin: 0 auto; }
+.demo-label { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); text-align: center; margin-bottom: 1.5rem; }
+.demo-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; }
+.demo-examples { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.demo-example-label { font-size: 11px; color: var(--dim); font-weight: 500; }
+.demo-example-pill { padding: 4px 10px; border: 1px solid var(--border2); border-radius: 99px; font-size: 11px; font-weight: 500; color: var(--muted); background: white; cursor: pointer; transition: all 0.15s; }
+.demo-example-pill:hover { border-color: var(--accent); color: var(--accent); }
+.demo-section textarea { width: 100%; border: none; background: var(--bg); color: var(--text); font-family: 'Geist', sans-serif; font-size: 14px; padding: 16px; line-height: 1.7; resize: none; min-height: 110px; outline: none; }
+.demo-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-top: 1px solid var(--border); background: var(--surface); }
+.demo-char-count { font-size: 11px; color: var(--dim); font-family: 'Geist Mono', monospace; }
+.demo-btn { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: var(--radius-lg); padding: 9px 20px; font-size: 13px; font-weight: 600; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.2s; }
+.demo-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(47,111,232,0.35); }
+.demo-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.demo-result-card { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; margin-top: 1rem; }
+.demo-result-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.demo-result-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.demo-result-body { padding: 16px; }
+.demo-stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.demo-stat { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; text-align: center; }
+.demo-stat-val { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+.demo-stat-lbl { font-size: 10px; color: var(--dim); margin-top: 2px; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; }
+.demo-efficient { background: var(--accent-light); border: 1px solid #bfdbfe; border-radius: var(--radius-lg); padding: 14px; font-size: 13px; color: #1e40af; line-height: 1.7; margin-bottom: 10px; }
+.demo-savings-badge { background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+.demo-cta-wrap { text-align: center; margin-top: 1.5rem; }
+.demo-cta-text { font-size: 14px; color: var(--muted); margin-bottom: 1rem; }
 .stats-strip {
   background: var(--surface);
   border-top: 1px solid var(--border);
@@ -486,6 +512,34 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
       <div class="proof-item"><span class="proof-check">✓</span> Improve every prompt</div>
       <div class="proof-divider"></div>
       <div class="proof-item"><span class="proof-check">✓</span> Powered by Claude</div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DEMO -->
+<section class="demo-section" id="demo">
+  <div class="demo-inner">
+    <div class="demo-label">Try it now — no account needed</div>
+    <div class="demo-card" id="demo-card">
+      <div class="demo-examples">
+        <span class="demo-example-label">Try an example:</span>
+        <button class="demo-example-pill" onclick="setDemoPrompt(0)">Verbose email</button>
+        <button class="demo-example-pill" onclick="setDemoPrompt(1)">Hedging request</button>
+        <button class="demo-example-pill" onclick="setDemoPrompt(2)">Technical prompt</button>
+      </div>
+      <textarea id="demo-textarea" placeholder="Paste any AI prompt here to see a live analysis…" rows="4"></textarea>
+      <div class="demo-footer">
+        <span class="demo-char-count" id="demo-char-count">0 / 500 characters</span>
+        <button class="demo-btn" id="demo-btn" onclick="runDemo()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Analyze free
+        </button>
+      </div>
+    </div>
+    <div id="demo-results" style="display:none;"></div>
+    <div id="demo-cta" style="display:none;" class="demo-cta-wrap">
+      <p class="demo-cta-text">Want unlimited analyses, score cards, and prompt history?</p>
+      <a href="/app" class="btn-hero" style="font-size:14px;padding:11px 24px;">Create free account →</a>
     </div>
   </div>
 </section>
@@ -782,6 +836,113 @@ async function goToCheckout(plan) {
     alert('Could not start checkout: ' + err.message);
     btn.disabled = false;
     btn.textContent = plan === 'plus' ? 'Get Plus →' : 'Get Pro →';
+  }
+}
+
+const DEMO_EXAMPLES = [
+  `Hi, I was hoping you could help me write a professional email to my team about our upcoming project deadline. I want it to be clear but also friendly and not too formal. We need to let everyone know that the deadline has been moved to next Friday and that we need everyone to submit their work by end of day. Could you make sure it sounds like it came from a manager but still approachable? Thanks so much!`,
+  `I was wondering if maybe you could possibly help me understand how machine learning works? I'm not sure if this is too basic of a question but I feel like I don't really get it and I've tried reading about it online but it's all very confusing. If you could explain it in simple terms that would be great, but also detailed enough that I actually learn something. Sorry if that's a weird request.`,
+  `Can you review my Python function and tell me if there are any issues with it? I want to make sure it works correctly and is written well. It's supposed to handle user authentication but I'm not totally sure if it's secure or if I'm doing it right. Also if you see ways to make it faster or cleaner that would be helpful too. Let me know what you think about the overall approach.`
+];
+
+let demoUsed = false;
+
+function setDemoPrompt(idx) {
+  const ta = document.getElementById('demo-textarea');
+  ta.value = DEMO_EXAMPLES[idx];
+  updateDemoCount();
+  ta.focus();
+}
+
+function updateDemoCount() {
+  const ta = document.getElementById('demo-textarea');
+  const el = document.getElementById('demo-char-count');
+  if (ta && el) {
+    const len = ta.value.length;
+    el.textContent = `${len} / 500 characters`;
+    el.style.color = len > 500 ? '#dc2626' : '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const ta = document.getElementById('demo-textarea');
+  if (ta) ta.addEventListener('input', updateDemoCount);
+});
+
+async function runDemo() {
+  const ta  = document.getElementById('demo-textarea');
+  const btn = document.getElementById('demo-btn');
+  const prompt = ta?.value.trim();
+
+  if (!prompt || prompt.length < 10) return;
+  if (prompt.length > 500) { ta.style.borderColor = '#dc2626'; return; }
+
+  if (demoUsed) {
+    document.getElementById('demo-cta').style.display = 'block';
+    document.getElementById('demo-cta').scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.75s linear infinite;display:inline-block;"></div> Analyzing…';
+
+  try {
+    const res  = await fetch('/api/demo', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Analysis failed');
+
+    demoUsed = true;
+    const r = data.result;
+    const savings = r.savings_percent || 0;
+    const effTokens = r.efficient_tokens || 0;
+    const origTokens = r.estimated_tokens || 0;
+
+    document.getElementById('demo-results').style.display = 'block';
+    document.getElementById('demo-results').innerHTML = `
+      <div class="demo-result-card">
+        <div class="demo-result-header">
+          <div class="demo-result-title">📊 Analysis results</div>
+          <span class="demo-savings-badge">−${savings}% tokens</span>
+        </div>
+        <div class="demo-result-body">
+          <div class="demo-stat-row">
+            <div class="demo-stat">
+              <div class="demo-stat-val">${origTokens}</div>
+              <div class="demo-stat-lbl">Original</div>
+            </div>
+            <div class="demo-stat">
+              <div class="demo-stat-val">${effTokens}</div>
+              <div class="demo-stat-lbl">Optimized</div>
+            </div>
+            <div class="demo-stat">
+              <div class="demo-stat-val" style="color:#16a34a">−${savings}%</div>
+              <div class="demo-stat-lbl">Saved</div>
+            </div>
+          </div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9ca3af;margin-bottom:8px;font-family:'Geist Mono',monospace;">✨ Optimized version</div>
+          <div class="demo-efficient">${(r.efficient_prompt || '').replace(/\n/g, '<br>')}</div>
+        </div>
+      </div>`;
+
+    document.getElementById('demo-cta').style.display = 'block';
+    document.getElementById('demo-results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    btn.innerHTML = '✓ Analysis complete — try another above';
+    btn.disabled = false;
+    btn.onclick = () => {
+      document.getElementById('demo-cta').scrollIntoView({ behavior: 'smooth' });
+    };
+
+  } catch(err) {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Analyze free';
+    document.getElementById('demo-results').style.display = 'block';
+    document.getElementById('demo-results').innerHTML = `<div style="padding:1rem;color:#dc2626;font-size:13px;text-align:center;">Something went wrong — try again or <a href="/app" style="color:#2563eb;">sign up free</a> for full access.</div>`;
   }
 }
 
