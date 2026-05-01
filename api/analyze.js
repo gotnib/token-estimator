@@ -198,8 +198,70 @@ function resetIn(startAt, windowDays) {
 
 export const config = { maxDuration: 30 };
 
+// Simple in-memory IP rate limit for demo — 1 per hour
+const demoIpCache = new Map();
+function isDemoRateLimited(ip) {
+  const now = Date.now();
+  const entry = demoIpCache.get(ip);
+  if (entry && now - entry < 3600000) return true;
+  demoIpCache.set(ip, now);
+  if (demoIpCache.size > 10000) {
+    for (const [k, v] of demoIpCache) {
+      if (now - v > 3600000) demoIpCache.delete(k);
+    }
+  }
+  return false;
+}
+
+const DEMO_SYSTEM = `You are a prompt efficiency expert. Analyze the given prompt and return ONLY valid JSON:
+{
+  "estimated_tokens": <integer>,
+  "efficient_prompt": "<optimized version — remove filler, hedging, politeness overhead, redundancy. Use single quotes only in code.>",
+  "savings_percent": <integer 0-100>,
+  "efficient_tokens": <integer>
+}
+Return ONLY the JSON object, no markdown, no explanation.`;
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // ── Demo path — no auth required ──────────────────
+  if (req.body?.demo === true) {
+    const ip = (req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+      || req.headers['x-real-ip']
+      || 'unknown');
+
+    if (isDemoRateLimited(ip)) {
+      return res.status(429).json({ error: 'One demo per hour. Sign up free for unlimited access.' });
+    }
+
+    const prompt = (req.body.prompt || '').trim().slice(0, 500);
+    if (prompt.length < 10) return res.status(400).json({ error: 'Prompt too short' });
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 25000);
+      const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 500, system: DEMO_SYSTEM, messages: [{ role: 'user', content: `Analyze:\n\n${prompt}` }] })
+      });
+      clearTimeout(timeout);
+      if (!apiRes.ok) throw new Error('API error');
+      const data = await apiRes.json();
+      const raw  = (data.content || []).map(c => c.text || '').join('');
+      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      let result;
+      try { result = JSON.parse(cleaned); }
+      catch(e) { const m = cleaned.match(/\{[\s\S]*\}/); result = m ? JSON.parse(m[0]) : null; }
+      if (!result) throw new Error('Parse failed');
+      return res.status(200).json({ result });
+    } catch(err) {
+      if (err.name === 'AbortError') return res.status(504).json({ error: 'Timed out — try a shorter prompt' });
+      return res.status(500).json({ error: 'Analysis failed' });
+    }
+  }
 
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const supabaseUrl  = process.env.SUPABASE_URL;
