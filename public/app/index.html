@@ -915,7 +915,21 @@ function buildResultCards(d, idx) {
         <div class="rc-title"><div class="rc-icon" style="background:#fefce8">💡</div>What you can learn from this</div>
       </div>
       <div class="rc-body">${reasonsHTML}</div>
-    </div>`;
+    </div>
+    ${(d.missing_context && d.missing_context.length > 0) ? `
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#fff7ed">🎯</div>What would make this even stronger</div>
+      </div>
+      <div class="rc-body">
+        ${d.missing_context.map(item => `
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;padding:10px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;">
+            <span style="color:#d97706;font-size:13px;flex-shrink:0;">+</span>
+            <span style="font-size:13px;color:#374151;line-height:1.55;">${escHtml(item)}</span>
+          </div>`).join('')}
+        <div style="font-size:11px;color:#9ca3af;margin-top:8px;">These are additions — not fixes. Your prompt is already more efficient. These would make it more precise.</div>
+      </div>
+    </div>` : ''}`;
   } catch(err) {
     console.error('buildResultCards error:', err, 'data:', JSON.stringify(d).slice(0, 500));
     return `<div class="error-state"><strong>Display error: ${escHtml(err.message)}</strong>Please try again.</div>`;
