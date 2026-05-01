@@ -705,7 +705,7 @@ async function analyze() {
       : { prompt: prompts[0], level: currentLevel };
 
     const controller = new AbortController();
-    const fetchTimeout = setTimeout(() => controller.abort(), 35000);
+    const fetchTimeout = setTimeout(() => controller.abort(), 28000);
 
     const res  = await fetch('/api/analyze', {
       method: 'POST',
@@ -767,6 +767,11 @@ async function analyze() {
         <br><br>
         <button onclick="analyze()" style="margin-top:8px;background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;">Try again</button>
       </div>`;
+    const b = document.getElementById('analyze-btn');
+    if (b) {
+      b.disabled = false;
+      b.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
+    }
   }
 
   btn.disabled = false;
