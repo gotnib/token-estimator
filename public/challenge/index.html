@@ -405,8 +405,6 @@ async function init() {
     renderNavPill(userPlan);
     updateCounter(profile);
 
-    if (userPlan === 'free') { renderGate(); return; }
-
     selectType('general');
   } catch(e) {
     document.getElementById('type-selector').innerHTML =
@@ -428,15 +426,14 @@ function updateCounter(profile) {
     wrap.innerHTML = `<div class="challenge-counter"><div class="counter-dot"></div>Unlimited challenges</div>`;
     return;
   }
-  if (userPlan === 'plus') {
-    const now    = new Date();
-    const lastAt = profile?.last_challenge_at ? new Date(profile.last_challenge_at) : null;
-    const hrs    = lastAt ? (now - lastAt) / 3600000 : 999;
-    const used   = hrs >= 24 ? 0 : (profile?.challenges_today || 0);
-    const rem    = Math.max(0, 5 - used);
-    const dotCls = rem > 2 ? '' : rem > 0 ? ' warn' : ' danger';
-    wrap.innerHTML = `<div class="challenge-counter"><div class="counter-dot${dotCls}"></div>${rem} / 5 challenges today</div>`;
-  }
+  const limit  = userPlan === 'free' ? 1 : 5;
+  const now    = new Date();
+  const lastAt = profile?.last_challenge_at ? new Date(profile.last_challenge_at) : null;
+  const hrs    = lastAt ? (now - lastAt) / 3600000 : 999;
+  const used   = hrs >= 24 ? 0 : (profile?.challenges_today || 0);
+  const rem    = Math.max(0, limit - used);
+  const dotCls = rem > (limit / 2) ? '' : rem > 0 ? ' warn' : ' danger';
+  wrap.innerHTML = `<div class="challenge-counter"><div class="counter-dot${dotCls}"></div>${rem} / ${limit} challenge${limit > 1 ? 's' : ''} today</div>`;
 }
 
 async function logout() { await sb.auth.signOut(); window.location.href = '/'; }
