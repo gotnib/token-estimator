@@ -52,13 +52,15 @@ const BASE_STRUCTURE = `Return ONLY valid JSON, no markdown, no preamble:
   "savings_percent": <integer 0-100>,
   "efficient_tokens": <integer>,
   "scores": { "clarity": <1-10>, "conciseness": <1-10>, "structure": <1-10>, "specificity": <1-10> },
-  "score_notes": { "clarity": "<10 words max>", "conciseness": "<10 words max>", "structure": "<10 words max>", "specificity": "<10 words max>" },
-  "reasons": [{ "change": "<what changed>", "principle": "<principle name only, 5 words max>", "lesson": "<one actionable sentence>" }]
+  "score_notes": { "clarity": "<10 words max>", "conciseness": "<10 words max>", "structure": "<10 words max>", "specificity": "<10 words max — if low, explain what is vague>" },
+  "reasons": [{ "change": "<what changed>", "principle": "<principle name only, 5 words max>", "lesson": "<one actionable sentence>" }],
+  "missing_context": ["<specific thing that would make this prompt more precise>"]
 }
 
-Scores: clarity=unambiguous instruction, conciseness=free of waste, structure=logical flow, specificity=output defined.
+missing_context: 1-3 things the user could ADD to make the prompt significantly more effective. Examples: missing language or framework, no output format specified, no constraints given, no examples provided, ambiguous scope. Only include genuinely missing items. If already highly specific return empty array.
+Scores: clarity=unambiguous instruction, conciseness=free of waste, structure=logical flow, specificity=output defined. If specificity below 7, score_notes.specificity must explain what is vague.
 Categories: Core instruction, Background context, System framing, Examples, Constraints, Output format spec, Redundancy/filler, Politeness overhead.
-Pricing: $3.00 per 1M input tokens (claude-sonnet-4-5). Max 3 breakdown items. Max 3 reasons.`;
+Pricing: $3.00 per 1M input tokens (claude-sonnet-4-5). Max 3 breakdown items. Max 3 reasons. Max 3 missing_context items.`;
 
 const SYSTEM_PROMPTS = {
   fast: `You are a prompt efficiency expert performing a FAST surface-level trim. ${BASE_STRUCTURE}
