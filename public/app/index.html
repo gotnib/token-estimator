@@ -335,9 +335,9 @@ const PLAN_ICONS  = { free: '🔍', plus: '⚡', pro: '🚀' };
 const PLAN_LABELS = { free: 'Free', plus: 'Plus', pro: 'Pro' };
 const CHAR_LIMITS = { free: 1500, plus: 5000, pro: 7500 };
 const LEVEL_CONFIG = {
-  fast:     { label: 'Fast',     desc: 'Trim obvious waste only', color: 'fast',     plans: ['free','plus','pro'] },
-  balanced: { label: 'Balanced', desc: 'Tighten and restructure',  color: 'balanced', plans: ['plus','pro'] },
-  deep:     { label: 'Deep',     desc: 'Maximum compression',      color: 'deep',     plans: ['pro'] }
+  fast:     { label: 'Fast',     desc: 'Trim obvious waste only',    color: 'fast',     plans: ['free','plus','pro'] },
+  balanced: { label: 'Balanced', desc: 'Tighten and restructure',    color: 'balanced', plans: ['plus','pro'] },
+  deep:     { label: 'Code',     desc: 'Optimize code input (Pro)',   color: 'deep',     plans: ['pro'] }
 };
 
 let sb, currentUser, currentSession, currentPlan = 'free';
@@ -376,8 +376,8 @@ function renderSlider() {
       <span class="slider-value ${valueCfg.color}">${valueCfg.label}</span>
     </div>
     <div class="slider-track">${optionsHTML}</div>
-    ${currentPlan === 'free' ? `<div class="slider-lock-note">Balanced and Deep available on <a href="#" onclick="showUpgrade()" style="color:var(--accent)">Plus and Pro</a></div>` : ''}
-    ${currentPlan === 'plus' ? `<div class="slider-lock-note">Deep optimization available on <a href="#" onclick="showUpgrade()" style="color:var(--accent2)">Pro</a></div>` : ''}`;
+    ${currentPlan === 'free' ? `<div class="slider-lock-note">Balanced and Code mode available on <a href="#" onclick="showUpgrade()" style="color:var(--accent)">Plus and Pro</a></div>` : ''}
+    ${currentPlan === 'plus' ? `<div class="slider-lock-note">Code optimization available on <a href="#" onclick="showUpgrade()" style="color:var(--accent2)">Pro</a></div>` : ''}`;
 }
 
 function renderNavPill(plan) {
@@ -558,7 +558,7 @@ function renderPromptList() {
     <div class="prompt-item">
       ${isPro && prompts.length > 1 ? `<div class="prompt-label">Prompt ${i + 1}</div>` : ''}
       <div class="prompt-row">
-        <textarea id="prompt-${i}" placeholder="Paste your prompt here…" oninput="onPromptInput(${i}, this.value)">${escHtml(p)}</textarea>
+        <textarea id="prompt-${i}" placeholder="${currentLevel === 'deep' ? 'Paste your code here…' : 'Paste your prompt here…'}" oninput="onPromptInput(${i}, this.value)">${escHtml(p)}</textarea>
         ${isPro && prompts.length > 1 ? `<button class="btn-remove" onclick="removePrompt(${i})" title="Remove">×</button>` : ''}
       </div>
     </div>`).join('');
@@ -627,7 +627,38 @@ async function analyze() {
 
   if (!prompts.length) return;
 
-  // Client-side char limit check
+  // Code detection for Fast and Balanced — block and upsell Pro
+  if (currentLevel !== 'deep') {
+    const codeSignals = [
+      /^\s*(def |class |import |from .* import |if __name__)/m,
+      /^\s*(function |const |let |var |=>|async function)/m,
+      /^\s*(SELECT |INSERT |UPDATE |DELETE |CREATE TABLE)/im,
+      /^\s*(<html|<div|<body|<!DOCTYPE)/im,
+      /^\s*(public |private |protected |void |int |string )/m,
+      /\{\s*\n.*\}/s,
+      /^\s*#include/m,
+      /^\s*(package |import java|import kotlin)/m,
+    ];
+    const inputText = prompts.join(' ');
+    const looksLikeCode = codeSignals.some(r => r.test(inputText));
+
+    if (looksLikeCode) {
+      document.getElementById('results').innerHTML = `
+        <div class="upgrade-card">
+          <div class="upgrade-icon">💻</div>
+          <div class="upgrade-title">Looks like you pasted code</div>
+          <div class="upgrade-sub">
+            Fast and Balanced are built for AI prompts, not code.<br>
+            Upgrade to <strong>Pro</strong> to use Code mode — paste your code and receive an optimized, cleaner version with explanations.
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button class="upgrade-btn" onclick="showUpgrade()">Upgrade to Pro →</button>
+            <button class="upgrade-btn-ghost" onclick="document.getElementById('results').innerHTML=''">Dismiss</button>
+          </div>
+        </div>`;
+      return;
+    }
+  }
   const lim      = charLimit();
   const overLimit = prompts.find(p => p.length > lim);
   if (overLimit) {
@@ -866,7 +897,7 @@ function buildResultCards(d, idx) {
         <button class="btn-upgrade-cta" style="padding:9px 22px;font-size:13px;" onclick="goToCheckout(this)">Upgrade to Plus →</button>
       </div>
     </div>` : `
-    <div class="efficient-prompt">${effPrompt}</div>
+    <div class="efficient-prompt" style="${d.level === 'deep' ? 'font-family:\'Geist Mono\',monospace;font-size:13px;white-space:pre-wrap;font-style:normal;background:#1e2d4a;color:#e2e8f0;border-color:#1e2d4a;' : ''}">${effPrompt}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn-copy" data-copy="${escHtml(effPromptRaw)}">Copy</button>
       ${isPro ? `<button class="btn-save" data-save-id="${histId || idx}" data-saved="false">☆ Save to library</button>` : ''}
@@ -905,7 +936,7 @@ function buildResultCards(d, idx) {
     </div>
     <div class="result-card">
       <div class="rc-header">
-        <div class="rc-title"><div class="rc-icon" style="background:#eff6ff">✨</div>Efficient alternative</div>
+        <div class="rc-title"><div class="rc-icon" style="background:#eff6ff">${d.level === 'deep' ? '💻' : '✨'}</div>${d.level === 'deep' ? 'Optimized code' : 'Efficient alternative'}</div>
         <span class="savings-badge">−${savings}% tokens</span>
       </div>
       <div class="rc-body">${optimizationSection}</div>
