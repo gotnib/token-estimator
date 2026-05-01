@@ -358,9 +358,7 @@ export default async function handler(req, res) {
   const apiKey  = process.env.ANTHROPIC_API_KEY;
   const action  = req.query.action || 'generate';
 
-  if (plan === 'free') {
-    return res.status(403).json({ error: 'upgrade_required', message: 'Challenge mode is available on Plus and Pro plans.' });
-  }
+  const CHALLENGE_LIMIT_FREE = 1;
 
   // Code challenges are Pro only
   const isCode = action === 'run-code' || !!req.query.code_language || !!req.body?.code_language;
@@ -370,18 +368,19 @@ export default async function handler(req, res) {
 
   // ── GET: generate challenge ────────────────────────
   if (req.method === 'GET') {
-    // Plus daily limit (prompt challenges only)
-    if (plan === 'plus') {
+    // Daily limits for free and plus
+    if (plan === 'free' || plan === 'plus') {
+      const limit    = plan === 'free' ? CHALLENGE_LIMIT_FREE : CHALLENGE_LIMIT_PLUS;
       const lastAt   = profile?.last_challenge_at ? new Date(profile.last_challenge_at) : null;
       const hrs      = lastAt ? (new Date() - lastAt) / 3600000 : 999;
       const used     = hrs >= 24 ? 0 : (profile?.challenges_today || 0);
 
-      if (used >= CHALLENGE_LIMIT_PLUS) {
+      if (used >= limit) {
         const resetsAt = new Date(lastAt.getTime() + 24 * 3600000);
         const mins     = Math.ceil((resetsAt - new Date()) / 60000);
         const h = Math.floor(mins / 60), m = mins % 60;
         return res.status(403).json({
-          error: 'limit_reached', used, limit: CHALLENGE_LIMIT_PLUS,
+          error: 'limit_reached', used, limit,
           resets_in: h > 0 ? `${h}h ${m}m` : `${m}m`
         });
       }
