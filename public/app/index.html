@@ -144,6 +144,7 @@ textarea::placeholder{color:var(--dim);}
 /* SCORE CARD */
 .score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem;}
 .score-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center;}
+@media(max-width:500px){.score-grid{grid-template-columns:repeat(2,1fr);}}
 .score-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:8px;}
 .score-ring{position:relative;width:52px;height:52px;margin:0 auto 6px;}
 .score-ring svg{transform:rotate(-90deg);}
