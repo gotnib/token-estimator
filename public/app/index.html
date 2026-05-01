@@ -694,18 +694,20 @@ async function analyze() {
     }, delay)
   );
 
+  // Refresh session token before analyzing — outside try so timeout covers everything
   try {
-    // Refresh session token before every analyze call
     const { data: { session: freshSession } } = await sb.auth.getSession();
     if (freshSession) currentSession = freshSession;
-    if (!currentSession) { openModal('login'); return; }
+  } catch(e) { /* fail open — use existing session */ }
+  if (!currentSession) { openModal('login'); return; }
 
+  const controller = new AbortController();
+  const fetchTimeout = setTimeout(() => controller.abort(), 28000);
+
+  try {
     const body = currentPlan === 'pro'
       ? { prompts, level: currentLevel }
       : { prompt: prompts[0], level: currentLevel };
-
-    const controller = new AbortController();
-    const fetchTimeout = setTimeout(() => controller.abort(), 28000);
 
     const res  = await fetch('/api/analyze', {
       method: 'POST',
@@ -757,6 +759,8 @@ async function analyze() {
     }
 
   } catch(err) {
+    clearTimeout(fetchTimeout);
+    controller.abort();
     msgTimers.forEach(clearTimeout);
     const msg = err.name === 'AbortError'
       ? 'Analysis timed out — try a shorter prompt or switch to Fast optimization level.'
