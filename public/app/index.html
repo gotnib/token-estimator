@@ -695,6 +695,11 @@ async function analyze() {
   );
 
   try {
+    // Refresh session token before every analyze call
+    const { data: { session: freshSession } } = await sb.auth.getSession();
+    if (freshSession) currentSession = freshSession;
+    if (!currentSession) { openModal('login'); return; }
+
     const body = currentPlan === 'pro'
       ? { prompts, level: currentLevel }
       : { prompt: prompts[0], level: currentLevel };
@@ -756,7 +761,12 @@ async function analyze() {
     const msg = err.name === 'AbortError'
       ? 'Analysis timed out — try a shorter prompt or switch to Fast optimization level.'
       : err.message;
-    document.getElementById('results').innerHTML = `<div class="error-state"><strong>Something went wrong</strong>${msg}</div>`;
+    document.getElementById('results').innerHTML = `
+      <div class="error-state">
+        <strong>Something went wrong</strong>${msg}
+        <br><br>
+        <button onclick="analyze()" style="margin-top:8px;background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;">Try again</button>
+      </div>`;
   }
 
   btn.disabled = false;
