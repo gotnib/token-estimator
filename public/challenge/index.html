@@ -495,7 +495,7 @@ async function startChallenge() {
       document.getElementById('content').style.display = 'none';
       btn.disabled = false;
       btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
-      alert('Error: ' + err.message);
+      showToast(err.message);
     }
     return;
   }
@@ -536,7 +536,7 @@ async function startChallenge() {
     document.getElementById('content').style.display = 'none';
     btn.disabled = false;
     btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate challenge';
-    alert('Error: ' + err.message);
+    showToast(err.message);
   }
 }
 
@@ -581,7 +581,7 @@ function renderCodeChallenge() {
 async function submitCodeAttempt() {
   const userCode = document.getElementById('user-code')?.value.trim();
   if (!userCode || userCode.length < 10) {
-    alert('Please write your rewritten code first.');
+    showToast('Please write your rewritten code first.');
     return;
   }
 
@@ -620,7 +620,7 @@ async function submitCodeAttempt() {
     scoreTimers.forEach(clearTimeout);
     btn.disabled = false;
     btn.innerHTML = 'Submit for scoring';
-    alert('Scoring failed: ' + err.message);
+    showToast('Scoring failed: ' + err.message);
   }
 }
 
@@ -793,7 +793,7 @@ async function submitAttempt() {
     scoreTimers.forEach(clearTimeout);
     btn.disabled = false;
     btn.innerHTML = 'Submit for scoring';
-    alert('Scoring failed: ' + err.message);
+    showToast('Scoring failed: ' + err.message);
   }
 }
 
