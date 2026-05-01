@@ -739,12 +739,52 @@ function updateCharHint() {
 function showToast(msg, type = 'error') {
   const existing = document.getElementById('toast');
   if (existing) existing.remove();
+  const existingBar = document.getElementById('bug-report-bar');
+  if (existingBar) existingBar.remove();
+
   const t = document.createElement('div');
   t.id = 'toast';
   t.textContent = msg;
   t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${type === 'error' ? '#dc2626' : '#16a34a'};color:white;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);white-space:nowrap;max-width:90vw;text-align:center;`;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(() => { if (t.parentNode) t.remove(); }, 3000);
+
+  if (type === 'error') {
+    const bar = document.createElement('div');
+    bar.id = 'bug-report-bar';
+    bar.style.cssText = `position:fixed;bottom:0;left:0;right:0;background:#1e2d4a;color:#94a3b8;font-size:12px;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;z-index:9998;`;
+    bar.innerHTML = `<span>Something went wrong</span><div style="display:flex;gap:8px;align-items:center;"><button id="bug-btn" onclick="reportBug('${msg.replace(/'/g, "\\'")}',document.getElementById('bug-btn'))" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;border-radius:99px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;">🐛 Report bug</button><button onclick="document.getElementById('bug-report-bar').remove()" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;line-height:1;">×</button></div>`;
+    document.body.appendChild(bar);
+  }
+}
+
+async function reportBug(errorMsg, btnEl) {
+  if (btnEl) { btnEl.textContent = 'Sending…'; btnEl.disabled = true; }
+  try {
+    const context = `Page: Challenge Mode
+Error: ${errorMsg}
+Type: ${selectedType || 'unknown'}
+Category: ${selectedCat || 'none'}
+Language: ${selectedLang || 'none'}
+Plan: ${userPlan || 'unknown'}
+Time: ${new Date().toISOString()}
+User agent: ${navigator.userAgent}`;
+
+    await fetch('/api/support', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Bug Report (auto)',
+        email: session?.user?.email || 'unknown',
+        message: context
+      })
+    });
+
+    if (btnEl) { btnEl.textContent = '✓ Reported — thanks!'; }
+    setTimeout(() => { const bar = document.getElementById('bug-report-bar'); if (bar) bar.remove(); }, 2000);
+  } catch(e) {
+    if (btnEl) { btnEl.textContent = 'Failed to send'; }
+  }
 }
 
 async function submitAttempt() {
