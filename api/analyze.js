@@ -38,7 +38,7 @@ async function checkRateLimit(userId, plan) {
 }
 
 const LIMITS = {
-  free: { daily: 3,    monthly: null, chars: 1500 },
+  free: { daily: 5,    monthly: null, chars: 1500 },
   plus: { daily: null, monthly: 120,  chars: 5000 },
   pro:  { daily: null, monthly: 600,  chars: 7500 }
 };
@@ -389,10 +389,6 @@ export default async function handler(req, res) {
 
     // ── Restrict output by plan ────────────────────────────
     const processedResults = results.map((r, i) => {
-      if (plan === 'free') {
-        const firstSentence = (r.efficient_prompt || '').split(/(?<=[.!?])\s+/)[0] || (r.efficient_prompt || '').substring(0, 120);
-        return { ...r, efficient_prompt: null, efficient_prompt_teaser: firstSentence, optimization_locked: true };
-      }
       return { ...r, priority: plan === 'pro' };
     });
 
