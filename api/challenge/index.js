@@ -45,25 +45,26 @@ const TECHNICAL_TOPICS = [
 
 const MISTAKE_POOLS = {
   general: [
-    'excessive politeness and hedging',
-    'vague output format with no structure specified',
-    'asking multiple unrelated things in one prompt',
-    'over-explaining obvious context the AI already knows',
-    'unnecessary role-setting preamble',
-    'hedging every request with if possible or sort of',
-    'apologizing for asking',
-    'repeating the same requirement three different ways',
-    'using passive voice and indirect language throughout',
+    'vague scope that could mean several different things',
+    'missing key context that would change the answer',
+    'no output format or structure specified',
+    'multiple separate questions bundled into one',
+    'describes the situation conversationally instead of stating the task',
+    'assumes context the AI does not have',
+    'unclear requirements that force the AI to guess',
+    'repeats the same requirement in different words',
+    'no constraints on length, tone, or audience',
+    'mixes what they want with unnecessary backstory',
   ],
   technical: [
-    'not specifying the programming language or framework',
-    'vague requirements without clear inputs and outputs',
-    'no mention of error handling or edge cases',
-    'requesting explanation AND code without separating concerns',
-    'no performance or complexity requirements stated',
-    'contradictory requirements in the same prompt',
-    'asking for a review without specifying what to look for',
-    'no context about the codebase or existing patterns',
+    'no programming language or version specified',
+    'vague about what the inputs and outputs should be',
+    'no error handling or edge case requirements',
+    'mixes code generation with explanation in one request',
+    'no context about what the code needs to integrate with',
+    'missing what done looks like or how to test it',
+    'no performance or scale requirements',
+    'asks for review without saying what to focus on',
   ]
 };
 
@@ -245,16 +246,29 @@ async function generatePromptChallenge(apiKey, category) {
   const mistakes   = randomMistakes(MISTAKE_POOLS[mistakeKey], 2 + Math.floor(Math.random() * 2));
 
   const parsed = await claude(apiKey,
-    `You generate intentionally inefficient AI prompts for a prompt engineering training exercise.
+    `You generate realistic but inefficient AI prompts for a prompt engineering training exercise.
+
+Critical: The bad prompt must sound like something a real person actually typed — NOT an obvious caricature. No "Hi there!", no "I hope you can help me!", no theatrical politeness. Real people are direct but imprecise.
+
+Bad prompts from real people look like:
+- Missing key context that changes the answer
+- Vague scope that forces the AI to guess
+- Asking multiple things at once without separating them
+- Assuming context the AI doesn't have
+- Describing the problem conversationally instead of specifying the task
+
 Return ONLY valid JSON:
 {
   "category": "<specific topic>",
-  "bad_prompt": "<inefficient prompt about: ${topic}>",
-  "hint": "<vague hint about the inefficiency, do not name it>",
+  "bad_prompt": "<realistic inefficient prompt about: ${topic}>",
+  "hint": "<vague hint about what is missing or unclear, do not name the principle>",
   "ideal_prompt": "<tight, precise optimized version>"
 }
-Bad prompt MUST include: ${mistakes.join('; ')}.
-Bad prompt: 80-200 words. Ideal prompt: 15-50 words. Topic: ${topic}.`,
+
+Bad prompt MUST demonstrate: ${mistakes.join('; ')}.
+Bad prompt: 40-120 words. Should sound like a real person, not a writing exercise.
+Ideal prompt: 15-50 words. Precise, direct, complete.
+Topic: ${topic}.`,
     'Generate the challenge now.'
   );
   return parsed;
