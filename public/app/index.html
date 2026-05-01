@@ -786,8 +786,24 @@ async function analyze() {
       <div class="loading-state">
         <div class="spinner"></div>
         <span id="loading-msg">Analyzing your prompt…</span>
+        <div id="loading-retry" style="display:none;margin-top:12px;text-align:center;">
+          <div style="font-size:12px;color:var(--dim);margin-bottom:8px;">Taking longer than usual…</div>
+          <button id="retry-btn" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;font-family:'Geist',sans-serif;">↺ Retry</button>
+        </div>
       </div>
     </div>`;
+
+  // Show retry button after 15 seconds — clicking cancels in-flight and retries
+  let activeController = null;
+  const retryTimer = setTimeout(() => {
+    const el = document.getElementById('loading-retry');
+    if (el) el.style.display = 'block';
+    const btn = document.getElementById('retry-btn');
+    if (btn) btn.onclick = () => {
+      if (activeController) activeController.abort();
+      analyze();
+    };
+  }, 15000);
 
   // Progressive messages so users know it's working
   const messages = [
@@ -811,6 +827,7 @@ async function analyze() {
   if (!currentSession) { openModal('login'); return; }
 
   const controller = new AbortController();
+  activeController = controller;
   const fetchTimeout = setTimeout(() => controller.abort(), 28000);
 
   try {
@@ -825,6 +842,7 @@ async function analyze() {
       body: JSON.stringify(body)
     });
     clearTimeout(fetchTimeout);
+    clearTimeout(retryTimer);
     const data = await res.json();
     msgTimers.forEach(clearTimeout);
 
@@ -869,6 +887,7 @@ async function analyze() {
 
   } catch(err) {
     clearTimeout(fetchTimeout);
+    clearTimeout(retryTimer);
     controller.abort();
     msgTimers.forEach(clearTimeout);
     const msg = err.name === 'AbortError'
