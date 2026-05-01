@@ -150,6 +150,14 @@ textarea::placeholder{color:var(--dim);}
 .score-ring svg{transform:rotate(-90deg);}
 .score-ring-bg{fill:none;stroke:var(--border);stroke-width:4;}
 .score-ring-fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1);}
+.model-selector-wrap{padding:12px 16px;border-top:1px solid var(--border);background:var(--bg);}
+.model-selector-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:8px;font-family:'Geist Mono',monospace;}
+.model-selector{display:flex;gap:6px;flex-wrap:wrap;}
+.model-pill{display:flex;align-items:center;gap:5px;padding:5px 12px;border:1.5px solid var(--border);border-radius:99px;font-size:12px;font-weight:500;color:var(--muted);background:var(--white);cursor:pointer;transition:all 0.15s;font-family:'Geist',sans-serif;}
+.model-pill:hover{border-color:var(--border2);color:var(--text);}
+.model-pill.active{background:var(--text);border-color:var(--text);color:white;}
+.model-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.model-selector-note{font-size:10px;color:var(--dim);margin-top:6px;}
 .score-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--text);}
 .score-tooltip{position:fixed;background:#1e2d4a;color:white;font-size:11px;line-height:1.5;padding:8px 12px;border-radius:8px;max-width:200px;z-index:9999;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
 .score-note{font-size:10px;color:var(--dim);line-height:1.4;}
@@ -345,6 +353,40 @@ const LEVEL_CONFIG = {
 let sb, currentUser, currentSession, currentPlan = 'free';
 let currentLevel = 'balanced';
 let prompts = [''];
+
+const MODELS = {
+  claude: { label: 'Claude Sonnet', provider: 'Anthropic', pricePerM: 3.00,  note: 'Estimated against Anthropic pricing' },
+  gpt4o:  { label: 'GPT-4o',        provider: 'OpenAI',    pricePerM: 2.50,  note: 'Estimated against OpenAI pricing' },
+  gemini: { label: 'Gemini Pro',    provider: 'Google',    pricePerM: 1.25,  note: 'Estimated against Google pricing' },
+  llama:  { label: 'Llama 70B',     provider: 'Meta',      pricePerM: 0.59,  note: 'Estimated against Meta/Groq pricing' },
+};
+let currentModel = localStorage.getItem('tl_model') || 'claude';
+
+function setModel(key) {
+  currentModel = key;
+  localStorage.setItem('tl_model', key);
+  renderModelSelector();
+  // Re-render results if visible with new pricing
+  const results = document.getElementById('results');
+  if (results && results.innerHTML && !results.innerHTML.includes('loading-state')) {
+    const costEls = document.querySelectorAll('.stat-sub');
+    costEls.forEach(el => {
+      if (el.textContent.includes('input rate') || el.textContent.includes('pricing')) {
+        el.textContent = MODELS[currentModel].note;
+      }
+    });
+  }
+}
+
+function renderModelSelector() {
+  const wrap = document.getElementById('model-selector');
+  if (!wrap) return;
+  wrap.innerHTML = Object.entries(MODELS).map(([key, m]) => `
+    <button class="model-pill ${key === currentModel ? 'active' : ''}" onclick="setModel('${key}')">
+      <span class="model-dot" style="background:${key === currentModel ? 'white' : '#d1d5db'}"></span>
+      ${m.label}
+    </button>`).join('');
+}
 
 function charLimit() { return CHAR_LIMITS[currentPlan] || 1500; }
 
@@ -543,12 +585,18 @@ function renderAnalyzer() {
           </button>
         </div>
         <div id="opt-slider" class="slider-wrap"></div>
+        <div class="model-selector-wrap">
+          <div class="model-selector-label">Estimate costs for</div>
+          <div class="model-selector" id="model-selector"></div>
+          <div class="model-selector-note">Token counts are estimated. Non-Claude models may vary ±10%.</div>
+        </div>
       </div>
     </div>
     <div id="results"></div>`;
 
   renderPromptList();
   renderSlider();
+  renderModelSelector();
   document.getElementById('analyze-btn').addEventListener('click', analyze);
 }
 
@@ -764,8 +812,8 @@ async function analyze() {
 
   try {
     const body = currentPlan === 'pro'
-      ? { prompts, level: currentLevel }
-      : { prompt: prompts[0], level: currentLevel };
+      ? { prompts, level: currentLevel, model: currentModel }
+      : { prompt: prompts[0], level: currentLevel, model: currentModel };
 
     const res  = await fetch('/api/analyze', {
       method: 'POST',
@@ -1005,7 +1053,7 @@ function buildResultCards(d, idx) {
       <div class="rc-body">
         <div class="stats-grid">
           <div class="stat-box"><div class="stat-label">Input tokens</div><div class="stat-value">${(d.estimated_tokens||0).toLocaleString()}</div><div class="stat-sub">your prompt</div></div>
-          <div class="stat-box"><div class="stat-label">Est. cost</div><div class="stat-value">${cost}</div><div class="stat-sub">Sonnet input rate</div></div>
+          <div class="stat-box"><div class="stat-label">Est. cost</div><div class="stat-value">${cost}</div><div class="stat-sub">${MODELS[currentModel]?.note || 'Sonnet input rate'}</div></div>
           <div class="stat-box"><div class="stat-label">Optimized to</div><div class="stat-value">${effTokens.toLocaleString()}</div><div class="stat-sub" style="color:var(--green);font-weight:500">${savings}% reduction</div></div>
         </div>
       </div>
