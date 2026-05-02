@@ -257,6 +257,9 @@ async function init() {
     .select('username, plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
     .eq('id', session.user.id).single();
   profile = data;
+  if (!profile?.username) {
+    profile = { ...profile, username: session.user?.user_metadata?.display_name || '' };
+  }
 
   if (profile?.plan === 'pro') { document.getElementById('nav-library').style.display = 'block'; document.getElementById('mobile-nav-library').style.display = 'block'; }
   renderNavPill(profile?.plan || 'free');
