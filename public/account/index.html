@@ -649,24 +649,7 @@ async function saveUsername() {
   flash.textContent = 'Saving...';
   try {
     const { error } = await sb.from('users').update({ username }).eq('id', session.user.id);
-    if (error) {
-      const msg = (error.message || '').toLowerCase();
-      const missingUsernameColumn = msg.includes("could not find the 'username' column")
-        || msg.includes('column "username"')
-        || msg.includes('schema cache');
-      if (!missingUsernameColumn) throw error;
-
-      const res = await fetch('/api/portal', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'authorization': 'Bearer ' + session.access_token
-        },
-        body: JSON.stringify({ action: 'update_name', username })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Could not update display name.');
-    }
+    await resolveUsernameUpdate(error, username);
     profile.username = username;
     flash.className = 'username-flash success';
     flash.textContent = 'Display name updated.';
@@ -676,6 +659,26 @@ async function saveUsername() {
   } finally {
     btn.disabled = false;
   }
+}
+
+async function resolveUsernameUpdate(error, username) {
+  if (!error) return;
+  const msg = (error.message || '').toLowerCase();
+  const missingUsernameColumn = msg.includes("could not find the 'username' column")
+    || msg.includes('column "username"')
+    || msg.includes('schema cache');
+  if (!missingUsernameColumn) throw error;
+
+  const res = await fetch('/api/portal', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'authorization': 'Bearer ' + session.access_token
+    },
+    body: JSON.stringify({ action: 'update_name', username })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Could not update display name.');
 }
 
 function compareRow(label, included, isPro) {
