@@ -1,10 +1,6 @@
 (() => {
   const STYLE_ID = 'tl-user-plan-style';
-  const SCRIPT_FLAG = '__tokenLensUserPlanNavLoaded';
   const PLAN_LABELS = { free: 'FREE', plus: 'PLUS', pro: 'PRO' };
-
-  if (window[SCRIPT_FLAG]) return;
-  window[SCRIPT_FLAG] = true;
 
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
@@ -72,7 +68,7 @@
       }
 
       @media (max-width: 640px) {
-        .nav-right > .tl-user-plan-wrap {
+        nav .nav-right > .tl-user-plan-wrap {
           display: none !important;
         }
       }
@@ -97,6 +93,19 @@
     );
   }
 
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function escapeAttr(value) {
+    return escapeHtml(value).replace(/`/g, '&#096;');
+  }
+
   function makeUserPlanWrap(username, plan) {
     const normalized = normalizePlan(plan);
     const wrap = document.createElement('div');
@@ -109,23 +118,64 @@
     return wrap;
   }
 
+  function cleanOldDesktopNav(navRight) {
+    document.querySelectorAll('[data-tl-nav-injected="true"]').forEach(el => el.remove());
+
+    const nav = document.querySelector('nav');
+
+    if (nav) {
+      nav.querySelectorAll('#nav-plan-pill, #nav-center').forEach(el => {
+        el.style.display = 'none';
+        el.innerHTML = '';
+      });
+
+      nav.querySelectorAll('.priority-badge').forEach(el => {
+        el.style.display = 'none';
+      });
+
+      nav.querySelectorAll('.plan-pill').forEach(el => {
+        if (!el.classList.contains('tl-plan-pill')) {
+          el.style.display = 'none';
+        }
+      });
+
+      nav.querySelectorAll('#nav-username, .nav-username').forEach(el => {
+        if (!el.classList.contains('tl-nav-username')) {
+          el.style.display = 'none';
+        }
+      });
+
+      Array.from(nav.querySelectorAll('span, div')).forEach(el => {
+        const text = (el.textContent || '').trim();
+        const hasChildren = el.children.length > 0;
+        const isLikelyOldPlanText = ['FREE', 'PLUS', 'PRO'].includes(text);
+        if (!hasChildren && isLikelyOldPlanText && !el.classList.contains('tl-plan-pill')) {
+          el.style.display = 'none';
+        }
+      });
+    }
+
+    if (navRight) {
+      Array.from(navRight.childNodes).forEach(node => {
+        if (node.nodeType !== Node.TEXT_NODE) return;
+        if (!node.textContent.trim()) return;
+        node.textContent = '';
+      });
+    }
+  }
+
   function applyDesktopNav(username, plan) {
     const navRight = document.querySelector('nav .nav-right');
     if (!navRight) return;
 
-    navRight.querySelectorAll('[data-tl-nav-injected="true"]').forEach(el => el.remove());
-
-    const existingPlan = navRight.querySelector('#nav-plan-pill');
-    if (existingPlan) existingPlan.style.display = 'none';
-
-    navRight.querySelectorAll('.priority-badge').forEach(el => {
-      el.style.display = 'none';
-    });
+    cleanOldDesktopNav(navRight);
 
     const wrap = makeUserPlanWrap(username, plan);
-    const hamburger = navRight.querySelector('.hamburger');
+
     const logoutButton = Array.from(navRight.querySelectorAll('button, a'))
       .find(el => /log out|logout/i.test(el.textContent || ''));
+
+    const hamburger = navRight.querySelector('.hamburger');
 
     if (logoutButton) {
       navRight.insertBefore(wrap, logoutButton);
@@ -142,8 +192,19 @@
 
     menu.querySelectorAll('.tl-mobile-user-plan-row').forEach(el => el.remove());
 
+    menu.querySelectorAll('.mobile-plan-row').forEach(el => {
+      el.style.display = 'none';
+      el.innerHTML = '';
+    });
+
+    menu.querySelectorAll('#mobile-plan-pill, #mobile-username-pill').forEach(el => {
+      el.style.display = 'none';
+      el.innerHTML = '';
+    });
+
     const row = document.createElement('div');
     row.className = 'tl-mobile-user-plan-row';
+    row.dataset.tlNavInjected = 'true';
     row.appendChild(makeUserPlanWrap(username, plan));
 
     const firstDivider = menu.querySelector('.mobile-menu-divider');
@@ -152,9 +213,6 @@
     } else {
       menu.prepend(row);
     }
-
-    const oldMobilePlan = menu.querySelector('.mobile-plan-row');
-    if (oldMobilePlan) oldMobilePlan.style.display = 'none';
   }
 
   function applyLibraryVisibility(plan) {
@@ -168,8 +226,7 @@
 
   function applyHomeGreeting(username) {
     const greeting = document.getElementById('greeting-name');
-    if (!greeting) return;
-    greeting.textContent = 'Hey ' + username + ' 👋';
+    if (greeting) greeting.textContent = 'Hey ' + username + ' 👋';
   }
 
   function applyAll(username, plan) {
@@ -220,19 +277,6 @@
     };
   }
 
-  function escapeHtml(value) {
-    return String(value ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  function escapeAttr(value) {
-    return escapeHtml(value).replace(/`/g, '&#096;');
-  }
-
   async function boot() {
     const identity = await loadIdentity();
     if (!identity) return;
@@ -242,18 +286,14 @@
     run();
     setTimeout(run, 250);
     setTimeout(run, 1000);
+    setTimeout(run, 2000);
 
-    const nav = document.querySelector('nav');
-    const mobileMenu = document.getElementById('mobile-menu') || document.querySelector('.mobile-menu');
-
-    [nav, mobileMenu].filter(Boolean).forEach(target => {
-      const observer = new MutationObserver(() => {
-        window.clearTimeout(observer._tlTimer);
-        observer._tlTimer = window.setTimeout(run, 50);
-      });
-
-      observer.observe(target, { childList: true, subtree: true });
+    const observer = new MutationObserver(() => {
+      window.clearTimeout(observer._tlTimer);
+      observer._tlTimer = window.setTimeout(run, 75);
     });
+
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 
   if (document.readyState === 'loading') {
