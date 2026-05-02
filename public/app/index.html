@@ -466,13 +466,16 @@ async function init() {
       openModal('signup', signupPlan);
     }
   }
+  // Track whether session existed on page load
+  let initialSessionChecked = false;
+
   sb.auth.onAuthStateChange(async (event, session) => {
     if (session) {
       currentUser = session.user;
       currentSession = session;
-      // Only redirect to home on a fresh login, not on page reload with existing session
-      if (event === 'SIGNED_IN' && sessionStorage.getItem('tl_logging_in')) {
-        sessionStorage.removeItem('tl_logging_in');
+      // SIGNED_IN fires on page load if already logged in AND on fresh login
+      // Only redirect to /home if this is a fresh login (after initial check)
+      if (event === 'SIGNED_IN' && initialSessionChecked) {
         window.location.href = '/home';
         return;
       }
@@ -481,6 +484,8 @@ async function init() {
       currentUser = null; currentSession = null; currentPlan = 'free'; onLoggedOut();
     }
   });
+
+  initialSessionChecked = true;
 }
 
 async function onLoggedIn() {
