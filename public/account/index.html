@@ -84,6 +84,18 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 .detail-label{font-size:13px;color:var(--muted);flex-shrink:0;}
 .detail-value{font-size:13px;font-weight:500;color:var(--text);text-align:right;}
 .detail-value.mono{font-family:'Geist Mono',monospace;font-size:12px;}
+.username-form{padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:10px;}
+.username-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--dim);font-family:'Geist Mono',monospace;}
+.username-input-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.username-input{flex:1;min-width:220px;border:1px solid var(--border2);background:var(--white);border-radius:var(--radius);padding:9px 12px;font-size:14px;color:var(--text);font-family:'Geist',sans-serif;}
+.username-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(123,166,146,0.18);}
+.btn-save-username{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:9px 14px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-save-username:hover{background:var(--accent-dark);}
+.btn-save-username:disabled{opacity:0.55;cursor:not-allowed;}
+.username-help{font-size:12px;color:var(--muted);}
+.username-flash{font-size:12px;min-height:18px;}
+.username-flash.error{color:var(--red);}
+.username-flash.success{color:var(--green);}
 
 /* UPGRADE BANNER */
 .upgrade-banner{background:linear-gradient(135deg,var(--accent-light),rgba(60,61,89,0.08));border:1px solid rgba(60,61,89,0.3);border-radius:var(--radius-xl);padding:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
@@ -138,6 +150,10 @@ footer a{color:var(--muted);text-decoration:none;}
   .plan-stats{grid-template-columns:1fr;}
   .plan-stat{border-right:none;border-bottom:1px solid var(--border);}
   .plan-stat:last-child{border-bottom:none;}
+  .upgrade-banner{justify-content:center;text-align:center;}
+  .upgrade-banner-actions{justify-content:center;width:100%;}
+  .username-input-row{flex-direction:column;align-items:stretch;}
+  .btn-save-username{width:100%;}
   nav{padding:0 1rem;}
 }
 
@@ -236,7 +252,7 @@ async function init() {
   session = s;
 
   const { data } = await sb.from('users')
-    .select('plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
+    .select('username, plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
     .eq('id', session.user.id).single();
   profile = data;
 
@@ -318,6 +334,7 @@ function renderNavPill(plan) {
 
 function renderContent() {
   const plan    = profile?.plan || 'free';
+  const username = (profile?.username || '').trim();
   const cfg     = PLAN_CONFIG[plan];
   const status  = profile?.subscription_status || (plan === 'free' ? 'free' : 'active');
   const now     = new Date();
@@ -429,6 +446,21 @@ function renderContent() {
     ${upgradedBanner}
     ${cancellingNotice}
     ${upgradeBanner}
+
+    <div class="section">
+      <div class="section-label">Profile</div>
+      <div class="card">
+        <div class="username-form">
+          <div class="username-label">Display name</div>
+          <div class="username-input-row">
+            <input class="username-input" id="username-input" type="text" maxlength="40" placeholder="Enter display name" value="${escapeHtml(username)}">
+            <button class="btn-save-username" id="save-username-btn" onclick="saveUsername()">Save name</button>
+          </div>
+          <div class="username-help">This name appears anywhere your account name is shown across TokenLens.</div>
+          <div class="username-flash" id="username-flash"></div>
+        </div>
+      </div>
+    </div>
 
     <div class="section">
       <div class="section-label">Your plan</div>
@@ -580,6 +612,50 @@ function renderContent() {
     </div>`;
 }
 
+function escapeHtml(text = '') {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function saveUsername() {
+  const input = document.getElementById('username-input');
+  const flash = document.getElementById('username-flash');
+  const btn = document.getElementById('save-username-btn');
+  if (!input || !flash || !btn || !session?.user?.id || !profile) return;
+
+  const username = input.value.trim().replace(/\s+/g, ' ');
+  if (username.length < 2) {
+    flash.className = 'username-flash error';
+    flash.textContent = 'Display name must be at least 2 characters.';
+    return;
+  }
+  if (username.length > 40) {
+    flash.className = 'username-flash error';
+    flash.textContent = 'Display name must be 40 characters or fewer.';
+    return;
+  }
+
+  btn.disabled = true;
+  flash.className = 'username-flash';
+  flash.textContent = 'Saving...';
+  try {
+    const { error } = await sb.from('users').update({ username }).eq('id', session.user.id);
+    if (error) throw error;
+    profile.username = username;
+    flash.className = 'username-flash success';
+    flash.textContent = 'Display name updated.';
+  } catch (err) {
+    flash.className = 'username-flash error';
+    flash.textContent = err?.message || 'Could not update display name.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 function compareRow(label, included, isPro) {
   const color = included ? (isPro ? 'var(--accent2)' : 'var(--green)') : 'var(--dim)';
   const icon  = included ? '✓' : '✗';
@@ -625,7 +701,7 @@ async function startCheckout(plan) {
     if (data.upgraded) {
       // Instant plan swap — no redirect needed, just reload
       const { data: updated } = await sb.from('users')
-        .select('plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
+        .select('username, plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
         .eq('id', session.user.id).single();
       profile = updated;
       renderNavPill(profile?.plan || 'free');
@@ -695,7 +771,7 @@ async function doCancel() {
 
     // Refresh profile
     const { data: updated } = await sb.from('users')
-      .select('plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
+      .select('username, plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, created_at')
       .eq('id', session.user.id).single();
     profile = updated;
 
