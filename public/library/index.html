@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Library | TokenLens</title>
+<meta name="description" content="Your saved prompt analyses and history. Available on Pro plan.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://tokenlens.live/library">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tokenlens.live/library">
+<meta property="og:title" content="Prompt Library | TokenLens">
+<meta property="og:description" content="Your saved prompt analyses and history. Available on Pro plan.">
+<meta property="og:image" content="https://tokenlens.live/og-image.png">
+<meta property="og:site_name" content="TokenLens">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Prompt Library | TokenLens">
+<meta name="twitter:description" content="Your saved prompt analyses and history. Available on Pro plan.">
+<meta name="twitter:image" content="https://tokenlens.live/og-image.png">
+<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:rgb(242,241,233);--white:rgb(250,249,244);--surface2:rgb(235,234,226);--border:rgb(215,213,203);--border2:rgb(195,193,182);
+  --text:rgb(60,61,89);--muted:rgb(100,101,120);--dim:rgb(140,141,158);
+  --accent:rgb(123,166,146);--accent-light:rgba(123,166,146,0.12);--accent-dark:rgb(95,138,118);--accent2:rgb(60,61,89);
+  --green:#16a34a;--green-light:#f0fdf4;--amber:#d97706;--amber-light:#fffbeb;
+  --red:#dc2626;--red-light:#fef2f2;--gold:#b45309;--gold-light:#fef3c7;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%);min-height:100vh;color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+.nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;text-decoration:none;}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+.nav-link.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.priority-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold-light);color:var(--gold);border:1px solid #fcd34d;border-radius:99px;font-size:11px;font-weight:600;padding:3px 10px;}
+.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.btn-nav:hover{background:var(--surface2);}
+
+.page{max-width:900px;margin:0 auto;padding:2rem 1.5rem 6rem;}
+.page-header{margin-bottom:2rem;}
+.page-title{font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-bottom:4px;}
+.page-sub{font-size:14px;color:var(--muted);}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;margin-bottom:1.5rem;border-bottom:1px solid var(--border);padding-bottom:0;}
+.tab{padding:8px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:transparent;font-family:'Geist',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* SEARCH */
+.search-bar{position:relative;margin-bottom:1.5rem;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:14px;}
+.search-input{width:100%;padding:10px 12px 10px 36px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);font-family:'Geist',sans-serif;font-size:14px;color:var(--text);transition:border-color 0.15s;}
+.search-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.search-input::placeholder{color:var(--dim);}
+
+/* HISTORY ITEMS */
+.history-list{display:flex;flex-direction:column;gap:10px;}
+.history-item{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:1.25rem;transition:border-color 0.15s;animation:slideUp 0.2s ease both;}
+.history-item:hover{border-color:var(--border2);}
+@keyframes slideUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.history-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.history-prompt{font-size:13px;color:var(--text);line-height:1.5;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.history-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.history-stats{display:flex;gap:16px;flex-wrap:wrap;}
+.history-stat{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);font-family:'Geist Mono',monospace;}
+.history-stat-label{color:var(--dim);}
+.history-date{font-size:11px;color:var(--dim);margin-top:8px;}
+.savings-pill{display:inline-flex;align-items:center;background:var(--green-light);color:var(--green);border:1px solid #bbf7d0;border-radius:99px;font-size:10px;font-weight:600;padding:2px 8px;}
+
+/* ACTION BUTTONS */
+.btn-icon{width:30px;height:30px;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.15s;}
+.btn-icon:hover{background:var(--surface2);color:var(--text);}
+.btn-icon.starred{color:var(--gold);border-color:#fcd34d;background:var(--gold-light);}
+.btn-icon.danger:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
+
+/* DETAIL PANEL */
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;justify-content:flex-end;animation:fadeIn 0.15s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.detail-panel{background:var(--white);width:100%;max-width:520px;height:100%;overflow-y:auto;padding:2rem;animation:slideIn 0.25s ease;}
+@keyframes slideIn{from{transform:translateX(100%);}to{transform:translateX(0);}}
+.detail-close{position:absolute;top:1rem;right:1rem;width:32px;height:32px;background:var(--surface2);border:none;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.detail-close:hover{background:var(--border);color:var(--text);}
+
+/* EMPTY / LOADING */
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--muted);}
+.empty-icon{font-size:36px;margin-bottom:1rem;opacity:0.5;}
+.empty-title{font-size:16px;font-weight:500;margin-bottom:6px;}
+.empty-sub{font-size:14px;}
+.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.75s linear infinite;margin:3rem auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* PRO GATE */
+.pro-gate{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:3rem 2rem;text-align:center;}
+.pro-gate-icon{font-size:32px;margin-bottom:1rem;}
+
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--dim);border-top:1px solid var(--border);margin-top:2rem;}
+footer a{color:var(--muted);text-decoration:none;}
+
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:var(--radius);}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;position:absolute;top:60px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:99;padding:0.75rem 1.25rem 1rem;}
+.mobile-menu.open{display:block;}
+.mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:var(--radius);border:none;background:none;font-family:'Geist',sans-serif;cursor:pointer;transition:background 0.15s;}
+.mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface2);}
+.mobile-menu a.active{color:var(--accent);background:var(--accent-light);}
+.mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
+.mobile-plan-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:12px;color:var(--muted);}
+@media(max-width:640px){
+  .nav-links,.nav-right .btn-nav{display:none!important;}
+  .hamburger{display:flex;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+  <a class="nav-logo" href="/">
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="/app">Analyzer</a>
+    <a class="nav-link" href="/challenge">Challenge</a>
+    <a class="nav-link active" href="/library">Library</a>
+    <a class="nav-link" href="/account">Account</a>
+  </div>
+  <div class="nav-right">
+    <span style="color:#b45309;font-weight:600;font-size:13px;">PRO</span>
+    <div class="priority-badge">⚡ Priority</div>
+    <button class="btn-nav" onclick="logout()">Log out</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-plan-row"><span id="mobile-plan-pill"></span></div>
+  <div class="mobile-menu-divider"></div>
+  <a href="/app">Analyzer</a>
+  <a href="/challenge">Challenge</a>
+  <a href="/library" class="active" id="mobile-nav-library">Library</a>
+  <a href="/account">Account</a>
+  <div class="mobile-menu-divider"></div>
+  <button onclick="handleMobileLogout()">Log out</button>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">Prompt Library</div>
+    <div class="page-sub">Your analysis history and saved prompts</div>
+  </div>
+
+  <div id="content"><div class="spinner"></div></div>
+</div>
+
+<footer>TokenLens · <a href="/app">Back to Analyzer</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></footer>
+
+<script>
+const { createClient } = supabase;
+let sb, currentSession, currentPlan;
+let allHistory = [], currentTab = 'all', searchQuery = '';
+let detailOpen = null;
+
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn  = document.getElementById('hamburger');
+  const open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  const pill = document.getElementById('nav-plan-pill');
+  if (pill) document.getElementById('mobile-plan-pill').innerHTML = pill.innerHTML;
+}
+
+async function init() {
+  const res = await fetch('/api/config');
+  const { supabaseUrl, supabaseAnonKey } = await res.json();
+  sb = createClient(supabaseUrl, supabaseAnonKey);
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '/app'; return; }
+  currentSession = session;
+
+  const { data: profile } = await sb.from('users').select('plan').eq('id', session.user.id).single();
+  currentPlan = profile?.plan || 'free';
+
+  if (currentPlan !== 'pro') { renderProGate(); return; }
+  await loadHistory();
+}
+
+async function logout() { await sb.auth.signOut(); window.location.href = '/'; }
+
+async function loadHistory() {
+  const res  = await fetch('/api/library', {
+    headers: { 'authorization': 'Bearer ' + currentSession.access_token }
+  });
+  const data = await res.json();
+  allHistory = data.history || [];
+  renderPage();
+}
+
+function renderPage() {
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <div class="tab-bar">
+      <button class="tab ${currentTab === 'all' ? 'active' : ''}" onclick="switchTab('all')">All history <span style="font-size:11px;color:var(--dim);margin-left:4px">${allHistory.length}</span></button>
+      <button class="tab ${currentTab === 'saved' ? 'active' : ''}" onclick="switchTab('saved')">★ Saved <span style="font-size:11px;color:var(--dim);margin-left:4px">${allHistory.filter(h=>h.saved).length}</span></button>
+    </div>
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" placeholder="Search prompts…" value="${searchQuery}" oninput="onSearch(this.value)">
+    </div>
+    <div class="history-list" id="history-list"></div>`;
+  renderList();
+}
+
+function switchTab(tab) { currentTab = tab; renderPage(); }
+function onSearch(val) { searchQuery = val; renderList(); }
+
+function renderList() {
+  const list = document.getElementById('history-list');
+  if (!list) return;
+
+  let items = allHistory;
+  if (currentTab === 'saved') items = items.filter(h => h.saved);
+  if (searchQuery.trim()) {
+    const q = searchQuery.toLowerCase();
+    items = items.filter(h => h.prompt?.toLowerCase().includes(q) || h.label?.toLowerCase().includes(q));
+  }
+
+  if (items.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">${currentTab === 'saved' ? '★' : '📋'}</div>
+      <div class="empty-title">${currentTab === 'saved' ? 'No saved prompts yet' : 'No history yet'}</div>
+      <div class="empty-sub">${currentTab === 'saved' ? 'Star an analysis to save it here.' : 'Analyze a prompt to see it here.'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = items.map((item, i) => {
+    const date    = new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const savings = item.savings_percent || 0;
+    return `
+      <div class="history-item" style="animation-delay:${i * 0.03}s">
+        <div class="history-header">
+          <div class="history-prompt" title="${escHtml(item.prompt || '')}">${escHtml(item.prompt || '').substring(0, 200)}</div>
+          <div class="history-actions">
+            <button class="btn-icon ${item.saved ? 'starred' : ''}" onclick="toggleSave('${item.id}', ${item.saved})" title="${item.saved ? 'Unsave' : 'Save'}">
+              ${item.saved ? '★' : '☆'}
+            </button>
+            <button class="btn-icon" onclick="openDetail('${item.id}')" title="View details">↗</button>
+            <button class="btn-icon danger" onclick="deleteItem('${item.id}')" title="Delete">×</button>
+          </div>
+        </div>
+        <div class="history-stats">
+          <div class="history-stat"><span class="history-stat-label">Tokens</span> ${(item.estimated_tokens||0).toLocaleString()}</div>
+          <div class="history-stat"><span class="history-stat-label">Optimized</span> ${(item.efficient_tokens||0).toLocaleString()}</div>
+          <div class="history-stat"><span class="history-stat-label">Cost</span> $${(item.cost_estimate_usd||0).toFixed(5)}</div>
+          ${savings > 0 ? `<span class="savings-pill">−${savings}% tokens</span>` : ''}
+        </div>
+        <div class="history-date">${date}</div>
+      </div>`;
+  }).join('');
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+async function toggleSave(id, currentlySaved) {
+  const saved = !currentlySaved;
+  const item  = allHistory.find(h => h.id === id);
+  if (item) item.saved = saved;
+  renderList();
+  await fetch('/api/library', {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
+    body: JSON.stringify({ id, saved })
+  });
+  // Update tab counts
+  renderPage();
+}
+
+async function deleteItem(id) {
+  if (!confirm('Delete this history item?')) return;
+  allHistory = allHistory.filter(h => h.id !== id);
+  renderPage();
+  await fetch('/api/library', {
+    method: 'DELETE',
+    headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
+    body: JSON.stringify({ id })
+  });
+}
+
+function openDetail(id) {
+  const item = allHistory.find(h => h.id === id);
+  if (!item) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'detail-overlay';
+  overlay.innerHTML = `
+    <div class="detail-panel" style="position:relative">
+      <button class="detail-close" onclick="closeDetail()">×</button>
+      <div style="margin-bottom:1.5rem">
+        <div style="font-size:11px;font-family:'Geist Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:8px">Original prompt</div>
+        <div style="font-size:13px;line-height:1.65;color:var(--text);background:var(--bg);padding:12px;border-radius:var(--radius-lg);border:1px solid var(--border)">${escHtml(item.prompt||'')}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.5rem">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Tokens</div>
+          <div style="font-size:20px;font-weight:600">${(item.estimated_tokens||0).toLocaleString()}</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Optimized</div>
+          <div style="font-size:20px;font-weight:600;color:var(--green)">${(item.efficient_tokens||0).toLocaleString()}</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Saved</div>
+          <div style="font-size:20px;font-weight:600;color:var(--green)">${item.savings_percent||0}%</div>
+        </div>
+      </div>
+      ${item.efficient_prompt ? `
+      <div style="margin-bottom:1.5rem">
+        <div style="font-size:11px;font-family:'Geist Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:8px">Optimized prompt</div>
+        <div style="font-size:13px;line-height:1.65;color:rgb(60,61,89);background:var(--accent-light);border:1px solid rgba(123,166,146,0.3);padding:12px;border-radius:var(--radius-lg);font-style:italic;margin-bottom:8px">${escHtml(item.efficient_prompt)}</div>
+        <button style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:7px 14px;font-size:12px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;" onclick="navigator.clipboard.writeText(${JSON.stringify(item.efficient_prompt)}).then(()=>{this.textContent='✓ Copied!';setTimeout(()=>{this.textContent='Copy optimized'},1500)})">Copy optimized</button>
+      </div>` : ''}
+      <div style="margin-bottom:1rem">
+        <div style="font-size:11px;font-family:'Geist Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:6px">Label (optional)</div>
+        <input style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-family:'Geist',sans-serif;font-size:13px;background:var(--bg);color:var(--text)" placeholder="Add a label…" value="${escHtml(item.label||'')}" onchange="updateLabel('${item.id}', this.value)">
+      </div>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeDetail(); });
+  document.body.appendChild(overlay);
+  detailOpen = overlay;
+}
+
+function closeDetail() { if (detailOpen) { detailOpen.remove(); detailOpen = null; } }
+
+async function updateLabel(id, label) {
+  const item = allHistory.find(h => h.id === id);
+  if (item) item.label = label;
+  await fetch('/api/library', {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
+    body: JSON.stringify({ id, label })
+  });
+}
+
+function renderProGate() {
+  document.getElementById('content').innerHTML = `
+    <div class="pro-gate">
+      <div class="pro-gate-icon">📚</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px">Library is a Pro feature</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:1.5rem;max-width:320px;margin-left:auto;margin-right:auto">Upgrade to Pro to save and revisit your prompt analyses, star favourites, and add labels.</div>
+      <a href="/app" style="display:inline-block;background:var(--accent);color:white;border-radius:var(--radius);padding:10px 24px;font-size:14px;font-weight:500;text-decoration:none;">Back to Analyzer</a>
+    </div>`;
+}
+
+init();
+</script>
+</body>
+</html>
