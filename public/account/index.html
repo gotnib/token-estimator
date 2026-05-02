@@ -648,16 +648,7 @@ async function saveUsername() {
   flash.className = 'username-flash';
   flash.textContent = 'Saving...';
   try {
-    const res = await fetch('/api/portal', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ' + session.access_token
-      },
-      body: JSON.stringify({ action: 'update_name', username })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Could not update display name.');
+    await persistDisplayName(username);
     profile.username = username;
     flash.className = 'username-flash success';
     flash.textContent = 'Display name updated.';
@@ -667,6 +658,19 @@ async function saveUsername() {
   } finally {
     btn.disabled = false;
   }
+}
+
+async function persistDisplayName(username) {
+  const res = await fetch('/api/portal', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'authorization': 'Bearer ' + session.access_token
+    },
+    body: JSON.stringify({ action: 'update_name', username })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Could not update display name.');
 }
 
 function compareRow(label, included, isPro) {
