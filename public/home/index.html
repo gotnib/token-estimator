@@ -14,36 +14,52 @@ body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-h
 nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);}
 .nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
 .nav-logo{text-decoration:none;}
-.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;}
+.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.btn-nav:hover{background:var(--surface2);}
+
+/* Login */
 .page{max-width:480px;margin:0 auto;padding:5rem 1.5rem;}
 .login-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:2.5rem;}
-.login-title{font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px;}
-.login-sub{font-size:14px;color:var(--muted);margin-bottom:2rem;}
+.login-logo{text-align:center;margin-bottom:1.75rem;}
+.login-title{font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px;text-align:center;}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:2rem;text-align:center;}
 .form-group{margin-bottom:1rem;}
 .form-label{font-size:13px;font-weight:500;display:block;margin-bottom:6px;}
-.form-input{width:100%;border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 14px;font-size:14px;font-family:'Geist',sans-serif;color:var(--text);background:var(--bg);}
-.form-input:focus{outline:none;border-color:var(--accent);background:var(--white);}
-.btn-login{width:100%;background:var(--accent);color:white;border:none;border-radius:var(--radius-lg);padding:12px;font-size:14px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;margin-top:0.5rem;}
-.btn-login:disabled{opacity:0.6;cursor:not-allowed;}
+.form-input{width:100%;border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 14px;font-size:14px;font-family:'Geist',sans-serif;color:var(--text);background:var(--bg);transition:border-color 0.15s,box-shadow 0.15s;}
+.form-input:focus{outline:none;border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.btn-login{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:var(--radius-lg);padding:12px;font-size:14px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;margin-top:0.5rem;transition:opacity 0.15s,transform 0.15s;}
+.btn-login:hover{opacity:0.92;transform:translateY(-1px);}
+.btn-login:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
 .login-footer{text-align:center;margin-top:1.25rem;font-size:13px;color:var(--muted);}
 .login-footer a{color:var(--accent);text-decoration:none;font-weight:500;}
 .msg-error{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:1rem;}
+
+/* Home cards */
+.home-page{max-width:560px;margin:0 auto;padding:5rem 1.5rem;}
 .greeting{text-align:center;margin-bottom:2.5rem;}
-.greeting-name{font-size:24px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px;}
+.greeting-name{font-size:26px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px;}
 .greeting-sub{font-size:14px;color:var(--muted);}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-.mode-card{background:var(--white);border:2px solid var(--border);border-radius:var(--radius-xl);padding:1.75rem 1.5rem;text-decoration:none;display:block;position:relative;transition:all 0.2s;}
-.mode-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.mode-card{background:var(--white);border:2px solid var(--border);border-radius:var(--radius-xl);padding:2rem 1.5rem;text-decoration:none;display:flex;flex-direction:column;align-items:center;text-align:center;transition:all 0.2s;position:relative;overflow:hidden;}
+.mode-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s;}
+.mode-card.analyzer::before{background:linear-gradient(135deg,rgba(37,99,235,0.04),rgba(37,99,235,0.01));}
+.mode-card.challenge::before{background:linear-gradient(135deg,rgba(124,82,224,0.04),rgba(124,82,224,0.01));}
+.mode-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.1);}
+.mode-card:hover::before{opacity:1;}
 .mode-card.analyzer:hover{border-color:var(--accent);}
 .mode-card.challenge:hover{border-color:var(--accent2);}
-.mode-icon{font-size:32px;margin-bottom:0.75rem;display:block;}
-.mode-title{font-size:17px;font-weight:700;margin-bottom:5px;}
-.mode-desc{font-size:12px;color:var(--muted);line-height:1.6;}
-.mode-badge{display:inline-flex;align-items:center;margin-top:0.75rem;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;}
+.mode-icon-wrap{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:1rem;}
+.analyzer .mode-icon-wrap{background:var(--accent-light);}
+.challenge .mode-icon-wrap{background:#f5f3ff;}
+.mode-title{font-size:17px;font-weight:700;margin-bottom:6px;}
+.mode-desc{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:1rem;}
+.mode-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px;margin-top:auto;}
 .badge-blue{background:var(--accent-light);color:var(--accent);}
 .badge-purple{background:#f5f3ff;color:var(--accent2);}
-.mode-arrow{position:absolute;top:1.25rem;right:1.25rem;font-size:16px;color:var(--border2);}
-@media(max-width:480px){.page{padding:3rem 1.25rem;}.cards{grid-template-columns:1fr;}}
+.mode-arrow{position:absolute;bottom:1.25rem;right:1.25rem;font-size:14px;color:var(--border2);transition:all 0.2s;}
+.mode-card:hover .mode-arrow{color:var(--muted);transform:translateX(2px);}
+
+@media(max-width:480px){.page,.home-page{padding:3rem 1.25rem;}.cards{grid-template-columns:1fr;}.mode-card{padding:1.5rem;}}
 </style>
 </head>
 <body>
@@ -59,8 +75,11 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 <div class="page">
   <div id="login-view">
     <div class="login-card">
+      <div class="login-logo">
+        <span style="font-weight:700;font-size:22px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:22px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+      </div>
       <div class="login-title">Welcome back</div>
-      <div class="login-sub">Log in to your TokenLens account</div>
+      <div class="login-sub">Log in to your account</div>
       <div id="msg"></div>
       <div class="form-group">
         <label class="form-label">Email</label>
@@ -70,32 +89,32 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
         <label class="form-label">Password</label>
         <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password">
       </div>
-      <button class="btn-login" id="login-btn" onclick="submitLogin()">Log in</button>
+      <button class="btn-login" id="login-btn" onclick="submitLogin()">Log in →</button>
       <div class="login-footer">No account? <a href="/app">Sign up free</a></div>
     </div>
   </div>
+</div>
 
-  <div id="home-view" style="display:none;">
-    <div class="greeting">
-      <div class="greeting-name" id="greeting-name">Welcome back</div>
-      <div class="greeting-sub">What would you like to do?</div>
-    </div>
-    <div class="cards">
-      <a class="mode-card analyzer" href="/app">
-        <span class="mode-arrow">→</span>
-        <span class="mode-icon">🔍</span>
-        <div class="mode-title">Analyzer</div>
-        <div class="mode-desc">Token breakdown, cost estimate, and optimized rewrite.</div>
-        <div class="mode-badge badge-blue">All plans</div>
-      </a>
-      <a class="mode-card challenge" href="/challenge">
-        <span class="mode-arrow">→</span>
-        <span class="mode-icon">🎯</span>
-        <div class="mode-title">Challenge</div>
-        <div class="mode-desc">Optimize bad prompts and get scored on what you missed.</div>
-        <div class="mode-badge badge-purple" id="challenge-badge">1/day free</div>
-      </a>
-    </div>
+<div class="home-page" id="home-view" style="display:none;">
+  <div class="greeting">
+    <div class="greeting-name" id="greeting-name">Welcome back</div>
+    <div class="greeting-sub">What would you like to do today?</div>
+  </div>
+  <div class="cards">
+    <a class="mode-card analyzer" href="/app">
+      <div class="mode-icon-wrap">🔍</div>
+      <div class="mode-title">Analyzer</div>
+      <div class="mode-desc">Paste any prompt and get a full token breakdown, cost estimate, and optimized rewrite.</div>
+      <div class="mode-badge badge-blue">All plans</div>
+      <span class="mode-arrow">→</span>
+    </a>
+    <a class="mode-card challenge" href="/challenge">
+      <div class="mode-icon-wrap">🎯</div>
+      <div class="mode-title">Challenge</div>
+      <div class="mode-desc">Optimize AI-generated bad prompts and get scored on what you caught and missed.</div>
+      <div class="mode-badge badge-purple" id="challenge-badge">1/day free</div>
+      <span class="mode-arrow">→</span>
+    </a>
   </div>
 </div>
 
@@ -137,6 +156,7 @@ async function submitLogin() {
 
 async function showHomeView(session) {
   document.getElementById('login-view').style.display = 'none';
+  document.querySelector('.page').style.display = 'none';
   document.getElementById('home-view').style.display = 'block';
   document.getElementById('nav-right').innerHTML = '<button class="btn-nav" onclick="logout()">Log out</button>';
   const name = (session.user?.email || '').split('@')[0];
