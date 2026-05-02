@@ -1,1 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokenLens</title>
+<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#f8f9fb;--white:#fff;--surface2:#f3f4f6;--border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;--dim:#9ca3af;
+  --accent:#2563eb;--accent-light:#eff6ff;--accent-dark:#1d4ed8;--accent2:#7c52e0;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
 
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+.nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;text-decoration:none;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.btn-nav:hover{background:var(--surface2);}
+
+.page{max-width:680px;margin:0 auto;padding:5rem 1.5rem;}
+
+.greeting{text-align:center;margin-bottom:3rem;}
+.greeting-name{font-size:26px;font-weight:700;letter-spacing:-0.02em;margin-bottom:8px;}
+.greeting-sub{font-size:15px;color:var(--muted);}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.mode-card{background:var(--white);border:2px solid var(--border);border-radius:var(--radius-xl);padding:2rem;cursor:pointer;transition:all 0.2s;text-decoration:none;display:block;position:relative;overflow:hidden;}
+.mode-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+.mode-card.analyzer:hover{border-color:var(--accent);}
+.mode-card.challenge:hover{border-color:var(--accent2);}
+.mode-icon{font-size:36px;margin-bottom:1rem;display:block;}
+.mode-title{font-size:18px;font-weight:700;letter-spacing:-0.01em;margin-bottom:6px;}
+.mode-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+.mode-badge{display:inline-flex;align-items:center;gap:4px;margin-top:1rem;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;}
+.badge-blue{background:var(--accent-light);color:var(--accent);}
+.badge-purple{background:#f5f3ff;color:var(--accent2);}
+.mode-arrow{position:absolute;bottom:1.25rem;right:1.25rem;font-size:18px;color:var(--border2);transition:all 0.2s;}
+.mode-card:hover .mode-arrow{color:var(--muted);transform:translateX(3px);}
+
+.plan-pill{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--muted);}
+
+@media(max-width:500px){
+  .cards{grid-template-columns:1fr;}
+  .page{padding:3rem 1.25rem;}
+  .greeting-name{font-size:22px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">
+      <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+    </a>
+    <div class="nav-right">
+      <span id="plan-pill" class="plan-pill"></span>
+      <button class="btn-nav" onclick="logout()">Log out</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="greeting">
+    <div class="greeting-name" id="greeting-text">Welcome back</div>
+    <div class="greeting-sub">What would you like to do today?</div>
+  </div>
+
+  <div class="cards">
+    <a class="mode-card analyzer" href="/app">
+      <span class="mode-icon">🔍</span>
+      <div class="mode-title">Analyzer</div>
+      <div class="mode-desc">Paste any AI prompt and get a full token breakdown, cost estimate, and optimized rewrite.</div>
+      <div class="mode-badge badge-blue">All plans</div>
+      <div class="mode-arrow">→</div>
+    </a>
+    <a class="mode-card challenge" href="/challenge">
+      <span class="mode-icon">🎯</span>
+      <div class="mode-title">Challenge</div>
+      <div class="mode-desc">Optimize AI-generated bad prompts and get scored on what you caught and what you missed.</div>
+      <div class="mode-badge badge-purple" id="challenge-badge">1/day free</div>
+      <div class="mode-arrow">→</div>
+    </a>
+  </div>
+</div>
+
+<script>
+const { createClient } = supabase;
+let sb, session;
+
+async function init() {
+  const cfgRes = await fetch('/api/config');
+  const { supabaseUrl, supabaseAnonKey } = await cfgRes.json();
+  sb = createClient(supabaseUrl, supabaseAnonKey);
+
+  const { data: { session: s } } = await sb.auth.getSession();
+  if (!s) { window.location.href = '/app'; return; }
+
+  // Proactively refresh token so it's warm before they hit the analyzer
+  try {
+    const { data: refreshed } = await sb.auth.refreshSession();
+    session = refreshed?.session || s;
+  } catch(e) {
+    session = s;
+  }
+
+  const email = session.user?.email || '';
+  const name  = email.split('@')[0];
+  document.getElementById('greeting-text').textContent = `Hey ${name} 👋`;
+
+  const { data: profile } = await sb.from('users')
+    .select('plan').eq('id', session.user.id).single();
+  const plan = profile?.plan || 'free';
+
+  const planLabels = { free: 'FREE', plus: 'PLUS', pro: 'PRO' };
+  const planColors = { free: 'color:#111827', plus: 'color:#7c52e0', pro: 'color:#b45309' };
+  document.getElementById('plan-pill').innerHTML =
+    `<span style="${planColors[plan]||planColors.free};font-weight:700;">${planLabels[plan]||'FREE'}</span>`;
+
+  const badgeLabels = { free: '1/day free', plus: '5/day', pro: 'Unlimited' };
+  document.getElementById('challenge-badge').textContent = badgeLabels[plan] || '1/day free';
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = '/';
+}
+
+init();
+</script>
+</body>
+</html>
