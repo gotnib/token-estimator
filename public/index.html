@@ -294,7 +294,8 @@ h1 {
 /* ── DEMO ── */
 .demo-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 4rem 1.5rem; }
 .demo-inner { max-width: 680px; margin: 0 auto; }
-.demo-label { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); text-align: center; margin-bottom: 1.5rem; }
+.demo-label { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); text-align: center; margin-bottom: 0.5rem; }
+.demo-label-sub { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); text-align: center; margin-bottom: 1.5rem; }
 .demo-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; }
 .demo-examples { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
 .demo-example-label { font-size: 11px; color: var(--dim); font-weight: 500; }
@@ -361,11 +362,21 @@ h1 {
 }
 .pricing-card:hover { border-color: var(--border2); }
 .pricing-card.featured {
-  background: rgba(123,166,146,0.04);
-  border-color: rgba(47,111,232,0.35);
-  box-shadow: 0 0 40px rgba(47,111,232,0.08);
+  background: rgb(60,61,89);
+  border-color: rgb(60,61,89);
+  box-shadow: 0 8px 32px rgba(60,61,89,0.25);
+  color: white;
 }
-.featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; font-size: 11px; font-weight: 600; padding: 3px 14px; border-radius: 99px; white-space: nowrap; }
+.pricing-card.featured .plan-name { color: rgba(255,255,255,0.6); }
+.pricing-card.featured .plan-price { color: white; }
+.pricing-card.featured .plan-price span { color: rgba(255,255,255,0.5); }
+.pricing-card.featured .plan-desc { color: rgba(255,255,255,0.5); }
+.pricing-card.featured .plan-divider { background: rgba(255,255,255,0.1); }
+.pricing-card.featured .plan-feature { color: rgba(255,255,255,0.7); }
+.pricing-card.featured .plan-feature-check { color: rgb(123,166,146); }
+.pricing-card.featured .btn-pricing { background: rgb(123,166,146); color: white; }
+.pricing-card.featured .btn-pricing:hover { background: rgb(95,138,118); }
+.featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: rgb(123,166,146); color: white; font-size: 11px; font-weight: 600; padding: 3px 14px; border-radius: 99px; white-space: nowrap; }
 .plan-name { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
 .plan-price { font-size: 48px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
 .plan-price span { font-size: 16px; font-weight: 400; color: var(--muted); }
@@ -519,7 +530,8 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 <!-- LIVE DEMO -->
 <section class="demo-section" id="demo">
   <div class="demo-inner">
-    <div class="demo-label">Try it now — no account needed</div>
+    <div class="demo-label">See it work on your prompt</div>
+    <div class="demo-label-sub">No account needed — instant results</div>
     <div class="demo-card" id="demo-card">
       <div class="demo-examples">
         <span class="demo-example-label">Try an example:</span>
