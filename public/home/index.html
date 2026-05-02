@@ -8,9 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f8f9fb;--white:#fff;--surface2:#f3f4f6;--border:#e5e7eb;--border2:#d1d5db;--text:#111827;--muted:#6b7280;--dim:#9ca3af;--accent:#2563eb;--accent-light:#eff6ff;--accent-dark:#1d4ed8;--accent2:#7c52e0;--red:#dc2626;--radius:8px;--radius-lg:12px;--radius-xl:16px;--shadow:0 4px 12px rgba(0,0,0,0.08);--shadow-sm:0 1px 3px rgba(0,0,0,0.08);}
+:root{--bg:rgb(242,241,233);--white:rgb(250,249,244);--surface2:rgb(235,234,226);--border:rgb(215,213,203);--border2:rgb(195,193,182);--text:rgb(60,61,89);--muted:rgb(100,101,120);--dim:rgb(140,141,158);--accent:rgb(123,166,146);--accent-light:rgba(123,166,146,0.12);--accent-dark:rgb(95,138,118);--accent2:rgb(60,61,89);--red:#dc2626;--radius:8px;--radius-lg:12px;--radius-xl:16px;--shadow:0 4px 12px rgba(0,0,0,0.08);--shadow-sm:0 1px 3px rgba(0,0,0,0.08);}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+body{background:linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%);min-height:100vh;color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
 nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);}
 .nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
 .nav-logo{text-decoration:none;}
@@ -27,7 +27,7 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 .form-label{font-size:13px;font-weight:500;display:block;margin-bottom:6px;}
 .form-input{width:100%;border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 14px;font-size:14px;font-family:'Geist',sans-serif;color:var(--text);background:var(--bg);transition:border-color 0.15s,box-shadow 0.15s;}
 .form-input:focus{outline:none;border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
-.btn-login{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:var(--radius-lg);padding:12px;font-size:14px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;margin-top:0.5rem;transition:opacity 0.15s,transform 0.15s;}
+.btn-login{width:100%;background:linear-gradient(135deg,rgb(123,166,146),rgb(60,61,89));color:white;border:none;border-radius:var(--radius-lg);padding:12px;font-size:14px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;margin-top:0.5rem;transition:opacity 0.15s,transform 0.15s;}
 .btn-login:hover{opacity:0.92;transform:translateY(-1px);}
 .btn-login:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
 .login-footer{text-align:center;margin-top:1.25rem;font-size:13px;color:var(--muted);}
@@ -50,12 +50,12 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 .mode-card.challenge:hover{border-color:var(--accent2);}
 .mode-icon-wrap{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:1rem;}
 .analyzer .mode-icon-wrap{background:var(--accent-light);}
-.challenge .mode-icon-wrap{background:#f5f3ff;}
+.challenge .mode-icon-wrap{background:rgba(60,61,89,0.08);}
 .mode-title{font-size:17px;font-weight:700;margin-bottom:6px;}
 .mode-desc{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:1rem;}
 .mode-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px;margin-top:auto;}
 .badge-blue{background:var(--accent-light);color:var(--accent);}
-.badge-purple{background:#f5f3ff;color:var(--accent2);}
+.badge-purple{background:rgba(60,61,89,0.08);color:var(--accent2);}
 .mode-arrow{position:absolute;bottom:1.25rem;right:1.25rem;font-size:14px;color:var(--border2);transition:all 0.2s;}
 .mode-card:hover .mode-arrow{color:var(--muted);transform:translateX(2px);}
 
@@ -66,7 +66,7 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 <nav>
   <div class="nav-inner">
     <a class="nav-logo" href="/">
-      <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+      <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span>
     </a>
     <div id="nav-right"><a href="/app" style="font-size:13px;color:var(--muted);text-decoration:none;">Sign up free</a></div>
   </div>
@@ -76,7 +76,7 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
   <div id="login-view">
     <div class="login-card">
       <div class="login-logo">
-        <span style="font-weight:700;font-size:22px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:22px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+        <span style="font-weight:700;font-size:22px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:22px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span>
       </div>
       <div class="login-title">Welcome back</div>
       <div class="login-sub">Log in to your account</div>
