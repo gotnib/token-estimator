@@ -321,6 +321,81 @@ footer a { color: var(--muted); text-decoration: none; }
 .upgrade-banner-text p{font-size:13px;color:var(--muted);}
 .upgrade-banner-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .btn-danger{background:var(--red);color:white;border:none;border-radius:var(--radius);padding:9px 14px;font-size:13px;font-weight:500;cursor:pointer;}
+
+.username-card.locked {
+  opacity: 0.72;
+  background: var(--surface2);
+}
+
+.username-card.locked .username-form {
+  pointer-events: auto;
+}
+
+.username-display-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.username-display-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.username-display-help {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.username-card {
+  transition: opacity 0.22s ease, background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.username-card.locked {
+  box-shadow: none;
+}
+
+.username-card.editing {
+  opacity: 1;
+  background: var(--white);
+  border-color: rgba(123,166,146,0.45);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.07);
+}
+
+.username-edit-fields {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: grid-template-rows 0.24s ease, opacity 0.18s ease, transform 0.24s ease, margin-top 0.24s ease;
+  margin-top: 0;
+  overflow: hidden;
+}
+
+.username-edit-fields-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.username-card.editing .username-edit-fields {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 12px;
+}
+
+.username-card.editing .username-display-row {
+  margin-bottom: 4px;
+}
+
+.username-display-row {
+  transition: margin-bottom 0.22s ease;
+}
+
 @media(max-width:560px){.plan-stats{grid-template-columns:1fr;}.plan-stat{border-right:none;border-bottom:1px solid var(--border);}.plan-stat:last-child{border-bottom:none;}.username-input-row{flex-direction:column;align-items:stretch;}.username-input-row .btn-primary{width:100%;}}
 
 </style>
@@ -564,15 +639,29 @@ function renderAccount() {
     </div>
 
     <div class="section">
-      <div class="section-label">Display Name</div>
-      <div class="card">
+      <div class="section-label">Username</div>
+      <div class="card username-card ${username ? 'locked' : 'editing'}" id="username-card">
         <div class="username-form">
-          <label class="section-label" for="username-input">Name shown in your account</label>
-          <div class="username-input-row">
-            <input class="input" id="username-input" maxlength="40" value="${escapeAttribute(username)}" placeholder="Your name">
-            <button class="btn-primary" id="save-username-btn" onclick="saveUsername()">Save</button>
+          <div class="username-display-row">
+            <div>
+              <div class="username-display-name" id="username-display-name">${username ? escapeHtml(username) : 'No username set'}</div>
+              <div class="username-display-help">${username ? 'Your username is set. Click edit to change it.' : 'Create a username for your account.'}</div>
+            </div>
+            ${username ? '<button class="btn-secondary" id="edit-username-btn" onclick="enableUsernameEdit()">Edit Username</button>' : ''}
           </div>
-          <div style="font-size:12px;color:var(--muted);">This updates your auth profile display name.</div>
+
+          <div class="username-edit-fields" id="username-edit-fields">
+            <div class="username-edit-fields-inner">
+              <label class="section-label" for="username-input">Name shown in your account</label>
+              <div class="username-input-row">
+                <input class="input" id="username-input" maxlength="40" value="${escapeAttribute(username)}" placeholder="Your name">
+                <button class="btn-primary" id="save-username-btn" onclick="saveUsername()">${username ? 'Save Changes' : 'Save Username'}</button>
+                ${username ? '<button class="btn-secondary" id="cancel-username-btn" onclick="cancelUsernameEdit()">Cancel</button>' : ''}
+              </div>
+              <div style="font-size:12px;color:var(--muted);">This updates your auth profile display name.</div>
+            </div>
+          </div>
+
           <div id="username-flash" style="font-size:12px;min-height:18px;"></div>
         </div>
       </div>
@@ -653,6 +742,47 @@ function featureRow(text, included) {
   return `<div class="detail-row"><div class="detail-label">${escapeHtml(text)}</div><div class="detail-value" style="color:${included ? 'var(--green)' : 'var(--dim)'};font-weight:600;">${included ? 'Included' : 'Not included'}</div></div>`;
 }
 
+
+function enableUsernameEdit() {
+  const card = document.getElementById('username-card');
+  const input = document.getElementById('username-input');
+  const flash = document.getElementById('username-flash');
+
+  if (card) {
+    card.classList.remove('locked');
+    card.classList.add('editing');
+  }
+
+  if (flash) {
+    flash.textContent = '';
+    flash.style.color = 'var(--muted)';
+  }
+
+  if (input) {
+    input.focus();
+    input.select();
+  }
+}
+
+function cancelUsernameEdit() {
+  const card = document.getElementById('username-card');
+  const input = document.getElementById('username-input');
+  const flash = document.getElementById('username-flash');
+  const currentName = getDisplayName(currentSession.user);
+
+  if (input) input.value = currentName;
+
+  if (card) {
+    card.classList.remove('editing');
+    card.classList.add('locked');
+  }
+
+  if (flash) {
+    flash.textContent = '';
+    flash.style.color = 'var(--muted)';
+  }
+}
+
 async function saveUsername() {
   const input = document.getElementById('username-input');
   const flash = document.getElementById('username-flash');
@@ -675,8 +805,13 @@ async function saveUsername() {
 
     currentSession.user.user_metadata = { ...(currentSession.user.user_metadata || {}), display_name: username };
     mountNav('account');
-    flash.style.color = 'var(--green)';
-    flash.textContent = 'Display name updated.';
+    renderAccount();
+
+    const updatedFlash = document.getElementById('username-flash');
+    if (updatedFlash) {
+      updatedFlash.style.color = 'var(--green)';
+      updatedFlash.textContent = 'Username updated.';
+    }
   } catch (err) {
     flash.style.color = 'var(--red)';
     flash.textContent = err.message || 'Could not update display name.';
