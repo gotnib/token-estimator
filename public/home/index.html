@@ -242,7 +242,7 @@ async function submitLogin() {
     return;
   }
 
-  showHomeView(data.session);
+  window.location.href = '/home';
 }
 
 async function showHomeView(session) {
