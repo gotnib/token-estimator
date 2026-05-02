@@ -15,6 +15,33 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Invalid session.' });
 
+  const action = req.body?.action || 'open_portal';
+
+  if (action === 'update_name') {
+    const username = String(req.body?.username || '').trim().replace(/\s+/g, ' ');
+    if (username.length < 2 || username.length > 40) {
+      return res.status(400).json({ error: 'Display name must be between 2 and 40 characters.' });
+    }
+
+    let saved = false;
+    let dbError = null;
+    for (const col of ['username', 'display_name', 'full_name', 'name']) {
+      const { error } = await supabase.from('users').update({ [col]: username }).eq('id', user.id);
+      if (!error) {
+        saved = true;
+        break;
+      }
+      dbError = error;
+    }
+
+    const { error: metaError } = await supabase.auth.updateUser({ data: { display_name: username } });
+    if (metaError && !saved) {
+      return res.status(500).json({ error: dbError?.message || metaError.message });
+    }
+
+    return res.status(200).json({ ok: true, username, saved_to_users: saved });
+  }
+
   const { data: profile } = await supabase
     .from('users')
     .select('stripe_customer_id')
