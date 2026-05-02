@@ -182,7 +182,7 @@ nav {
 .nav-right { display: flex; align-items: center; gap: 10px; }
 .btn-ghost { background: transparent; border: 1px solid var(--border2); border-radius: var(--radius); padding: 8px 18px; font-size: 13px; font-weight: 500; font-family: 'Geist', sans-serif; color: var(--muted); cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-flex; align-items: center; }
 .btn-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
-.btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: var(--radius); padding: 9px 20px; font-size: 13px; font-weight: 600; font-family: 'Geist', sans-serif; color: white; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; box-shadow: 0 0 20px rgba(91,142,240,0.3); }
+.btn-primary { background: var(--accent); border: none; border-radius: var(--radius); padding: 9px 20px; font-size: 13px; font-weight: 600; font-family: 'Geist', sans-serif; color: white; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; box-shadow: none; }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(91,142,240,0.45); }
 .btn-primary:active { transform: translateY(0); }
 
@@ -267,7 +267,7 @@ h1 {
 .hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 4rem; }
 
 .btn-hero {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  background: var(--accent);
   border: none; border-radius: var(--radius-lg);
   padding: 14px 32px; font-size: 16px; font-weight: 600;
   font-family: 'Geist', sans-serif; color: white; cursor: pointer;
@@ -275,7 +275,7 @@ h1 {
   box-shadow: 0 0 40px rgba(91,142,240,0.35), 0 4px 16px rgba(0,0,0,0.3);
   display: inline-flex; align-items: center; gap: 8px;
 }
-.btn-hero:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(91,142,240,0.5), 0 8px 24px rgba(0,0,0,0.4); }
+.btn-hero:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(123,166,146,0.4); }
 .btn-hero-ghost {
   background: transparent; border: 1px solid var(--border2);
   border-radius: var(--radius-lg); padding: 14px 32px;
@@ -303,7 +303,7 @@ h1 {
 .demo-section textarea { width: 100%; border: none; background: var(--bg); color: var(--text); font-family: 'Geist', sans-serif; font-size: 14px; padding: 16px; line-height: 1.7; resize: none; min-height: 110px; outline: none; }
 .demo-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-top: 1px solid var(--border); background: var(--surface); }
 .demo-char-count { font-size: 11px; color: var(--dim); font-family: 'Geist Mono', monospace; }
-.demo-btn { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: var(--radius-lg); padding: 9px 20px; font-size: 13px; font-weight: 600; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.2s; }
+.demo-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: white; border: none; border-radius: var(--radius-lg); padding: 9px 20px; font-size: 13px; font-weight: 600; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.2s; }
 .demo-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(47,111,232,0.35); }
 .demo-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 .demo-result-card { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; margin-top: 1rem; }
@@ -324,7 +324,7 @@ h1 {
   border-bottom: 1px solid var(--border);
   padding: 3rem 2rem;
 }.stats-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: center; }
-.stat-num { font-size: 42px; font-weight: 700; letter-spacing: -0.03em; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
+.stat-num { font-size: 42px; font-weight: 700; letter-spacing: -0.03em; background: var(--accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
 .stat-desc { font-size: 14px; color: var(--muted); }
 
 /* ── FEATURES ── */
@@ -361,11 +361,11 @@ h1 {
 }
 .pricing-card:hover { border-color: var(--border2); }
 .pricing-card.featured {
-  background: linear-gradient(160deg, rgba(47,111,232,0.05), rgba(124,82,224,0.03));
+  background: rgba(123,166,146,0.04);
   border-color: rgba(47,111,232,0.35);
   box-shadow: 0 0 40px rgba(47,111,232,0.08);
 }
-.featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; font-size: 11px; font-weight: 600; padding: 3px 14px; border-radius: 99px; white-space: nowrap; }
+.featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; font-size: 11px; font-weight: 600; padding: 3px 14px; border-radius: 99px; white-space: nowrap; }
 .plan-name { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
 .plan-price { font-size: 48px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
 .plan-price span { font-size: 16px; font-weight: 400; color: var(--muted); }
@@ -376,7 +376,7 @@ h1 {
 .plan-cta { display: block; width: 100%; margin-top: 1.75rem; padding: 12px; border-radius: var(--radius-lg); font-size: 14px; font-weight: 600; font-family: 'Geist', sans-serif; cursor: pointer; text-align: center; border: none; transition: all 0.2s; text-decoration: none; }
 .plan-cta-ghost { background: transparent; border: 1px solid var(--border2); color: var(--muted); }
 .plan-cta-ghost:hover { color: var(--text); background: var(--surface2); }
-.plan-cta-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; box-shadow: 0 0 24px rgba(91,142,240,0.3); }
+.plan-cta-primary { background: var(--accent); color: white; box-shadow: none; }
 .plan-cta-primary:hover { transform: translateY(-1px); box-shadow: 0 0 40px rgba(91,142,240,0.45); }
 
 /* ── TESTIMONIALS ── */
