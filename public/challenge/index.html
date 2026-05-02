@@ -22,16 +22,16 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --bg:#f8f9fb;--white:#fff;--surface2:#f3f4f6;--border:#e5e7eb;--border2:#d1d5db;
-  --text:#111827;--muted:#6b7280;--dim:#9ca3af;
-  --accent:#2563eb;--accent-light:#eff6ff;--accent-dark:#1d4ed8;--accent2:#7c52e0;
+  --bg:rgb(242,241,233);--white:rgb(250,249,244);--surface2:rgb(235,234,226);--border:rgb(215,213,203);--border2:rgb(195,193,182);
+  --text:rgb(60,61,89);--muted:rgb(100,101,120);--dim:rgb(140,141,158);
+  --accent:rgb(123,166,146);--accent-light:rgba(123,166,146,0.12);--accent-dark:rgb(95,138,118);--accent2:rgb(60,61,89);
   --green:#16a34a;--green-light:#f0fdf4;--amber:#d97706;--amber-light:#fffbeb;
   --red:#dc2626;--red-light:#fef2f2;--gold:#b45309;--gold-light:#fef3c7;
   --radius:8px;--radius-lg:12px;--radius-xl:16px;
   --shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
+body{background:linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%);min-height:100vh;color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
 
 nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
 .nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
@@ -50,7 +50,7 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 .challenge-hero{text-align:center;padding:2rem 0 2.5rem;}
 .challenge-hero h1{font-size:28px;font-weight:600;letter-spacing:-0.02em;margin-bottom:8px;}
 .challenge-hero p{font-size:15px;color:var(--muted);max-width:480px;margin:0 auto 1.5rem;}
-.challenge-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent-light),#f5f3ff);border:1px solid #c4b5fd;border-radius:99px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:1rem;}
+.challenge-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent-light),rgba(60,61,89,0.08));border:1px solid rgba(60,61,89,0.3);border-radius:99px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:1rem;}
 
 /* TYPE SELECTOR */
 .type-selector{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:1.5rem;margin-bottom:1.5rem;}
@@ -59,7 +59,7 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 .type-card{border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;}
 .type-card:hover{border-color:var(--border2);}
 .type-card.active{border-color:var(--accent);background:var(--accent-light);}
-.type-card.active.technical{border-color:var(--accent2);background:#f5f3ff;}
+.type-card.active.technical{border-color:var(--accent2);background:rgba(60,61,89,0.08);}
 .type-icon{font-size:18px;flex-shrink:0;}
 .type-name{font-size:13px;font-weight:600;color:var(--text);}
 .type-desc{font-size:11px;color:var(--muted);margin-top:2px;}
@@ -100,7 +100,7 @@ textarea::placeholder{color:var(--dim);}
 .btn-secondary{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 18px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
 .btn-secondary:hover{background:var(--border2);}
 .btn-secondary:disabled{opacity:0.4;cursor:not-allowed;}
-.btn-pro{background:linear-gradient(135deg,#7c52e0,#5b3fc4);color:white;border:none;border-radius:var(--radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;}
+.btn-pro{background:linear-gradient(135deg,rgb(60,61,89),rgb(45,46,70));color:white;border:none;border-radius:var(--radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;}
 .btn-pro:hover{opacity:0.9;transform:translateY(-1px);}
 
 /* SCORE DISPLAY */
@@ -137,7 +137,7 @@ textarea::placeholder{color:var(--dim);}
 
 /* LOADING */
 .loading-state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:3rem;color:var(--muted);font-size:14px;}
-.code-block{background:#1e2d4a;border-radius:var(--radius-lg);padding:14px 16px;font-family:'Geist Mono',monospace;font-size:12px;color:#e2e8f0;line-height:1.7;overflow-x:auto;white-space:pre;margin-bottom:1rem;}
+.code-block{background:rgb(60,61,89);border-radius:var(--radius-lg);padding:14px 16px;font-family:'Geist Mono',monospace;font-size:12px;color:#e2e8f0;line-height:1.7;overflow-x:auto;white-space:pre;margin-bottom:1rem;}
 .code-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;font-family:'Geist Mono',monospace;display:flex;align-items:center;justify-content:space-between;}
 .code-lang-badge{background:var(--accent2);color:white;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:0.06em;}
 
@@ -181,7 +181,7 @@ footer a{color:var(--muted);text-decoration:none;}
 <nav>
   <div class="nav-inner">
   <a class="nav-logo" href="/">
-    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#1e2d4a;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#5b9fe8,#8b6fe8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span>
   </a>
   <div class="nav-links">
     <a class="nav-link" href="/app">Analyzer</a>
@@ -237,7 +237,7 @@ footer a{color:var(--muted);text-decoration:none;}
       <div class="type-card" id="type-code" onclick="selectType('code')" style="position:relative;">
         <div class="type-icon">💻</div>
         <div>
-          <div class="type-name">Code <span id="pro-code-badge" style="font-size:9px;background:linear-gradient(135deg,#7c52e0,#5b3fc4);color:white;padding:2px 6px;border-radius:99px;font-weight:600;vertical-align:middle;">PRO</span></div>
+          <div class="type-name">Code <span id="pro-code-badge" style="font-size:9px;background:linear-gradient(135deg,rgb(60,61,89),rgb(45,46,70));color:white;padding:2px 6px;border-radius:99px;font-weight:600;vertical-align:middle;">PRO</span></div>
           <div class="type-desc">Generate real code output</div>
         </div>
       </div>
@@ -413,7 +413,7 @@ async function init() {
 }
 
 function renderNavPill(plan) {
-  const styles = { free:'color:#111827', plus:'color:#7c52e0', pro:'color:#b45309' };
+  const styles = { free:'color:rgb(60,61,89)', plus:'color:rgb(60,61,89)', pro:'color:#b45309' };
   const labels = { free:'FREE', plus:'PLUS', pro:'PRO' };
   document.getElementById('nav-plan-pill').innerHTML =
     `<span style="${styles[plan]||styles.free};font-weight:600;font-size:13px;">${labels[plan]||'FREE'}</span>`;
@@ -622,7 +622,7 @@ async function submitCodeAttempt() {
 }
 
 function renderCodeScore(result, userCode) {
-  const gradeColors = { A:'var(--green)', B:'#2563eb', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
+  const gradeColors = { A:'var(--green)', B:'rgb(123,166,146)', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
   const color = gradeColors[result.grade] || 'var(--text)';
 
   const improvedHTML = (result.what_you_improved || []).map(item =>
@@ -749,7 +749,7 @@ function showToast(msg, type = 'error') {
   if (type === 'error') {
     const bar = document.createElement('div');
     bar.id = 'bug-report-bar';
-    bar.style.cssText = `position:fixed;bottom:0;left:0;right:0;background:#1e2d4a;color:#94a3b8;font-size:12px;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;z-index:9998;`;
+    bar.style.cssText = `position:fixed;bottom:0;left:0;right:0;background:rgb(60,61,89);color:#94a3b8;font-size:12px;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;z-index:9998;`;
     bar.innerHTML = `<span>Something went wrong</span><div style="display:flex;gap:8px;align-items:center;"><button id="bug-btn" onclick="reportBug('${msg.replace(/'/g, "\\'")}',document.getElementById('bug-btn'))" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;border-radius:99px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;">🐛 Report bug</button><button onclick="document.getElementById('bug-report-bar').remove()" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;line-height:1;">×</button></div>`;
     document.body.appendChild(bar);
   }
@@ -835,7 +835,7 @@ async function submitAttempt() {
 }
 
 function renderScore(result, userAttempt) {
-  const gradeColors = { A:'var(--green)', B:'#2563eb', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
+  const gradeColors = { A:'var(--green)', B:'rgb(123,166,146)', C:'var(--amber)', D:'#d97706', F:'var(--red)' };
   const color = gradeColors[result.grade] || 'var(--text)';
 
   const gotRightHTML = (result.what_you_got_right || []).map(item =>
@@ -864,7 +864,7 @@ function renderScore(result, userAttempt) {
         <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1rem;">
           <div>
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2);margin-bottom:6px;font-family:'Geist Mono',monospace;">✏️ Your version</div>
-            <div style="background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius-lg);padding:12px;font-size:13px;color:#1e40af;line-height:1.65;">${escHtml(userAttempt)}</div>
+            <div style="background:var(--accent-light);border:1px solid rgba(123,166,146,0.3);border-radius:var(--radius-lg);padding:12px;font-size:13px;color:rgb(60,61,89);line-height:1.65;">${escHtml(userAttempt)}</div>
           </div>
           <div>
             <div class="ideal-label">✅ Ideal version</div>
@@ -872,7 +872,7 @@ function renderScore(result, userAttempt) {
           </div>
         </div>
         ${result.comparison ? `<div class="comparison-note">📊 ${result.comparison}</div>` : ''}
-        ${result.code_impact ? `<div class="comparison-note" style="margin-top:8px;border-left:3px solid var(--accent2);background:#f5f3ff;">💻 ${result.code_impact}</div>` : ''}
+        ${result.code_impact ? `<div class="comparison-note" style="margin-top:8px;border-left:3px solid var(--accent2);background:rgba(60,61,89,0.08);">💻 ${result.code_impact}</div>` : ''}
       </div>
     </div>
 
@@ -913,7 +913,7 @@ function renderGate() {
           <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--accent);">Plus — $9/mo</div>
           <div style="font-size:12px;color:var(--muted);line-height:1.6;">5 AI-generated challenges per day · Scoring and feedback</div>
         </div>
-        <div style="border:1px solid var(--accent2);border-radius:var(--radius-lg);padding:1.25rem;background:#faf5ff;">
+        <div style="border:1px solid var(--accent2);border-radius:var(--radius-lg);padding:1.25rem;background:rgba(60,61,89,0.05);">
           <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--accent2);">Pro — $29/mo</div>
           <div style="font-size:12px;color:var(--muted);line-height:1.6;">Unlimited challenges · All categories · Priority processing</div>
         </div>
