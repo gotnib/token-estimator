@@ -290,10 +290,60 @@ async function showHomeView(session) {
     </div>
     <div class="mobile-menu-divider"></div>`;
 
-  loadRecentActivity();
+  renderRecentActivityLoading();
+  requestAnimationFrame(() => loadRecentActivityWhenReady());
 }
 
-async function loadRecentActivity() {
+
+function renderRecentActivityLoading() {
+  const container = document.getElementById('recent-activity');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="recent-activity">
+      <div class="recent-activity-header">
+        <div class="recent-activity-title">Recent Activity</div>
+        <div class="recent-activity-sub">Loading...</div>
+      </div>
+      <div class="activity-list">
+        <div class="activity-row">
+          <div class="activity-left">
+            <div class="activity-icon">⏳</div>
+            <div class="activity-main">
+              <div class="activity-label">Checking your latest activity</div>
+              <div class="activity-meta">One moment</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function loadRecentActivityWhenReady(attempt = 0) {
+  const container = document.getElementById('recent-activity');
+  if (!container) return;
+
+  renderRecentActivityLoading();
+
+  if (!currentSession?.access_token || !currentSession?.user?.id) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data?.session || currentSession;
+  }
+
+  if (!currentSession?.access_token || !currentSession?.user?.id) {
+    if (attempt < 4) {
+      setTimeout(() => loadRecentActivityWhenReady(attempt + 1), 250);
+      return;
+    }
+
+    renderRecentActivity(null, null);
+    return;
+  }
+
+  setTimeout(() => loadRecentActivity(attempt), 75);
+}
+
+async function loadRecentActivity(attempt = 0) {
   const container = document.getElementById('recent-activity');
   if (!container || !currentSession) return;
 
@@ -340,8 +390,18 @@ async function loadRecentActivity() {
       latestChallenge = Array.isArray(challengeRes.value.data) ? challengeRes.value.data[0] : null;
     }
 
+    if (!latestAnalysis && !latestChallenge && attempt < 4) {
+      setTimeout(() => loadRecentActivityWhenReady(attempt + 1), 350);
+      return;
+    }
+
     renderRecentActivity(latestAnalysis, latestChallenge);
   } catch (error) {
+    if (attempt < 4) {
+      setTimeout(() => loadRecentActivityWhenReady(attempt + 1), 350);
+      return;
+    }
+
     renderRecentActivity(null, null);
   }
 }
