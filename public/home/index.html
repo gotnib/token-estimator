@@ -61,6 +61,20 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 .mode-card:hover .mode-arrow{color:var(--muted);transform:translateX(2px);}
 
 @media(max-width:480px){.page,.home-page{padding:3rem 1.25rem;}.cards{grid-template-columns:1fr;}.mode-card{padding:1.5rem;}}
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:var(--radius);}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;position:absolute;top:60px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:99;padding:0.75rem 1.25rem 1rem;}
+.mobile-menu.open{display:block;}
+.mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:var(--radius);border:none;background:none;font-family:'Geist',sans-serif;cursor:pointer;transition:background 0.15s;}
+.mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface2);}
+.mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+@media(max-width:640px){.nav-links,.nav-right .btn-nav{display:none!important;}.hamburger{display:flex;}}
 </style>
 </head>
 <body>
@@ -69,9 +83,26 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
     <a class="nav-logo" href="/">
       <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span>
     </a>
-    <div id="nav-right"><a href="/app" style="font-size:13px;color:var(--muted);text-decoration:none;">Sign up free</a></div>
+    <div class="nav-links" id="nav-links" style="display:none;">
+      <a class="nav-link" href="/app">Analyzer</a>
+      <a class="nav-link" href="/challenge">Challenge</a>
+      <a class="nav-link" href="/account">Account</a>
+    </div>
+    <div class="nav-right" id="nav-right">
+      <a href="/app" style="font-size:13px;color:var(--muted);text-decoration:none;">Sign up free</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu" style="display:none;">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="/app">Analyzer</a>
+  <a href="/challenge">Challenge</a>
+  <a href="/account">Account</a>
+  <div class="mobile-menu-divider"></div>
+  <button onclick="logout()">Log out</button>
+</div>
 
 <div class="page">
   <div id="login-view">
@@ -159,7 +190,12 @@ async function showHomeView(session) {
   document.getElementById('login-view').style.display = 'none';
   document.querySelector('.page').style.display = 'none';
   document.getElementById('home-view').style.display = 'block';
-  document.getElementById('nav-right').innerHTML = '<button class="btn-nav" onclick="logout()">Log out</button>';
+  document.getElementById('nav-links').style.display = 'flex';
+  document.getElementById('nav-right').innerHTML = `
+    <button class="btn-nav" onclick="logout()">Log out</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>`;
   const name = (session.user?.email || '').split('@')[0];
   document.getElementById('greeting-name').textContent = 'Hey ' + name + ' \uD83D\uDC4B';
   try {
@@ -167,6 +203,14 @@ async function showHomeView(session) {
     const badges = { free: '1/day free', plus: '5/day', pro: 'Unlimited' };
     document.getElementById('challenge-badge').textContent = badges[p?.plan] || '1/day free';
   } catch(e) {}
+}
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn  = document.getElementById('hamburger');
+  if (!menu || !btn) return;
+  const open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
 }
 
 async function logout() {
