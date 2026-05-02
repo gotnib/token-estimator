@@ -242,6 +242,7 @@ async function submitLogin() {
     return;
   }
 
+  sessionStorage.setItem('tokenlensJustLoggedIn', 'true');
   window.location.href = '/home';
 }
 
@@ -291,7 +292,14 @@ async function showHomeView(session) {
     <div class="mobile-menu-divider"></div>`;
 
   renderRecentActivityLoading();
-  requestAnimationFrame(() => loadRecentActivityWhenReady());
+
+  const justLoggedIn = sessionStorage.getItem('tokenlensJustLoggedIn') === 'true';
+  if (justLoggedIn) {
+    sessionStorage.removeItem('tokenlensJustLoggedIn');
+    setTimeout(() => loadRecentActivityWhenReady(), 700);
+  } else {
+    requestAnimationFrame(() => loadRecentActivityWhenReady());
+  }
 }
 
 
@@ -332,7 +340,7 @@ async function loadRecentActivityWhenReady(attempt = 0) {
 
   if (!currentSession?.access_token || !currentSession?.user?.id) {
     if (attempt < 4) {
-      setTimeout(() => loadRecentActivityWhenReady(attempt + 1), 250);
+      setTimeout(() => loadRecentActivityWhenReady(attempt + 1), 500);
       return;
     }
 
@@ -340,7 +348,7 @@ async function loadRecentActivityWhenReady(attempt = 0) {
     return;
   }
 
-  setTimeout(() => loadRecentActivity(attempt), 75);
+  setTimeout(() => loadRecentActivity(attempt), 150);
 }
 
 async function loadRecentActivity(attempt = 0) {
@@ -391,14 +399,14 @@ async function loadRecentActivity(attempt = 0) {
     }
 
     if (!latestAnalysis && !latestChallenge && attempt < 4) {
-      setTimeout(() => loadRecentActivityWhenReady(attempt + 1), 350);
+      setTimeout(() => loadRecentActivityWhenReady(attempt + 1), 600);
       return;
     }
 
     renderRecentActivity(latestAnalysis, latestChallenge);
   } catch (error) {
     if (attempt < 4) {
-      setTimeout(() => loadRecentActivityWhenReady(attempt + 1), 350);
+      setTimeout(() => loadRecentActivityWhenReady(attempt + 1), 600);
       return;
     }
 
