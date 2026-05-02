@@ -470,8 +470,9 @@ async function init() {
     if (session) {
       currentUser = session.user;
       currentSession = session;
-      // If user just signed in via modal — redirect to home selector
-      if (event === 'SIGNED_IN') {
+      // Only redirect to home on a fresh login, not on page reload with existing session
+      if (event === 'SIGNED_IN' && sessionStorage.getItem('tl_logging_in')) {
+        sessionStorage.removeItem('tl_logging_in');
         window.location.href = '/home';
         return;
       }
@@ -1319,8 +1320,14 @@ async function submitLogin() {
   if (!email || !pass) { setModalMsg('Please fill in all fields.', 'error'); return; }
   const btn = document.getElementById('auth-submit');
   btn.disabled = true; btn.textContent = 'Logging in…';
+  sessionStorage.setItem('tl_logging_in', '1');
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) { setModalMsg(error.message, 'error'); btn.disabled = false; btn.textContent = 'Log in'; }
+  if (error) {
+    sessionStorage.removeItem('tl_logging_in');
+    setModalMsg(error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Log in';
+  }
 }
 
 async function submitSignup() {
