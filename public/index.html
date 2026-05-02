@@ -144,7 +144,7 @@
 <link rel="icon" type="image/png" href="/tokenlens_favicon.png">
 <style>
 :root {
-  --bg: #f8f9fb;
+  --bg: rgb(242,241,233);
   --surface: #ffffff;
   --surface2: #f0f2f7;
   --border: #e2e6f0;
@@ -152,8 +152,8 @@
   --text: #0f1623;
   --muted: #5a6480;
   --dim: #9ba3b8;
-  --accent: #2f6fe8;
-  --accent2: #7c52e0;
+  --accent: rgb(123,166,146);
+  --accent2: rgb(60,61,89);
   --accent-glow: rgba(47,111,232,0.12);
   --green: #16a34a;
   --amber: #d97706;
@@ -163,7 +163,7 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: 'Geist', sans-serif; font-weight: 400; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body { background: linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%); min-height:100vh; color: var(--text); font-family: 'Geist', sans-serif; font-weight: 400; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
 /* ── NAV ── */
 nav {
@@ -314,7 +314,7 @@ h1 {
 .demo-stat { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; text-align: center; }
 .demo-stat-val { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
 .demo-stat-lbl { font-size: 10px; color: var(--dim); margin-top: 2px; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; }
-.demo-efficient { background: var(--accent-light); border: 1px solid #bfdbfe; border-radius: var(--radius-lg); padding: 14px; font-size: 13px; color: #1e40af; line-height: 1.7; margin-bottom: 10px; }
+.demo-efficient { background: var(--accent-light); border: 1px solid rgba(123,166,146,0.3); border-radius: var(--radius-lg); padding: 14px; font-size: 13px; color: rgb(60,61,89); line-height: 1.7; margin-bottom: 10px; }
 .demo-savings-badge { background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
 .demo-cta-wrap { text-align: center; margin-top: 1.5rem; }
 .demo-cta-text { font-size: 14px; color: var(--muted); margin-bottom: 1rem; }
@@ -465,7 +465,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="#">
-    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#0f1623;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,#2f6fe8,#7c52e0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#0f1623;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,rgb(123,166,146),rgb(60,61,89));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
   </a>
   <div class="nav-links">
     <a href="#features">Features</a>
@@ -487,7 +487,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
     </div>
 
     <div style="margin: 0 auto 2.5rem; animation: float 6s ease-in-out infinite;">
-      <span style="font-size:clamp(52px,10vw,96px);font-weight:700;letter-spacing:-0.04em;color:#0f1623;">Token</span><span style="font-size:clamp(52px,10vw,96px);font-weight:700;letter-spacing:-0.04em;background:linear-gradient(135deg,#2f6fe8,#7c52e0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+      <span style="font-size:clamp(52px,10vw,96px);font-weight:700;letter-spacing:-0.04em;color:#0f1623;">Token</span><span style="font-size:clamp(52px,10vw,96px);font-weight:700;letter-spacing:-0.04em;background:linear-gradient(135deg,rgb(123,166,146),rgb(60,61,89));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
     </div>
 
     <h1>See every token. Save more.<br>Prompt smarter. Every time.</h1>
@@ -668,7 +668,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
       <div class="featured-badge">Most popular</div>
       <div>
         <div class="plan-name" style="color:var(--accent)">Plus</div>
-        <div class="plan-price" style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">$9 <span style="-webkit-text-fill-color:var(--dim)">/ month</span></div>
+        <div class="plan-price" style="background:linear-gradient(135deg,rgb(123,166,146),rgb(60,61,89));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">$9 <span style="-webkit-text-fill-color:var(--dim)">/ month</span></div>
         <div class="plan-desc">For regular users and teams</div>
       </div>
       <div class="plan-divider"></div>
@@ -704,7 +704,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
         <div class="plan-feature"><span class="plan-feature-check">✓</span> 7,500 char limit</div>
         <div class="plan-feature"><span class="plan-feature-check">✓</span> Cancel anytime</div>
       </div>
-      <button class="plan-cta plan-cta-primary" onclick="goToCheckout('pro')" style="margin-top:1.5rem;background:linear-gradient(135deg,#7c52e0,#5b3fc4);">Get Pro →</button>
+      <button class="plan-cta plan-cta-primary" onclick="goToCheckout('pro')" style="margin-top:1.5rem;background:linear-gradient(135deg,rgb(60,61,89),rgb(45,46,70));">Get Pro →</button>
     </div>
 
   </div>
@@ -770,7 +770,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
   <div class="footer-inner">
     <div class="footer-brand">
       <div>
-        <span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:#0f1623;">Token</span><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;background:linear-gradient(90deg,#2f6fe8,#7c52e0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+        <span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:#0f1623;">Token</span><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;background:linear-gradient(90deg,rgb(123,166,146),rgb(60,61,89));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
       </div>
       <p>See every token. Save more. Prompt smarter. Every time. Powered by Anthropic Claude.</p>
     </div>
@@ -942,7 +942,7 @@ async function runDemo() {
     btn.disabled = false;
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Analyze free';
     document.getElementById('demo-results').style.display = 'block';
-    document.getElementById('demo-results').innerHTML = `<div style="padding:1rem;color:#dc2626;font-size:13px;text-align:center;">Something went wrong — try again or <a href="/app" style="color:#2563eb;">sign up free</a> for full access.</div>`;
+    document.getElementById('demo-results').innerHTML = `<div style="padding:1rem;color:#dc2626;font-size:13px;text-align:center;">Something went wrong — try again or <a href="/app" style="color:rgb(123,166,146);">sign up free</a> for full access.</div>`;
   }
 }
 
