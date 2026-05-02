@@ -436,9 +436,27 @@ async function init() {
   const res = await fetch('/api/config');
   const { supabaseUrl, supabaseAnonKey } = await res.json();
   sb = createClient(supabaseUrl, supabaseAnonKey);
+
+  // Force a fresh session from the server — avoids stale token on first analyze
   const { data: { session } } = await sb.auth.getSession();
-  if (session) { currentUser = session.user; currentSession = session; await onLoggedIn(); }
-  else {
+  if (session) {
+    // Proactively refresh the token so it's warm before user clicks analyze
+    try {
+      const { data: refreshed } = await sb.auth.refreshSession();
+      if (refreshed?.session) {
+        currentUser    = refreshed.session.user;
+        currentSession = refreshed.session;
+      } else {
+        currentUser    = session.user;
+        currentSession = session;
+      }
+      await onLoggedIn();
+    } catch(e) {
+      currentUser    = session.user;
+      currentSession = session;
+      await onLoggedIn();
+    }
+  } else {
     onLoggedOut();
     // Check if landing page sent us here with a plan pre-selected
     const params = new URLSearchParams(window.location.search);
@@ -449,8 +467,18 @@ async function init() {
     }
   }
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (session) { currentUser = session.user; currentSession = session; await onLoggedIn(); }
-    else { currentUser = null; currentSession = null; currentPlan = 'free'; onLoggedOut(); }
+    if (session) {
+      currentUser = session.user;
+      currentSession = session;
+      // If user just signed in via modal — redirect to home selector
+      if (event === 'SIGNED_IN') {
+        window.location.href = '/home';
+        return;
+      }
+      await onLoggedIn();
+    } else {
+      currentUser = null; currentSession = null; currentPlan = 'free'; onLoggedOut();
+    }
   });
 }
 
@@ -507,12 +535,17 @@ async function logout() {
 
 async function refreshUsage() {
   if (!currentUser) return null;
-  const { data } = await sb
-    .from('users')
-    .select('plan, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at')
-    .eq('id', currentUser.id)
-    .single();
-  return data || null;
+  try {
+    const timeout = new Promise(resolve => setTimeout(() => resolve({ data: null }), 5000));
+    const query   = sb.from('users')
+      .select('plan, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at')
+      .eq('id', currentUser.id)
+      .single();
+    const { data } = await Promise.race([query, timeout]);
+    return data || null;
+  } catch(e) {
+    return null;
+  }
 }
 
 async function goToCheckout(btnEl) {
@@ -786,24 +819,10 @@ async function analyze() {
       <div class="loading-state">
         <div class="spinner"></div>
         <span id="loading-msg">Analyzing your prompt…</span>
-        <div id="loading-retry" style="display:none;margin-top:12px;text-align:center;">
-          <div style="font-size:12px;color:var(--dim);margin-bottom:8px;">Taking longer than usual…</div>
-          <button id="retry-btn" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;font-family:'Geist',sans-serif;">↺ Retry</button>
-        </div>
       </div>
     </div>`;
 
-  // Show retry button after 15 seconds — clicking cancels in-flight and retries
   let activeController = null;
-  const retryTimer = setTimeout(() => {
-    const el = document.getElementById('loading-retry');
-    if (el) el.style.display = 'block';
-    const btn = document.getElementById('retry-btn');
-    if (btn) btn.onclick = () => {
-      if (activeController) activeController.abort();
-      analyze();
-    };
-  }, 15000);
 
   // Progressive messages so users know it's working
   const messages = [
@@ -842,7 +861,6 @@ async function analyze() {
       body: JSON.stringify(body)
     });
     clearTimeout(fetchTimeout);
-    clearTimeout(retryTimer);
     const data = await res.json();
     msgTimers.forEach(clearTimeout);
 
@@ -887,7 +905,6 @@ async function analyze() {
 
   } catch(err) {
     clearTimeout(fetchTimeout);
-    clearTimeout(retryTimer);
     controller.abort();
     msgTimers.forEach(clearTimeout);
     const msg = err.name === 'AbortError'
