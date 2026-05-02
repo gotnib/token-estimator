@@ -648,16 +648,19 @@ async function saveUsername() {
   flash.className = 'username-flash';
   flash.textContent = 'Saving...';
   try {
-    const res = await fetch('/api/portal', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ' + session.access_token
-      },
-      body: JSON.stringify({ action: 'update_name', username })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Could not update display name.');
+    const { error } = await sb.from('users').update({ username }).eq('id', session.user.id);
+    if (error) {
+      const res = await fetch('/api/portal', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'authorization': 'Bearer ' + session.access_token
+        },
+        body: JSON.stringify({ action: 'update_name', username })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not update display name.');
+    }
     profile.username = username;
     flash.className = 'username-flash success';
     flash.textContent = 'Display name updated.';
