@@ -168,18 +168,19 @@ body { background: linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 1
 /* ── NAV ── */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: center;
   padding: 0 2.5rem; height: 64px;
   background: rgba(248,249,251,0.85);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
+.nav-inner-land { width: 100%; max-width: 1100px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
 .nav-logo { display: flex; align-items: center; gap: 0; text-decoration: none; }
-.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-links { display: flex; align-items: center; gap: 2rem; justify-content: center; }
 .nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
 .nav-links a:hover { color: var(--text); }
-.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-right { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
 .btn-ghost { background: transparent; border: 1px solid var(--border2); border-radius: var(--radius); padding: 8px 18px; font-size: 13px; font-weight: 500; font-family: 'Geist', sans-serif; color: var(--muted); cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-flex; align-items: center; }
 .btn-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
 .btn-primary { background: var(--accent); border: none; border-radius: var(--radius); padding: 9px 20px; font-size: 13px; font-weight: 600; font-family: 'Geist', sans-serif; color: white; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; box-shadow: none; }
@@ -475,6 +476,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 
 <!-- NAV -->
 <nav>
+  <div class="nav-inner-land">
   <a class="nav-logo" href="#">
     <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#0f1623;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,rgb(123,166,146),rgb(60,61,89));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
   </a>
@@ -486,6 +488,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
   <div class="nav-right">
     <a class="btn-ghost" href="/home">Log in</a>
     <a class="btn-primary" href="/app">Start free →</a>
+  </div>
   </div>
 </nav>
 
@@ -530,8 +533,8 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 <!-- LIVE DEMO -->
 <section class="demo-section" id="demo">
   <div class="demo-inner">
-    <div class="demo-label">See it work on your prompt</div>
-    <div class="demo-label-sub">No account needed — instant results</div>
+    <div class="demo-label">Try it now</div>
+    <div class="demo-label-sub">No account needed</div>
     <div class="demo-card" id="demo-card">
       <div class="demo-examples">
         <span class="demo-example-label">Try an example:</span>
@@ -725,33 +728,16 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 <!-- TESTIMONIALS -->
 <section class="testimonials-section">
   <div class="testimonials-inner">
-    <div style="text-align:center">
-      <div class="section-label" style="justify-content:center;display:flex">Testimonials</div>
-      <div class="section-title">What developers are saying</div>
-    </div>
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <div class="testimonial-text">"Cut my average system prompt from 800 tokens to 310. That's real money saved at scale when you're running thousands of calls a day."</div>
-        <div class="testimonial-author">
-          <div class="author-avatar" style="background:rgba(91,142,240,0.15);color:var(--accent)">MR</div>
-          <div><div class="author-name">Marcus R.</div><div class="author-role">Backend Engineer</div></div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <div class="testimonial-text">"The rewrite feature is genuinely impressive. It doesn't just shorten your prompt — it keeps the intent and improves the structure."</div>
-        <div class="testimonial-author">
-          <div class="author-avatar" style="background:rgba(52,211,153,0.15);color:var(--green)">SL</div>
-          <div><div class="author-name">Sarah L.</div><div class="author-role">AI Product Manager</div></div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <div class="testimonial-text">"After a week of using TokenLens I don't even need it for simple prompts anymore. The principles it taught me are now just how I write. That's the real value."</div>
-        <div class="testimonial-author">
-          <div class="author-avatar" style="background:rgba(139,111,232,0.15);color:var(--accent2)">JP</div>
-          <div><div class="author-name">James P.</div><div class="author-role">Indie Developer</div></div>
+    <div style="max-width:640px;margin:0 auto;text-align:center;">
+      <div style="font-size:48px;margin-bottom:1.5rem;">👋</div>
+      <blockquote style="font-size:18px;line-height:1.75;color:var(--text);font-weight:400;margin-bottom:2rem;">
+        "I built this after watching my API costs grow without understanding why. Seeing many people complaining about the same thing in the community I decided to make it available for other users as well. Most of that spend was waste — filler words, overhead, repeated context. TokenLens makes that visible."
+      </blockquote>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;">J</div>
+        <div style="text-align:left;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);">Jason</div>
+          <div style="font-size:12px;color:var(--muted);">Founder, TokenLens</div>
         </div>
       </div>
     </div>
