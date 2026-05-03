@@ -179,8 +179,10 @@ function toggleMobileMenu() {
   const btn  = document.getElementById('hamburger');
   const open = menu.classList.toggle('open');
   btn.classList.toggle('open', open);
+  // Sync username + plan into mobile menu header
   const pill = document.getElementById('nav-plan-pill');
-  if (pill) document.getElementById('mobile-plan-pill').innerHTML = pill.innerHTML;
+  const mobilePill = document.getElementById('mobile-plan-pill');
+  if (pill && mobilePill) mobilePill.innerHTML = pill.innerHTML;
 }
 
 async function init() {
