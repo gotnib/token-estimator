@@ -60,7 +60,13 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 .mode-arrow{position:absolute;bottom:1.25rem;right:1.25rem;font-size:14px;color:var(--border2);transition:all 0.2s;}
 .mode-card:hover .mode-arrow{color:var(--muted);transform:translateX(2px);}
 
-@media(max-width:480px){.page,.home-page{padding:3rem 1.25rem;}.cards{grid-template-columns:1fr;}.mode-card{padding:1.5rem;}}
+.stats-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;}
+.stat-block{text-align:center;padding:0.5rem;}
+.stat-block:not(:last-child){border-right:1px solid var(--border);}
+.stat-block-val{font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--text);}
+.stat-block-lbl{font-size:11px;color:var(--dim);margin-top:3px;font-family:'Geist Mono',monospace;text-transform:uppercase;letter-spacing:0.06em;}
+.stats-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:10px;font-family:'Geist Mono',monospace;}
+@media(max-width:480px){.stats-card{grid-template-columns:1fr 1fr;}.stat-block:nth-child(2){border-right:none;}.stat-block:nth-child(3){border-right:none;border-top:1px solid var(--border);grid-column:span 2;}}
 .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:var(--radius);}
 .hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
 .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
@@ -132,6 +138,24 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
     <div class="greeting-name" id="greeting-name">Welcome back</div>
     <div class="greeting-sub">What would you like to do today?</div>
   </div>
+
+  <div class="stats-card" id="weekly-stats" style="display:none;">
+    <div style="grid-column:span 3;margin-bottom:10px;">
+      <div class="stats-card-label">This week</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-block-val" id="stat-tokens">—</div>
+      <div class="stat-block-lbl">Tokens saved</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-block-val" id="stat-analyses">—</div>
+      <div class="stat-block-lbl">Analyses</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-block-val" id="stat-grade">—</div>
+      <div class="stat-block-lbl">Avg grade</div>
+    </div>
+  </div>
   <div class="cards">
     <a class="mode-card analyzer" href="/app">
       <div class="mode-icon-wrap">🔍</div>
@@ -202,6 +226,41 @@ async function showHomeView(session) {
 
     document.getElementById('greeting-name').textContent = 'Hey ' + username + ' \uD83D\uDC4B';
     document.getElementById('challenge-badge').textContent = badges[plan] || '1/day free';
+
+    // Fetch weekly stats
+    const weekAgo = new Date(Date.now() - 7 * 24 * 3600000).toISOString();
+
+    const [histRes, challengeRes] = await Promise.all([
+      sb.from('prompt_history')
+        .select('estimated_tokens, efficient_tokens')
+        .eq('user_id', session.user.id)
+        .gte('created_at', weekAgo),
+      sb.from('challenge_scores')
+        .select('score, grade')
+        .eq('user_id', session.user.id)
+        .gte('created_at', weekAgo)
+    ]);
+
+    const history   = histRes.data || [];
+    const challenges = challengeRes.data || [];
+
+    const tokensSaved = history.reduce((sum, r) => sum + Math.max(0, (r.estimated_tokens || 0) - (r.efficient_tokens || 0)), 0);
+    const analyses   = history.length;
+    const avgScore   = challenges.length
+      ? Math.round(challenges.reduce((s, r) => s + r.score, 0) / challenges.length)
+      : null;
+    const avgGrade   = avgScore !== null
+      ? (avgScore >= 90 ? 'A' : avgScore >= 75 ? 'B' : avgScore >= 60 ? 'C' : avgScore >= 40 ? 'D' : 'F')
+      : '—';
+    const gradeColor = { A:'rgb(22,163,74)', B:'rgb(123,166,146)', C:'#d97706', D:'#d97706', F:'#dc2626' };
+
+    if (analyses > 0 || challenges.length > 0) {
+      document.getElementById('stat-tokens').textContent  = tokensSaved > 0 ? tokensSaved.toLocaleString() : '0';
+      document.getElementById('stat-analyses').textContent = analyses;
+      document.getElementById('stat-grade').textContent   = avgGrade;
+      if (gradeColor[avgGrade]) document.getElementById('stat-grade').style.color = gradeColor[avgGrade];
+      document.getElementById('weekly-stats').style.display = 'grid';
+    }
 
     document.getElementById('nav-right').innerHTML = `
       <span style="font-size:13px;font-weight:500;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${username}</span>
