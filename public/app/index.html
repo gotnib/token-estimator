@@ -3,713 +3,1390 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TokenLens App</title>
+<title>TokenLens App — Analyze & Optimize AI Prompts</title>
+<meta name="description" content="Paste any AI prompt and instantly get a token breakdown, cost estimate, optimization score, and a leaner rewrite. Free to start — no credit card needed.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://tokenlens.live/app">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tokenlens.live/app">
+<meta property="og:title" content="TokenLens App — Analyze & Optimize AI Prompts">
+<meta property="og:description" content="Paste any AI prompt and instantly get a token breakdown, cost estimate, optimization score, and a leaner rewrite. Free to start — no credit card needed.">
+<meta property="og:image" content="https://tokenlens.live/og-image.png">
+<meta property="og:site_name" content="TokenLens">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TokenLens App — Analyze & Optimize AI Prompts">
+<meta name="twitter:description" content="Paste any AI prompt and instantly get a token breakdown, cost estimate, optimization score, and a leaner rewrite. Free to start — no credit card needed.">
+<meta name="twitter:image" content="https://tokenlens.live/og-image.png">
 <link rel="icon" type="image/png" href="/tokenlens_favicon.png">
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-
 :root {
-  --bg: rgb(242,241,233);
-  --white: rgb(250,249,244);
-  --surface2: rgb(235,234,226);
-  --border: rgb(215,213,203);
-  --border2: rgb(195,193,182);
-  --text: rgb(60,61,89);
-  --muted: rgb(100,101,120);
-  --dim: rgb(140,141,158);
-  --accent: rgb(123,166,146);
-  --accent-light: rgba(123,166,146,0.12);
-  --accent-dark: rgb(95,138,118);
-  --green: #16a34a;
-  --green-light: #f0fdf4;
-  --amber: #d97706;
-  --amber-light: #fffbeb;
-  --red: #dc2626;
-  --red-light: #fef2f2;
-  --gold: #b45309;
-  --gold-light: #fef3c7;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --bg:rgb(242,241,233);--white:rgb(250,249,244);--surface2:rgb(235,234,226);--border:rgb(215,213,203);--border2:rgb(195,193,182);
+  --text:rgb(60,61,89);--muted:rgb(100,101,120);--dim:rgb(140,141,158);
+  --accent:rgb(123,166,146);--accent-light:rgba(123,166,146,0.12);--accent-dark:rgb(95,138,118);--accent2:rgb(60,61,89);
+  --green:#16a34a;--green-light:#f0fdf4;--amber:#d97706;--amber-light:#fffbeb;
+  --red:#dc2626;--red-light:#fef2f2;--gold:#b45309;--gold-light:#fef3c7;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: linear-gradient(160deg, rgb(242,241,233) 0%, rgb(232,231,220) 100%);
-  min-height: 100vh;
-  color: var(--text);
-  font-family: 'Geist', sans-serif;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-a { color: inherit; }
-nav {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  padding: 0 1.25rem;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow-sm);
-}
-.nav-inner {
-  width: 100%;
-  max-width: 1100px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.nav-logo { display: flex; align-items: center; text-decoration: none; flex-shrink: 0; }
-.nav-links { display: flex; align-items: center; gap: 4px; }
-.nav-link {
-  font-size: 13px;
-  color: var(--muted);
-  text-decoration: none;
-  padding: 6px 12px;
-  border-radius: var(--radius);
-  transition: all 0.15s;
-}
-.nav-link:hover { color: var(--text); background: var(--surface2); }
-.nav-link.active { color: var(--accent); background: var(--accent-light); font-weight: 500; }
-.nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.user-plan {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-.nav-username {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.plan-pill {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 99px;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  padding: 4px 10px;
-  letter-spacing: 0.04em;
-}
-.plan-pill.free { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-.plan-pill.plus { background: var(--accent-light); color: var(--accent); border: 1px solid rgba(123,166,146,0.3); }
-.plan-pill.pro { background: var(--gold-light); color: var(--gold); border: 1px solid #fcd34d; }
-.btn-nav, .btn, button {
-  font-family: 'Geist', sans-serif;
-}
-.btn-nav {
-  background: transparent;
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  padding: 7px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.btn-nav:hover { background: var(--surface2); }
-.btn-primary {
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: var(--radius);
-  padding: 10px 22px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
-.btn-primary:disabled, .btn-nav:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-.btn-secondary {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  cursor: pointer;
-}
-.hamburger {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: var(--radius);
-}
-.hamburger span {
-  display: block;
-  width: 20px;
-  height: 2px;
-  background: var(--text);
-  border-radius: 2px;
-  transition: all 0.2s;
-}
-.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
-.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-.mobile-menu {
-  display: none;
-  position: absolute;
-  top: 60px;
-  left: 0;
-  right: 0;
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  z-index: 99;
-  padding: 0.75rem 1.25rem 1rem;
-}
-.mobile-menu.open { display: block; }
-.mobile-user-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  margin-bottom: 6px;
-}
-.mobile-menu a, .mobile-menu button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
-  text-decoration: none;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-.mobile-menu a:hover, .mobile-menu button:hover { background: var(--surface2); }
-.mobile-menu a.active { color: var(--accent); background: var(--accent-light); }
-.mobile-menu-divider { height: 1px; background: var(--border); margin: 6px 0; }
-.page { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 6rem; }
-.page.narrow { max-width: 700px; }
-.page-header { margin-bottom: 2rem; }
-.page-title { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
-.page-sub { font-size: 14px; color: var(--muted); }
-.card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-.card-pad { padding: 1.5rem; }
-.section { margin-bottom: 1.25rem; }
-.section-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--dim);
-  margin-bottom: 8px;
-  font-family: 'Geist Mono', monospace;
-}
-input, textarea, select {
-  font-family: 'Geist', sans-serif;
-}
-textarea, .input {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  color: var(--text);
-  font-size: 14px;
-  padding: 14px 16px;
-  line-height: 1.7;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-textarea:focus, .input:focus {
-  outline: none;
-  border-color: var(--accent);
-  background: var(--white);
-  box-shadow: 0 0 0 3px rgba(123,166,146,0.16);
-}
-.status {
-  font-size: 13px;
-  padding: 12px 14px;
-  border-radius: var(--radius-lg);
-  margin-bottom: 1rem;
-}
-.status.error { background: var(--red-light); border: 1px solid #fecaca; color: var(--red); }
-.status.success { background: var(--green-light); border: 1px solid #bbf7d0; color: var(--green); }
-.status.warn { background: var(--amber-light); border: 1px solid #fde68a; color: #92400e; }
-.spinner {
-  width: 28px;
-  height: 28px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.75s linear infinite;
-  margin: 3rem auto;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-footer {
-  text-align: center;
-  padding: 2rem;
-  font-size: 12px;
-  color: var(--dim);
-  border-top: 1px solid var(--border);
-  margin-top: 2rem;
-}
-footer a { color: var(--muted); text-decoration: none; }
-@media(max-width:640px) {
-  .nav-links, .nav-right .btn-nav, .nav-right .user-plan { display: none !important; }
-  .hamburger { display: flex; }
-}
-@media(max-width:560px) {
-  nav { padding: 0 1rem; }
-  .page { padding: 1.5rem 1.25rem 5rem; }
-}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%);min-height:100vh;color:var(--text);font-family:'Geist',sans-serif;font-weight:400;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
 
+/* NAV */
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+.nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:0;text-decoration:none;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-links{display:flex;align-items:center;gap:4px;margin-right:8px;}
+.nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+.nav-link.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
+.usage-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:5px 12px;font-size:12px;color:var(--muted);font-family:'Geist Mono',monospace;}
+.usage-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.usage-dot.warn{background:var(--amber);}
+.usage-dot.danger{background:var(--red);}
+.priority-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold-light);color:var(--gold);border:1px solid #fcd34d;border-radius:99px;font-size:11px;font-weight:600;padding:3px 10px;}
+.plan-pill{display:inline-flex;align-items:center;gap:5px;border-radius:99px;font-size:11px;font-weight:600;padding:4px 12px;}
+.plan-pill.free{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.plan-pill.plus{background:var(--accent-light);color:var(--accent);border:1px solid rgba(123,166,146,0.3);}
+.plan-pill.pro{background:var(--gold-light);color:var(--gold);border:1px solid #fcd34d;}
+.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.btn-nav:hover{background:var(--surface2);}
+.btn-nav-primary{background:var(--accent);color:white;border-color:var(--accent);}
+.btn-nav-primary:hover{background:var(--accent-dark);}
 
-.page{max-width:820px;}
+/* PAGE */
+.page{max-width:820px;margin:0 auto;padding:0 1.5rem;}
 .hero{text-align:center;padding:3rem 1.5rem 2rem;max-width:640px;margin:0 auto;}
 .hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);border:1px solid rgba(123,166,146,0.3);border-radius:99px;padding:4px 12px;font-size:12px;font-weight:500;margin-bottom:1.25rem;}
+.hero-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
 h1{font-size:clamp(26px,4vw,38px);font-weight:600;letter-spacing:-0.03em;line-height:1.15;margin-bottom:0.75rem;}
 h1 span{color:var(--accent);}
 .hero-sub{font-size:15px;color:var(--muted);max-width:420px;margin:0 auto;}
+
+/* GATE */
+.gate-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:3rem 2rem;text-align:center;margin-bottom:2rem;}
+.gate-icon{font-size:32px;margin-bottom:1rem;}
+.gate-title{font-size:18px;font-weight:600;margin-bottom:8px;}
+.gate-sub{font-size:14px;color:var(--muted);margin-bottom:1.5rem;max-width:340px;margin-left:auto;margin-right:auto;}
+.gate-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* MAIN CARD */
+.main-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);margin-bottom:1.5rem;overflow:hidden;}
 .card-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.card-title{font-size:13px;font-weight:600;color:var(--text);}
-.card-sub{font-size:12px;color:var(--dim);margin-top:2px;}
+.card-header-left{flex:1;}
+.card-header-title{font-size:13px;font-weight:600;color:var(--text);}
+.card-header-sub{font-size:12px;color:var(--dim);margin-top:2px;}
 .card-body{padding:1.5rem;}
-textarea{min-height:140px;resize:vertical;}
-.input-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:1rem;flex-wrap:wrap;}
+
+/* PROMPT BOXES */
+.prompt-list{display:flex;flex-direction:column;gap:12px;}
+.prompt-item{position:relative;}
+.prompt-label{font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);margin-bottom:5px;}
+.prompt-row{display:flex;gap:8px;align-items:flex-start;}
+textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);color:var(--text);font-family:'Geist',sans-serif;font-size:14px;padding:14px 16px;min-height:120px;resize:vertical;line-height:1.7;transition:border-color 0.15s,box-shadow 0.15s;}
+textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);background:var(--white);}
+textarea::placeholder{color:var(--dim);}
+.btn-remove{width:32px;height:32px;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:8px;transition:all 0.15s;}
+.btn-remove:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
+.batch-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:8px;}
+.btn-add-prompt{background:transparent;border:1px dashed var(--border2);border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--muted);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px;}
+.btn-add-prompt:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+.batch-info{font-size:12px;color:var(--dim);font-family:'Geist Mono',monospace;}
+.input-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
 .char-count{font-family:'Geist Mono',monospace;font-size:11px;color:var(--dim);}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
-.control-pill{border:1px solid var(--border);background:var(--white);color:var(--muted);border-radius:99px;padding:6px 13px;font-size:12px;font-weight:500;cursor:pointer;}
-.control-pill.active{background:var(--accent);border-color:var(--accent);color:white;}
+.btn-analyze{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:10px 22px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:8px;}
+.btn-analyze:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.25);}
+.btn-analyze:active{transform:translateY(0);}
+.btn-analyze:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* RESULTS */
 .results-wrap{display:flex;flex-direction:column;gap:12px;padding-bottom:4rem;}
-.result-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);overflow:hidden;}
-.result-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
-.result-title{font-size:13px;font-weight:600;color:var(--text);}
-.result-body{padding:1.25rem;}
+.result-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);overflow:hidden;animation:slideUp 0.3s ease both;}
+.result-card:nth-child(2){animation-delay:0.06s;}
+.result-card:nth-child(3){animation-delay:0.12s;}
+.result-card:nth-child(4){animation-delay:0.18s;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.rc-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.rc-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.rc-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.rc-body{padding:1.25rem;}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 .stat-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;}
 .stat-label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
 .stat-value{font-size:28px;font-weight:600;color:var(--text);line-height:1;letter-spacing:-0.02em;}
-.efficient-prompt{background:var(--accent-light);border:1px solid rgba(123,166,146,0.3);border-radius:var(--radius-lg);padding:16px;font-size:14px;color:rgb(60,61,89);line-height:1.7;margin-bottom:12px;font-style:italic;white-space:pre-wrap;}
-.breakdown-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
-.breakdown-row:last-child{border-bottom:none;}
-.small-muted{font-size:12px;color:var(--muted);}
-.login-gate{max-width:520px;margin:3rem auto;}
-@media(max-width:600px){.stats-grid{grid-template-columns:1fr;}}
+.stat-sub{font-size:11px;color:var(--dim);margin-top:4px;}
+.breakdown-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.breakdown-row:first-child{padding-top:0;}
+.breakdown-row:last-child{border-bottom:none;padding-bottom:0;}
+.breakdown-left{flex:1;min-width:0;}
+.breakdown-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.breakdown-detail{font-size:11px;color:var(--dim);}
+.breakdown-right{text-align:right;flex-shrink:0;}
+.breakdown-tokens{font-family:'Geist Mono',monospace;font-size:13px;font-weight:500;color:var(--text);}
+.breakdown-pct{font-size:11px;color:var(--dim);}
+.bar-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px;}
+.bar-fill{height:100%;border-radius:2px;}
+.efficient-prompt{background:var(--accent-light);border:1px solid rgba(123,166,146,0.3);border-radius:var(--radius-lg);padding:16px;font-size:14px;color:rgb(60,61,89);line-height:1.7;margin-bottom:12px;font-style:italic;}
+.savings-badge{display:inline-flex;align-items:center;background:var(--green-light);color:var(--green);border:1px solid #bbf7d0;border-radius:99px;font-size:11px;font-weight:600;padding:3px 10px;}
+.btn-copy{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.btn-copy:hover{background:var(--border2);}
+.btn-save{background:transparent;border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--muted);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-save:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-light);}
+.btn-save.saved{background:var(--gold-light);color:var(--gold);border-color:#fcd34d;}
+.reason-row{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);}
+.reason-row:first-child{padding-top:0;}
+.reason-row:last-child{border-bottom:none;padding-bottom:0;}
+.reason-num{width:22px;height:22px;background:var(--accent-light);color:var(--accent);border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.reason-text{font-size:13px;color:var(--muted);line-height:1.6;}
 
+/* SCORE CARD */
+.score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem;}
+.score-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center;}
+@media(max-width:500px){.score-grid{grid-template-columns:repeat(2,1fr);}}
+.score-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:8px;}
+.score-ring{position:relative;width:52px;height:52px;margin:0 auto 6px;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring-bg{fill:none;stroke:var(--border);stroke-width:4;}
+.score-ring-fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1);}
+.model-selector-wrap{padding:12px 16px;border-top:1px solid var(--border);background:var(--bg);}
+.model-selector-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:8px;font-family:'Geist Mono',monospace;}
+.model-selector{display:flex;gap:6px;flex-wrap:wrap;}
+.model-pill{display:flex;align-items:center;gap:5px;padding:5px 12px;border:1.5px solid var(--border);border-radius:99px;font-size:12px;font-weight:500;color:var(--muted);background:var(--white);cursor:pointer;transition:all 0.15s;font-family:'Geist',sans-serif;}
+.model-pill:hover{border-color:var(--border2);color:var(--text);}
+.model-pill.active{background:var(--text);border-color:var(--text);color:white;}
+.model-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.model-selector-note{font-size:10px;color:var(--dim);margin-top:6px;}
+.score-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--text);}
+.score-tooltip{position:fixed;background:rgb(60,61,89);color:white;font-size:11px;line-height:1.5;padding:8px 12px;border-radius:8px;max-width:200px;z-index:9999;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.score-note{font-size:10px;color:var(--dim);line-height:1.4;}
+.score-delta{font-size:10px;font-weight:600;margin-top:4px;}
+.score-delta.up{color:var(--green);}
+.score-delta.down{color:var(--red);}
+.score-delta.same{color:var(--dim);}
+
+/* LESSON CARDS */
+.reason-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;}
+.reason-card:last-child{margin-bottom:0;}
+.reason-change{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;}
+.reason-change-num{width:20px;height:20px;background:var(--accent-light);color:var(--accent);border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.reason-principle{font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:4px;margin-left:28px;}
+.reason-lesson{font-size:12px;color:var(--muted);line-height:1.6;margin-left:28px;padding:8px 10px;background:var(--white);border-left:3px solid var(--accent2);border-radius:0 var(--radius) var(--radius) 0;}
+.slider-wrap{margin-top:14px;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);}
+.slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.slider-label{font-size:12px;font-weight:500;color:var(--text);}
+.slider-value{font-size:12px;font-weight:600;padding:2px 10px;border-radius:99px;}
+.slider-value.fast{background:var(--green-light);color:var(--green);}
+.slider-value.balanced{background:var(--accent-light);color:var(--accent);}
+.slider-value.deep{background:rgba(60,61,89,0.08);color:var(--accent2);}
+.slider-track{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.slider-option{padding:8px;border:1.5px solid var(--border);border-radius:var(--radius);text-align:center;cursor:pointer;transition:all 0.15s;}
+.slider-option:hover{border-color:var(--border2);}
+.slider-option.active.fast{border-color:var(--green);background:var(--green-light);}
+.slider-option.active.balanced{border-color:var(--accent);background:var(--accent-light);}
+.slider-option.active.deep{border-color:var(--accent2);background:rgba(60,61,89,0.08);}
+.slider-option.locked{opacity:0.4;cursor:not-allowed;}
+.slider-option-name{font-size:12px;font-weight:600;margin-bottom:2px;}
+.slider-option-desc{font-size:10px;color:var(--muted);line-height:1.4;}
+.slider-option.active.fast .slider-option-name{color:var(--green);}
+.slider-option.active.balanced .slider-option-name{color:var(--accent);}
+.slider-option.active.deep .slider-option-name{color:var(--accent2);}
+.slider-lock-note{font-size:11px;color:var(--dim);margin-top:8px;text-align:center;}
+.batch-tabs{display:flex;gap:4px;padding:1rem 1.25rem;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.batch-tab{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Geist',sans-serif;transition:all 0.15s;}
+.batch-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
+.batch-tab:hover:not(.active){background:var(--surface2);}
+
+/* LOADING */
+.loading-state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:3rem;color:var(--muted);font-size:14px;}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.75s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* LIMIT/ERROR/BANNERS */
+.error-state{background:var(--red-light);border:1px solid #fecaca;border-radius:var(--radius-lg);padding:14px 16px;font-size:13px;color:var(--red);}
+.error-state strong{display:block;font-weight:600;margin-bottom:3px;}
+.limit-banner{background:var(--amber-light);border:1px solid #fde68a;border-radius:var(--radius-lg);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;margin-bottom:12px;}
+.limit-banner-text{color:#92400e;}
+.limit-banner-text strong{font-weight:600;}
+.btn-upgrade-inline{background:var(--amber);color:white;border:none;border-radius:var(--radius);padding:7px 16px;font-size:12px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.btn-upgrade-inline:hover{opacity:0.85;}
+
+/* UPGRADE CARD */
+.upgrade-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:3rem 2rem;text-align:center;margin-bottom:2rem;}
+.upgrade-icon{font-size:32px;margin-bottom:1rem;}
+.upgrade-title{font-size:20px;font-weight:600;margin-bottom:8px;}
+.upgrade-sub{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 1.75rem;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:680px;margin:0 auto 1.5rem;text-align:left;}
+.pricing-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;position:relative;}
+.pricing-card.featured{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.featured-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;font-size:10px;font-weight:600;padding:3px 12px;border-radius:99px;white-space:nowrap;}
+.pricing-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.pricing-price{font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-bottom:12px;}
+.pricing-price span{font-size:13px;font-weight:400;color:var(--muted);}
+.pricing-feature{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.plan-feature-check{color:var(--green);font-weight:700;font-size:11px;flex-shrink:0;}
+.btn-upgrade-cta{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:12px 28px;font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.15s;}
+.btn-upgrade-cta:hover{background:var(--accent-dark);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn 0.15s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--white);border-radius:var(--radius-xl);box-shadow:var(--shadow);width:100%;max-width:400px;padding:2rem;animation:slideUp 0.2s ease;}
+.modal.wide{max-width:600px;}
+.plan-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem;}
+.plan-select-card{border:2px solid var(--border);border-radius:var(--radius-lg);padding:12px;cursor:pointer;transition:all 0.15s;text-align:center;position:relative;}
+.plan-select-card:hover{border-color:var(--border2);}
+.plan-select-card.selected{border-color:var(--accent);background:var(--accent-light);}
+.plan-select-card.selected.pro{border-color:var(--accent2);background:rgba(60,61,89,0.08);}
+.plan-select-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.plan-select-price{font-size:11px;color:var(--muted);margin-bottom:6px;font-family:'Geist Mono',monospace;}
+.plan-select-feature{font-size:10px;color:var(--dim);line-height:1.5;}
+.modal-title{font-size:20px;font-weight:600;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:12px;font-weight:500;color:var(--text);display:block;margin-bottom:5px;}
+.form-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Geist',sans-serif;font-size:14px;padding:10px 12px;transition:border-color 0.15s,box-shadow 0.15s;}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.btn-full{width:100%;padding:11px;border-radius:var(--radius);font-size:14px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;border:none;transition:all 0.15s;}
+.btn-primary-full{background:var(--accent);color:white;}
+.btn-primary-full:hover{background:var(--accent-dark);}
+.btn-primary-full:disabled{opacity:0.5;cursor:not-allowed;}
+.modal-switch{text-align:center;margin-top:1rem;font-size:13px;color:var(--muted);}
+.modal-switch a{color:var(--accent);text-decoration:none;cursor:pointer;font-weight:500;}
+.modal-error{background:var(--red-light);border:1px solid #fecaca;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--red);margin-bottom:14px;}
+.modal-success{background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--green);margin-bottom:14px;}
+
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--dim);border-top:1px solid var(--border);margin-top:2rem;}
+footer a{color:var(--muted);text-decoration:none;}
+footer a:hover{color:var(--text);}
+
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr;}
+  .pricing-grid{grid-template-columns:1fr;}
+}
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:var(--radius);}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;position:absolute;top:60px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:99;padding:0.75rem 1.25rem 1rem;}
+.mobile-menu.open{display:block;}
+.mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:var(--radius);border:none;background:none;font-family:'Geist',sans-serif;cursor:pointer;transition:background 0.15s;}
+.mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface2);}
+.mobile-menu a.active{color:var(--accent);background:var(--accent-light);}
+.mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
+.mobile-plan-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:12px;color:var(--muted);}
+@media(max-width:640px){
+  .nav-links,.nav-right .btn-nav,.nav-right .priority-badge{display:none!important;}
+  .hamburger{display:flex;}
+}
 </style>
 </head>
 <body>
-<div id="nav-root"></div>
+
+<nav>
+  <div class="nav-inner">
+  <a class="nav-logo" href="/">
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span>
+  </a>
+  <div class="nav-links" id="nav-links" style="display:none">
+    <a class="nav-link active" href="/app">Analyzer</a>
+    <a class="nav-link" href="/challenge">Challenge</a>
+    <a class="nav-link" href="/library" id="nav-library" style="display:none">Library</a>
+    <a class="nav-link" href="/account">Account</a>
+  </div>
+  <div class="nav-right">
+    <div id="nav-plan-pill" style="display:flex;align-items:center;gap:6px;">
+      <span id="nav-username" style="font-size:13px;font-weight:500;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    </div>
+    <div class="priority-badge" id="priority-badge" style="display:none">⚡ Priority</div>
+    <button class="btn-nav" id="btn-logout" style="display:none" onclick="logout()">Log out</button>
+    <button class="btn-nav" id="btn-login" onclick="openModal('login')">Log in</button>
+    <button class="btn-nav btn-nav-primary" id="btn-signup" onclick="openModal('signup')">Sign up free</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-plan-row"><span>TokenLens</span><span id="mobile-plan-pill"></span></div>
+  <div class="mobile-menu-divider"></div>
+  <a href="/app" class="active">Analyzer</a>
+  <a href="/challenge">Challenge</a>
+  <a href="/library" id="mobile-nav-library" style="display:none">Library</a>
+  <a href="/account">Account</a>
+  <div class="mobile-menu-divider"></div>
+  <button id="mobile-btn-logout" style="display:none" onclick="toggleMobileMenu();logout()">Log out</button>
+  <button id="mobile-btn-login" onclick="openModal('login');toggleMobileMenu()">Log in</button>
+  <button id="mobile-btn-signup" onclick="openModal('signup');toggleMobileMenu()">Sign up free</button>
+</div>
 
 <div class="page">
   <div class="hero">
-    <div class="hero-badge">TokenLens Analyzer</div>
-    <h1>Analyze and optimize your <span>AI prompts</span></h1>
-    <div class="hero-sub">Paste a prompt to estimate tokens, cost, clarity, and rewrite it more efficiently.</div>
+    <div class="hero-badge"><div class="hero-badge-dot"></div>Powered by Claude</div>
+    <h1>Understand your <span>prompt costs</span><br>before they add up</h1>
+    <p class="hero-sub">Get a token breakdown, cost estimate, and a leaner rewrite — instantly.</p>
   </div>
-
-  <div id="content"><div class="spinner"></div></div>
+  <div id="app-body"></div>
 </div>
 
-<footer>TokenLens · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></footer>
+<footer>
+  TokenLens · Powered by <a href="https://anthropic.com" target="_blank">Anthropic Claude</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a>
+</footer>
+
+<div class="modal-overlay" id="modal" style="display:none" onclick="closeModalOnOverlay(event)">
+  <div class="modal wide" id="modal-box"><div id="modal-content"></div></div>
+</div>
 
 <script>
-
 const { createClient } = supabase;
-let sb = null;
-let currentSession = null;
-let currentUserProfile = null;
+const COLORS = ['rgb(123,166,146)','#16a34a','#d97706','#dc2626','#7c3aed','#0891b2'];
+const PLAN_ICONS  = { free: '🔍', plus: '⚡', pro: '🚀' };
+const PLAN_LABELS = { free: 'Free', plus: 'Plus', pro: 'Pro' };
+const CHAR_LIMITS = { free: 1500, plus: 5000, pro: 7500 };
+const LEVEL_CONFIG = {
+  fast:     { label: 'Fast',     desc: 'Trim obvious waste only',    color: 'fast',     plans: ['free','plus','pro'] },
+  balanced: { label: 'Balanced', desc: 'Tighten and restructure',    color: 'balanced', plans: ['plus','pro'] },
+  deep:     { label: 'Code',     desc: 'Optimize code input (Pro)',   color: 'deep',     plans: ['pro'] }
+};
 
-const PLAN_LABELS = { free: 'FREE', plus: 'PLUS', pro: 'PRO' };
+let sb, currentUser, currentSession, currentPlan = 'free';
+let currentLevel = 'balanced';
+let prompts = [''];
 
-function normalizePlan(plan) {
-  const value = String(plan || 'free').trim().toLowerCase();
-  return PLAN_LABELS[value] ? value : 'free';
+const MODELS = {
+  claude: { label: 'Claude Sonnet', provider: 'Anthropic', pricePerM: 3.00,  note: 'Estimated against Anthropic pricing' },
+  gpt4o:  { label: 'GPT-4o',        provider: 'OpenAI',    pricePerM: 2.50,  note: 'Estimated against OpenAI pricing' },
+  gemini: { label: 'Gemini Pro',    provider: 'Google',    pricePerM: 1.25,  note: 'Estimated against Google pricing' },
+  llama:  { label: 'Llama 70B',     provider: 'Meta',      pricePerM: 0.59,  note: 'Estimated against Meta/Groq pricing' },
+};
+let currentModel = localStorage.getItem('tl_model') || 'claude';
+
+function setModel(key) {
+  currentModel = key;
+  localStorage.setItem('tl_model', key);
+  renderModelSelector();
+  // Re-render results if visible with new pricing
+  const results = document.getElementById('results');
+  if (results && results.innerHTML && !results.innerHTML.includes('loading-state')) {
+    const costEls = document.querySelectorAll('.stat-sub');
+    costEls.forEach(el => {
+      if (el.textContent.includes('input rate') || el.textContent.includes('pricing')) {
+        el.textContent = MODELS[currentModel].note;
+      }
+    });
+  }
 }
 
-function getDisplayName(user) {
-  const metadata = user?.user_metadata || {};
-  return metadata.display_name ||
-    metadata.full_name ||
-    metadata.name ||
-    metadata.username ||
-    (user?.email || '').split('@')[0] ||
-    'Account';
+function renderModelSelector() {
+  const wrap = document.getElementById('model-selector');
+  if (!wrap) return;
+  wrap.innerHTML = Object.entries(MODELS).map(([key, m]) => `
+    <button class="model-pill ${key === currentModel ? 'active' : ''}" onclick="setModel('${key}')">
+      <span class="model-dot" style="background:${key === currentModel ? 'white' : '#d1d5db'}"></span>
+      ${m.label}
+    </button>`).join('');
 }
 
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+function charLimit() { return CHAR_LIMITS[currentPlan] || 1500; }
+
+function setLevel(level) {
+  const cfg = LEVEL_CONFIG[level];
+  if (!cfg.plans.includes(currentPlan)) return; // locked
+  currentLevel = level;
+  renderSlider();
 }
 
-function escapeAttribute(value) {
-  return escapeHtml(value).replace(/`/g, '&#096;');
-}
+function renderSlider() {
+  const wrap = document.getElementById('opt-slider');
+  if (!wrap) return;
 
-async function setupSupabase() {
-  const cfgRes = await fetch('/api/config');
-  if (!cfgRes.ok) throw new Error('Could not load app config.');
-  const { supabaseUrl, supabaseAnonKey } = await cfgRes.json();
-  sb = createClient(supabaseUrl, supabaseAnonKey);
-  return sb;
-}
+  const levels = ['fast', 'balanced', 'deep'];
+  const optionsHTML = levels.map(l => {
+    const cfg     = LEVEL_CONFIG[l];
+    const allowed = cfg.plans.includes(currentPlan);
+    const active  = currentLevel === l;
+    const cls     = `slider-option${active ? ' active ' + l : ''}${!allowed ? ' locked' : ''}`;
+    return `<div class="${cls}" onclick="setLevel('${l}')" title="${!allowed ? 'Upgrade to unlock' : ''}">
+      <div class="slider-option-name">${cfg.label}${!allowed ? ' 🔒' : ''}</div>
+      <div class="slider-option-desc">${cfg.desc}</div>
+    </div>`;
+  }).join('');
 
-async function getSession() {
-  const { data, error } = await sb.auth.getSession();
-  if (error) throw error;
-  currentSession = data?.session || null;
-  return currentSession;
-}
-
-async function loadProfile(userId) {
-  const { data, error } = await sb
-    .from('users')
-    .select('plan, subscription_status, plan_expires_at, stripe_subscription_id, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, challenges_today, last_challenge_at, created_at')
-    .eq('id', userId)
-    .single();
-
-  if (error) throw error;
-
-  currentUserProfile = {
-    ...data,
-    plan: normalizePlan(data?.plan)
-  };
-
-  return currentUserProfile;
-}
-
-function renderLogo() {
-  return `<span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span>`;
-}
-
-function buildNav(activePage = '') {
-  const plan = normalizePlan(currentUserProfile?.plan);
-  const username = getDisplayName(currentSession?.user);
-
-  const libraryStyle = plan === 'pro' ? '' : 'style="display:none"';
-
-  return `
-    <nav>
-      <div class="nav-inner">
-        <a class="nav-logo" href="/">${renderLogo()}</a>
-        <div class="nav-links">
-          <a class="nav-link ${activePage === 'app' ? 'active' : ''}" href="/app">Analyzer</a>
-          <a class="nav-link ${activePage === 'challenge' ? 'active' : ''}" href="/challenge">Challenge</a>
-          <a class="nav-link ${activePage === 'library' ? 'active' : ''}" href="/library" ${libraryStyle}>Library</a>
-          <a class="nav-link ${activePage === 'account' ? 'active' : ''}" href="/account">Account</a>
-        </div>
-        <div class="nav-right">
-          <div class="user-plan">
-            <span class="nav-username" title="${escapeAttribute(username)}">${escapeHtml(username)}</span>
-            <span class="plan-pill ${plan}">${PLAN_LABELS[plan]}</span>
-          </div>
-          <button class="btn-nav" onclick="logout()">Log out</button>
-          <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
-            <span></span><span></span><span></span>
-          </button>
-        </div>
-      </div>
-    </nav>
-    <div class="mobile-menu" id="mobile-menu">
-      <div class="mobile-user-row">
-        <span class="nav-username" title="${escapeAttribute(username)}">${escapeHtml(username)}</span>
-        <span class="plan-pill ${plan}">${PLAN_LABELS[plan]}</span>
-      </div>
-      <div class="mobile-menu-divider"></div>
-      <a href="/app" class="${activePage === 'app' ? 'active' : ''}">Analyzer</a>
-      <a href="/challenge" class="${activePage === 'challenge' ? 'active' : ''}">Challenge</a>
-      ${plan === 'pro' ? `<a href="/library" class="${activePage === 'library' ? 'active' : ''}">Library</a>` : ''}
-      <a href="/account" class="${activePage === 'account' ? 'active' : ''}">Account</a>
-      <div class="mobile-menu-divider"></div>
-      <button onclick="logout()">Log out</button>
+  const valueCfg = LEVEL_CONFIG[currentLevel];
+  wrap.innerHTML = `
+    <div class="slider-header">
+      <span class="slider-label">Optimization level</span>
+      <span class="slider-value ${valueCfg.color}">${valueCfg.label}</span>
     </div>
-  `;
+    <div class="slider-track">${optionsHTML}</div>
+    ${currentPlan === 'free' ? `<div class="slider-lock-note">Balanced and Code mode available on <a href="#" onclick="showUpgrade()" style="color:var(--accent)">Plus and Pro</a></div>` : ''}
+    ${currentPlan === 'plus' ? `<div class="slider-lock-note">Code optimization available on <a href="#" onclick="showUpgrade()" style="color:var(--accent2)">Pro</a></div>` : ''}`;
 }
 
-function mountNav(activePage) {
-  const holder = document.getElementById('nav-root');
-  if (holder) holder.innerHTML = buildNav(activePage);
+function renderNavPill(plan) {
+  const styles = { free:'color:rgb(60,61,89)', plus:'color:rgb(60,61,89)', pro:'color:#b45309' };
+  const labels = { free:'FREE', plus:'PLUS', pro:'PRO' };
+  const pill = document.getElementById('nav-plan-pill');
+  if (!pill) return;
+  const username = currentUser?.email?.split('@')[0] || '';
+  pill.innerHTML = `
+    <span style="font-size:13px;font-weight:500;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(username)}</span>
+    <span style="${styles[plan]||styles.free};font-weight:600;font-size:13px;margin-left:6px;">${labels[plan]||'FREE'}</span>`;
+}
+// ── INIT ──────────────────────────────────────────
+async function init() {
+  const res = await fetch('/api/config');
+  const { supabaseUrl, supabaseAnonKey } = await res.json();
+  sb = createClient(supabaseUrl, supabaseAnonKey);
+
+  // Force a fresh session from the server — avoids stale token on first analyze
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    // Proactively refresh the token so it's warm before user clicks analyze
+    try {
+      const { data: refreshed } = await sb.auth.refreshSession();
+      if (refreshed?.session) {
+        currentUser    = refreshed.session.user;
+        currentSession = refreshed.session;
+      } else {
+        currentUser    = session.user;
+        currentSession = session;
+      }
+      await onLoggedIn();
+    } catch(e) {
+      currentUser    = session.user;
+      currentSession = session;
+      await onLoggedIn();
+    }
+  } else {
+    onLoggedOut();
+    // Check if landing page sent us here with a plan pre-selected
+    const params = new URLSearchParams(window.location.search);
+    const signupPlan = params.get('signup');
+    if (signupPlan && ['plus', 'pro'].includes(signupPlan)) {
+      window.history.replaceState({}, '', '/app');
+      openModal('signup', signupPlan);
+    }
+  }
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (session) { currentUser = session.user; currentSession = session; await onLoggedIn(); }
+    else { currentUser = null; currentSession = null; currentPlan = 'free'; onLoggedOut(); }
+  });
+}
+
+async function onLoggedIn() {
+  closeModal();
+  document.getElementById('btn-login').style.display = 'none';
+  document.getElementById('btn-signup').style.display = 'none';
+  document.getElementById('btn-logout').style.display = 'block';
+  document.getElementById('nav-links').style.display = 'flex';
+  document.getElementById('mobile-btn-login').style.display = 'none';
+  document.getElementById('mobile-btn-signup').style.display = 'none';
+  document.getElementById('mobile-btn-logout').style.display = 'block';
+  const profile = await refreshUsage();
+  currentPlan = profile?.plan || 'free';
+  currentLevel = currentPlan === 'free' ? 'fast' : currentPlan === 'plus' ? 'balanced' : 'balanced';
+  renderNavPill(currentPlan);
+  if (currentPlan === 'pro') {
+    document.getElementById('priority-badge').style.display = 'inline-flex';
+    document.getElementById('nav-library').style.display = 'block';
+    document.getElementById('mobile-nav-library').style.display = 'block';
+  }
+  renderAnalyzer();
+}
+
+function onLoggedOut() {
+  document.getElementById('btn-login').style.display = 'block';
+  document.getElementById('btn-signup').style.display = 'block';
+  document.getElementById('btn-logout').style.display = 'none';
+  document.getElementById('priority-badge').style.display = 'none';
+  document.getElementById('nav-links').style.display = 'none';
+  document.getElementById('mobile-btn-login').style.display = 'block';
+  document.getElementById('mobile-btn-signup').style.display = 'block';
+  document.getElementById('mobile-btn-logout').style.display = 'none';
+  renderGate();
 }
 
 function toggleMobileMenu() {
   const menu = document.getElementById('mobile-menu');
-  const btn = document.getElementById('hamburger');
-  if (!menu || !btn) return;
+  const btn  = document.getElementById('hamburger');
   const open = menu.classList.toggle('open');
   btn.classList.toggle('open', open);
+  // Sync plan pill
+  const pill = document.getElementById('nav-plan-pill');
+  if (pill) document.getElementById('mobile-plan-pill').innerHTML = pill.innerHTML;
 }
 
 async function logout() {
-  if (sb) await sb.auth.signOut();
-  window.location.href = '/';
+  await sb.auth.signOut();
+  currentUser    = null;
+  currentSession = null;
+  currentPlan    = 'free';
+  onLoggedOut();
 }
 
-async function requireAuth(activePage) {
-  await setupSupabase();
-  const session = await getSession();
-
-  if (!session) {
-    window.location.href = '/app';
+async function refreshUsage() {
+  if (!currentUser) return null;
+  try {
+    const timeout = new Promise(resolve => setTimeout(() => resolve({ data: null }), 5000));
+    const query   = sb.from('users')
+      .select('plan, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at')
+      .eq('id', currentUser.id)
+      .single();
+    const { data } = await Promise.race([query, timeout]);
+    return data || null;
+  } catch(e) {
     return null;
   }
-
-  await loadProfile(session.user.id);
-  mountNav(activePage);
-  return session;
 }
 
-
-let selectedLevel = 'balanced';
-let selectedModel = 'claude';
-
-const MODEL_LABELS = {
-  claude: 'Claude',
-  gpt4o: 'GPT 4o',
-  gemini: 'Gemini',
-  llama: 'Llama'
-};
-
-function renderPublicNav() {
-  document.getElementById('nav-root').innerHTML = `
-    <nav>
-      <div class="nav-inner">
-        <a class="nav-logo" href="/">${renderLogo()}</a>
-        <div class="nav-links"></div>
-        <div class="nav-right"><button class="btn-nav" onclick="renderAuthGate()">Log in</button></div>
-      </div>
-    </nav>`;
-}
-
-async function init() {
-  await setupSupabase();
-  const session = await getSession();
-
-  if (!session) {
-    renderPublicNav();
-    renderAuthGate();
-    return;
+async function goToCheckout(btnEl) {
+  const plan = btnEl.textContent.toLowerCase().includes('plus') ? 'plus' : 'pro';
+  if (!currentSession) { openModal('login'); return; }
+  btnEl.disabled = true;
+  const orig = btnEl.textContent;
+  btnEl.textContent = 'Loading…';
+  try {
+    const res  = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
+      body: JSON.stringify({ plan })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    if (data.upgraded) {
+      // Instant swap — reload plan and re-render
+      const profile = await refreshUsage();
+      currentPlan   = profile?.plan || currentPlan;
+      currentLevel  = currentPlan === 'free' ? 'fast' : 'balanced';
+      renderNavPill(currentPlan);
+      renderAnalyzer();
+      window.location.href = '/account?upgraded=true';
+    } else if (data.url) {
+      window.location.href = data.url;
+    }
+  } catch(err) {
+    alert('Could not start checkout: ' + err.message);
+    btnEl.disabled = false;
+    btnEl.textContent = orig;
   }
-
-  await loadProfile(session.user.id);
-  mountNav('app');
-  renderAnalyzer();
 }
 
-function renderAuthGate() {
-  document.getElementById('content').innerHTML = `
-    <div class="login-gate card">
-      <div class="card-pad">
-        <div style="text-align:center;margin-bottom:1.5rem;">
-          <div style="font-size:20px;font-weight:700;margin-bottom:6px;">Start using TokenLens</div>
-          <div style="font-size:14px;color:var(--muted);">Create an account or log in to analyze prompts.</div>
-        </div>
-        <div id="auth-msg"></div>
-        <div class="section">
-          <label class="section-label">Email</label>
-          <input class="input" id="auth-email" type="email" placeholder="you@example.com">
-        </div>
-        <div class="section">
-          <label class="section-label">Password</label>
-          <input class="input" id="auth-password" type="password" placeholder="••••••••">
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn-primary" onclick="login()">Log in</button>
-          <button class="btn-secondary" onclick="signup()">Create account</button>
-        </div>
+// ── RENDER STATES ─────────────────────────────────
+function renderGate() {
+  document.getElementById('app-body').innerHTML = `
+    <div class="gate-card">
+      <div class="gate-icon">🔍</div>
+      <div class="gate-title">Sign up to start analyzing</div>
+      <div class="gate-sub">Free account includes 5 analyses per day. No credit card required.</div>
+      <div class="gate-buttons">
+        <button class="btn-nav btn-nav-primary" style="padding:10px 24px;font-size:14px;" onclick="openModal('signup')">Create free account</button>
+        <button class="btn-nav" style="padding:10px 24px;font-size:14px;" onclick="openModal('login')">Log in</button>
       </div>
     </div>`;
-}
-
-async function login() {
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  const msg = document.getElementById('auth-msg');
-
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) {
-    msg.innerHTML = `<div class="status error">${escapeHtml(error.message)}</div>`;
-    return;
-  }
-
-  currentSession = data.session;
-  await loadProfile(currentSession.user.id);
-  mountNav('app');
-  renderAnalyzer();
-}
-
-async function signup() {
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  const msg = document.getElementById('auth-msg');
-
-  const { data, error } = await sb.auth.signUp({ email, password });
-  if (error) {
-    msg.innerHTML = `<div class="status error">${escapeHtml(error.message)}</div>`;
-    return;
-  }
-
-  msg.innerHTML = `<div class="status success">Account created. Check your email if confirmation is required, then log in.</div>`;
 }
 
 function renderAnalyzer() {
-  const plan = normalizePlan(currentUserProfile?.plan);
-  const charLimits = { free: 1500, plus: 5000, pro: 7500 };
-  const allowedLevels = plan === 'free' ? ['fast'] : plan === 'plus' ? ['fast','balanced'] : ['fast','balanced','deep'];
-  if (!allowedLevels.includes(selectedLevel)) selectedLevel = allowedLevels[allowedLevels.length - 1];
-
-  document.getElementById('content').innerHTML = `
-    <div class="card" style="margin-bottom:1.5rem;">
+  const isPro  = currentPlan === 'pro';
+  const isFree = currentPlan === 'free';
+  document.getElementById('app-body').innerHTML = `
+    <div class="main-card">
       <div class="card-header">
-        <div>
-          <div class="card-title">Prompt</div>
-          <div class="card-sub">Your ${PLAN_LABELS[plan]} plan supports up to ${charLimits[plan].toLocaleString()} characters.</div>
+        <div class="model-selector-wrap" style="border-top:none;border-bottom:1px solid var(--border);margin:-1px -1px 0;padding:10px 16px;background:var(--bg);border-radius:var(--radius-xl) var(--radius-xl) 0 0;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span class="model-selector-label" style="margin:0;white-space:nowrap;">Estimate costs for</span>
+            <div class="model-selector" id="model-selector"></div>
+          </div>
         </div>
+      </div>
+      <div class="card-header" style="border-top:none;">
+        <div class="card-header-left">
+          <div class="card-header-title">Analyze ${isPro ? 'prompts' : 'a prompt'}${isPro ? ' <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;">— batch mode enabled</span>' : ''}</div>
+          <div class="card-header-sub">${isPro ? 'Add up to 15 prompts — each counts as one analysis' : 'Paste any prompt — the wordier the better to see the savings'}</div>
+        </div>
+        ${isPro ? `<button class="btn-add-prompt" id="btn-add" onclick="addPrompt()"><span style="font-size:16px">+</span> Add another prompt</button>` : ''}
       </div>
       <div class="card-body">
-        <div class="controls">
-          ${['fast','balanced','deep'].map(level => `
-            <button class="control-pill ${selectedLevel === level ? 'active' : ''}" ${allowedLevels.includes(level) ? `onclick="setLevel('${level}')"` : 'disabled'}>${level}</button>
-          `).join('')}
+        <div class="prompt-list" id="prompt-list"></div>
+        <div class="${isPro ? 'batch-footer' : 'input-footer'}">
+          ${isPro
+            ? `<span class="batch-info" id="batch-info">1 prompt · 1 analysis</span>`
+            : `<span class="char-count" id="char-count">0 / ${charLimit().toLocaleString()}</span>`}
+          <button class="btn-analyze" id="analyze-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            ${isPro ? 'Analyze all' : 'Analyze prompt'}
+          </button>
         </div>
-        <div class="controls">
-          ${Object.entries(MODEL_LABELS).map(([key,label]) => `
-            <button class="control-pill ${selectedModel === key ? 'active' : ''}" onclick="setModel('${key}')">${label}</button>
-          `).join('')}
-        </div>
-        <textarea id="prompt-input" maxlength="${charLimits[plan]}" placeholder="Paste your prompt here..." oninput="updateCharCount()"></textarea>
-        <div class="input-footer">
-          <span class="char-count" id="char-count">0 / ${charLimits[plan].toLocaleString()}</span>
-          <button class="btn-primary" id="analyze-btn" onclick="analyzePrompt()">Analyze →</button>
-        </div>
+        <div id="opt-slider" class="slider-wrap"></div>
       </div>
     </div>
-    <div id="result-area" class="results-wrap"></div>`;
+    <div id="results"></div>`;
+
+  renderPromptList();
+  renderSlider();
+  renderModelSelector();
+  document.getElementById('analyze-btn').addEventListener('click', analyze);
 }
 
-function setLevel(level) {
-  selectedLevel = level;
-  renderAnalyzer();
+function renderPromptList() {
+  const isPro = currentPlan === 'pro';
+  const list  = document.getElementById('prompt-list');
+  if (!list) return;
+  list.innerHTML = prompts.map((p, i) => `
+    <div class="prompt-item">
+      ${isPro && prompts.length > 1 ? `<div class="prompt-label">Prompt ${i + 1}</div>` : ''}
+      <div class="prompt-row">
+        <textarea id="prompt-${i}" placeholder="${currentLevel === 'deep' ? 'Paste your code here…' : 'Paste your prompt here…'}" oninput="onPromptInput(${i}, this.value)">${escHtml(p)}</textarea>
+        ${isPro && prompts.length > 1 ? `<button class="btn-remove" onclick="removePrompt(${i})" title="Remove">×</button>` : ''}
+      </div>
+    </div>`).join('');
+
+  if (!isPro) {
+    const ta = document.getElementById('prompt-0');
+    if (ta) ta.addEventListener('input', function() {
+      const cc  = document.getElementById('char-count');
+      const lim = charLimit();
+      const len = this.value.length;
+      if (cc) {
+        cc.textContent = `${len.toLocaleString()} / ${lim.toLocaleString()}`;
+        cc.style.color = len > lim ? 'var(--red)' : '';
+      }
+    });
+  }
+  updateBatchInfo();
 }
 
-function setModel(model) {
-  selectedModel = model;
-  renderAnalyzer();
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Tooltips ───────────────────────────────────────
+document.addEventListener('mouseover', e => {
+  const trigger = e.target.closest('.score-tooltip-trigger');
+  if (!trigger) return;
+  let tip = document.getElementById('score-tooltip');
+  if (!tip) { tip = document.createElement('div'); tip.id = 'score-tooltip'; tip.className = 'score-tooltip'; document.body.appendChild(tip); }
+  tip.textContent = trigger.dataset.tip;
+  const r = trigger.getBoundingClientRect();
+  tip.style.left = Math.min(r.left, window.innerWidth - 220) + 'px';
+  tip.style.top  = (r.bottom + 6) + 'px';
+  tip.style.display = 'block';
+});
+document.addEventListener('mouseout', e => {
+  if (!e.target.closest('.score-tooltip-trigger')) {
+    const tip = document.getElementById('score-tooltip');
+    if (tip) tip.style.display = 'none';
+  }
+});
+
+// ── Share results ──────────────────────────────────
+async function shareResults(prompt, savings, avgScore) {
+  const text = `I just analyzed a prompt on TokenLens:\n\n📊 ${savings}% token reduction\n🎯 Avg score: ${avgScore}/10\n\nTokenLens shows where your AI prompt tokens are going and how to fix it.\n\nhttps://tokenlens.live`;
+  if (navigator.share) {
+    try { await navigator.share({ title: 'My TokenLens analysis', text }); return; } catch(e) {}
+  }
+  await navigator.clipboard.writeText(text);
+  const btn = document.getElementById('share-btn');
+  if (btn) { btn.textContent = '✓ Copied'; setTimeout(() => { btn.textContent = '↗ Share'; }, 2000); }
 }
 
-function updateCharCount() {
-  const text = document.getElementById('prompt-input').value;
-  const max = document.getElementById('prompt-input').maxLength;
-  document.getElementById('char-count').textContent = `${text.length.toLocaleString()} / ${Number(max).toLocaleString()}`;
+async function reportBug(errorMsg) {
+  try {
+    const context = `Page: Analyzer
+Error: ${errorMsg}
+Level: ${currentLevel || 'unknown'}
+Plan: ${currentPlan || 'unknown'}
+Time: ${new Date().toISOString()}
+User agent: ${navigator.userAgent}`;
+
+    await fetch('/api/support', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Bug Report (auto)',
+        email: currentSession?.user?.email || 'unknown',
+        message: context
+      })
+    });
+
+    const btn = document.querySelector('[onclick^="reportBug"]');
+    if (btn) { btn.textContent = '✓ Reported'; btn.disabled = true; }
+  } catch(e) {
+    console.error('Bug report failed:', e);
+  }
 }
 
-async function analyzePrompt() {
-  const prompt = document.getElementById('prompt-input').value.trim();
-  const btn = document.getElementById('analyze-btn');
-  const resultArea = document.getElementById('result-area');
+function onPromptInput(i, val) {
+  prompts[i] = val;
+  updateBatchInfo();
+  // Show per-prompt char count indicator
+  const lim   = charLimit();
+  const label = document.querySelector(`#prompt-${i}`)?.closest('.prompt-item')?.querySelector('.prompt-label');
+  if (label && currentPlan === 'pro') {
+    const over = val.length > lim;
+    label.innerHTML = `Prompt ${i + 1} <span style="font-family:'Geist Mono',monospace;font-size:10px;color:${over ? 'var(--red)' : 'var(--dim)'}">${val.length.toLocaleString()} / ${lim.toLocaleString()}</span>`;
+  }
+}
 
-  if (!prompt) {
-    resultArea.innerHTML = `<div class="status error">Paste a prompt first.</div>`;
+function addPrompt() {
+  if (prompts.length >= 15) return;
+  prompts.push('');
+  renderPromptList();
+  const newTa = document.getElementById(`prompt-${prompts.length - 1}`);
+  if (newTa) newTa.focus();
+}
+
+function removePrompt(i) {
+  if (prompts.length <= 1) return;
+  prompts.splice(i, 1);
+  renderPromptList();
+}
+
+function updateBatchInfo() {
+  const info = document.getElementById('batch-info');
+  if (!info) return;
+  const n = prompts.length;
+  info.textContent = `${n} prompt${n !== 1 ? 's' : ''} · ${n} ${n !== 1 ? 'analyses' : 'analysis'}`;
+  const btn = document.getElementById('btn-add');
+  if (btn) btn.style.opacity = prompts.length >= 15 ? '0.4' : '1';
+}
+
+// ── ANALYZE ───────────────────────────────────────
+async function analyze() {
+  if (!currentSession) { openModal('login'); return; }
+
+  // Sync textarea values into prompts array
+  prompts = prompts.map((_, i) => {
+    const ta = document.getElementById(`prompt-${i}`);
+    return ta ? ta.value.trim() : '';
+  }).filter(p => p.length > 0);
+
+  if (!prompts.length) return;
+
+  // Code detection for Fast and Balanced — block and upsell Pro
+  if (currentLevel !== 'deep') {
+    const codeSignals = [
+      /^\s*(def |class |import |from .* import |if __name__)/m,
+      /^\s*(function |const |let |var |=>|async function)/m,
+      /^\s*(SELECT |INSERT |UPDATE |DELETE |CREATE TABLE)/im,
+      /^\s*(<html|<div|<body|<!DOCTYPE)/im,
+      /^\s*(public |private |protected |void |int |string )/m,
+      /\{\s*\n.*\}/s,
+      /^\s*#include/m,
+      /^\s*(package |import java|import kotlin)/m,
+    ];
+    const inputText = prompts.join(' ');
+    const looksLikeCode = codeSignals.some(r => r.test(inputText));
+
+    if (looksLikeCode) {
+      document.getElementById('results').innerHTML = `
+        <div class="upgrade-card">
+          <div class="upgrade-icon">💻</div>
+          <div class="upgrade-title">Looks like you pasted code</div>
+          <div class="upgrade-sub">
+            Fast and Balanced are built for AI prompts, not code.<br>
+            Upgrade to <strong>Pro</strong> to use Code mode — paste your code and receive an optimized, cleaner version with explanations.
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button class="upgrade-btn" onclick="showUpgrade()">Upgrade to Pro →</button>
+            <button class="upgrade-btn-ghost" onclick="document.getElementById('results').innerHTML=''">Dismiss</button>
+          </div>
+        </div>`;
+      return;
+    }
+  }
+  const lim      = charLimit();
+  const overLimit = prompts.find(p => p.length > lim);
+  if (overLimit) {
+    document.getElementById('results').innerHTML = `<div class="error-state"><strong>Prompt too long</strong>Your ${currentPlan} plan supports up to ${lim.toLocaleString()} characters per prompt. Please shorten your prompt or upgrade.</div>`;
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
     return;
   }
 
+  const btn = document.getElementById('analyze-btn');
   btn.disabled = true;
-  btn.textContent = 'Analyzing...';
-  resultArea.innerHTML = `<div class="card"><div class="loading-state"><div class="spinner"></div><div>Analyzing prompt...</div></div></div>`;
+  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white;border-color:rgba(255,255,255,0.3)"></div> Analyzing…';
+
+  document.getElementById('results').innerHTML = `
+    <div class="result-card">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <span id="loading-msg">Analyzing your prompt…</span>
+      </div>
+    </div>`;
+
+  let activeController = null;
+
+  // Progressive messages so users know it's working
+  const messages = [
+    [3000,  'Breaking down token categories…'],
+    [7000,  'Scoring clarity, conciseness, structure…'],
+    [12000, 'Generating your optimized rewrite…'],
+    [18000, 'Almost there — deep analysis takes a moment…'],
+  ];
+  const msgTimers = messages.map(([delay, text]) =>
+    setTimeout(() => {
+      const el = document.getElementById('loading-msg');
+      if (el) el.textContent = text;
+    }, delay)
+  );
+
+  // Refresh session token before analyzing — outside try so timeout covers everything
+  try {
+    const { data: { session: freshSession } } = await sb.auth.getSession();
+    if (freshSession) currentSession = freshSession;
+  } catch(e) { /* fail open — use existing session */ }
+  if (!currentSession) { openModal('login'); return; }
+
+  const controller = new AbortController();
+  activeController = controller;
+  const fetchTimeout = setTimeout(() => controller.abort(), 28000);
 
   try {
-    const res = await fetch('/api/analyze', {
+    const body = currentPlan === 'pro'
+      ? { prompts, level: currentLevel, model: currentModel }
+      : { prompt: prompts[0], level: currentLevel, model: currentModel };
+
+    const res  = await fetch('/api/analyze', {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ' + currentSession.access_token
-      },
-      body: JSON.stringify({ prompt, level: selectedLevel, model: selectedModel })
+      signal: controller.signal,
+      headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
+      body: JSON.stringify(body)
     });
-
+    clearTimeout(fetchTimeout);
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || data.error || 'Analysis failed.');
+    msgTimers.forEach(clearTimeout);
 
-    currentUserProfile = { ...currentUserProfile, ...(data.usage ? { plan: data.usage.plan } : {}) };
-    renderResult(data.results, data.usage);
-  } catch (err) {
-    resultArea.innerHTML = `<div class="status error">${escapeHtml(err.message)}</div>`;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Analyze →';
+    if (res.status === 429 && data.error === 'rate_limited') {
+      document.getElementById('results').innerHTML =
+        `<div class="error-state"><strong>Slow down a little</strong>${data.message}</div>`;
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
+      return;
+    }
+
+    if (res.status === 403 && data.error === 'limit_reached') {
+      renderLimitReached(data);
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
+      return;
+    }
+    if (!res.ok) throw new Error(data.error || 'Server error ' + res.status);
+
+    await refreshUsage();
+
+    // Normalise: single or batch
+    const resultArr = data.batch ? (Array.isArray(data.results) ? data.results : [data.results]) : [data.results || data];
+    renderResults(resultArr, data.usage, data.level);
+
+    // Banners
+    const u = data.usage;
+    if (u && u.remaining !== null) {
+      if (u.remaining === 0 || u.remaining <= (u.plan === 'plus' ? 10 : u.plan === 'pro' ? 50 : 0)) {
+        const banner = document.createElement('div');
+        banner.className = 'limit-banner';
+        if (u.remaining === 0) {
+          banner.innerHTML = u.plan === 'free'
+            ? `<div class="limit-banner-text"><strong>Last free analysis used today.</strong> Resets in 24h.</div><button class="btn-upgrade-inline" onclick="showUpgrade()">Upgrade</button>`
+            : `<div class="limit-banner-text"><strong>Monthly limit reached.</strong> Upgrade for more.</div><button class="btn-upgrade-inline" onclick="showUpgrade()">Upgrade</button>`;
+        } else {
+          banner.innerHTML = `<div class="limit-banner-text"><strong>${u.remaining} analyses remaining</strong> this ${u.period}.</div><button class="btn-upgrade-inline" onclick="showUpgrade()">Upgrade</button>`;
+        }
+        document.getElementById('results').prepend(banner);
+      }
+    }
+
+  } catch(err) {
+    clearTimeout(fetchTimeout);
+    controller.abort();
+    msgTimers.forEach(clearTimeout);
+    const msg = err.name === 'AbortError'
+      ? 'Analysis timed out — try a shorter prompt or switch to Fast optimization level.'
+      : err.message;
+    document.getElementById('results').innerHTML = `
+      <div class="error-state">
+        <strong>Something went wrong</strong>${msg}
+        <br><br>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="analyze()" style="background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;">Try again</button>
+          <button onclick="reportBug('${msg.replace(/'/g, "\\'")}')" style="background:transparent;color:var(--muted);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;">🐛 Report bug</button>
+        </div>
+      </div>`;
+    const b = document.getElementById('analyze-btn');
+    if (b) {
+      b.disabled = false;
+      b.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
+    }
   }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> ' + (currentPlan === 'pro' ? 'Analyze all' : 'Analyze prompt');
 }
 
-function renderResult(result, usage) {
-  const rows = Array.isArray(result.breakdown) ? result.breakdown : [];
-  document.getElementById('result-area').innerHTML = `
-    ${usage ? `<div class="status success">Usage: ${usage.used || 0} / ${usage.limit || '∞'} this ${usage.period || 'period'}.</div>` : ''}
+// ── RENDER RESULTS ────────────────────────────────
+function renderResults(resultArr, usage, level) {
+  const wrap = document.getElementById('results');
+  try {
+    if (resultArr.length === 1) {
+      wrap.innerHTML = `<div class="results-wrap">${buildResultCards({...resultArr[0], level}, 0)}</div>`;
+    } else {
+      const tabs   = resultArr.map((_, i) => `<button class="batch-tab ${i === 0 ? 'active' : ''}" onclick="switchTab(${i})" id="tab-${i}">Prompt ${i + 1}</button>`).join('');
+      const panels = resultArr.map((r, i) => `<div id="panel-${i}" style="${i > 0 ? 'display:none' : ''}"><div class="results-wrap" style="padding-top:1rem">${buildResultCards({...r, level}, i)}</div></div>`).join('');
+      wrap.innerHTML = `<div class="result-card" style="overflow:visible"><div class="batch-tabs">${tabs}</div>${panels}</div>`;
+    }
+  } catch(err) {
+    console.error('renderResults error:', err);
+    wrap.innerHTML = `<div class="error-state"><strong>Render error</strong>${err.message} — please try again.</div>`;
+    return;
+  }
+
+  // Attach copy/save listeners
+  wrap.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      navigator.clipboard.writeText(this.dataset.copy).then(() => {
+        this.textContent = '✓ Copied!';
+        setTimeout(() => { this.textContent = 'Copy'; }, 1800);
+      });
+    });
+  });
+
+  wrap.querySelectorAll('[data-save-id]').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const id     = this.dataset.saveId;
+      const saved  = this.dataset.saved !== 'true';
+      this.dataset.saved = saved;
+      this.className = 'btn-save' + (saved ? ' saved' : '');
+      this.innerHTML = saved ? '★ Saved' : '☆ Save';
+      await fetch('/api/library', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + currentSession.access_token },
+        body: JSON.stringify({ id, saved })
+      });
+    });
+  });
+
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function switchTab(i) {
+  document.querySelectorAll('.batch-tab').forEach((t, j) => {
+    t.className = 'batch-tab' + (j === i ? ' active' : '');
+    document.getElementById(`panel-${j}`).style.display = j === i ? 'block' : 'none';
+  });
+}
+
+function buildResultCards(d, idx) {
+  try {
+    const maxTok    = Math.max(...(d.breakdown || []).map(b => b.tokens), 1);
+  const savings   = d.savings_percent || 0;
+  const effTokens = d.efficient_tokens || Math.round((d.estimated_tokens || 0) * (1 - savings / 100));
+  const cost      = typeof d.cost_estimate_usd === 'number' ? '$' + d.cost_estimate_usd.toFixed(5) : 'N/A';
+  const isPro     = currentPlan === 'pro';
+  const histId    = d.history_id || null;
+
+  const breakdownHTML = (d.breakdown || []).map((item, i) => {
+    const pct  = Math.round((item.tokens / Math.max(d.estimated_tokens, 1)) * 100);
+    const barW = Math.round((item.tokens / maxTok) * 100);
+    return `<div class="breakdown-row">
+      <div class="breakdown-left">
+        <div class="breakdown-name">${escHtml(item.category)}</div>
+        <div class="breakdown-detail">${escHtml(item.detail)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:${COLORS[i % COLORS.length]}"></div></div>
+      </div>
+      <div class="breakdown-right">
+        <div class="breakdown-tokens">${item.tokens.toLocaleString()}</div>
+        <div class="breakdown-pct">${pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── Score card ──
+  const scores     = d.scores || {};
+  const scoreNotes = d.score_notes || {};
+  const scoreLabels = { clarity: 'Clarity', conciseness: 'Conciseness', structure: 'Structure', specificity: 'Specificity' };
+  const scoreColors = (s) => s >= 8 ? '#16a34a' : s >= 5 ? 'rgb(123,166,146)' : '#dc2626';
+  const scoreTooltips = {
+    clarity:     'How unambiguous is the instruction? A clear prompt leaves no room for misinterpretation.',
+    conciseness: 'How free of waste is it? A concise prompt has no filler, hedging, or repeated ideas.',
+    structure:   'How logically organized is it? A well-structured prompt flows naturally from context to instruction.',
+    specificity: 'How well-defined is the expected output? A specific prompt tells the AI exactly what format and scope to use.'
+  };
+
+  const scoreCardHTML = Object.keys(scoreLabels).length && d.scores ? `
+    <div class="score-grid">
+      ${Object.entries(scoreLabels).map(([key, label]) => {
+        const val  = scores[key] || 0;
+        const circ = 2 * Math.PI * 20;
+        const pct  = val / 10;
+        const dash = circ * pct;
+        const color = scoreColors(val);
+        return `<div class="score-item">
+          <div class="score-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">
+            ${label}
+            <span class="score-tooltip-trigger" data-tip="${escHtml(scoreTooltips[key])}" style="width:13px;height:13px;border-radius:50%;background:var(--border2);color:var(--muted);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex-shrink:0;">?</span>
+          </div>
+          <div class="score-ring">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle class="score-ring-bg" cx="26" cy="26" r="20"/>
+              <circle class="score-ring-fill" cx="26" cy="26" r="20"
+                stroke="${color}"
+                stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}"
+                stroke-dashoffset="0"/>
+            </svg>
+            <div class="score-ring-num" style="color:${color}">${val}</div>
+          </div>
+          <div class="score-note">${escHtml(scoreNotes[key] || '')}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  // ── Reasons with lessons ──
+  const reasonsHTML = (d.reasons || []).map((r, i) => {
+    if (typeof r === 'string') {
+      return `<div class="reason-card">
+        <div class="reason-change"><div class="reason-change-num">${i+1}</div>${escHtml(r)}</div>
+      </div>`;
+    }
+    return `<div class="reason-card">
+      <div class="reason-change"><div class="reason-change-num">${i+1}</div>${escHtml(r.change || '')}</div>
+      ${r.principle ? `<div class="reason-principle">📌 ${escHtml(r.principle)}</div>` : ''}
+      ${r.lesson    ? `<div class="reason-lesson">💡 ${escHtml(r.lesson)}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const effPromptRaw = d.efficient_prompt || '';
+  const effPrompt = escHtml(effPromptRaw).replace(/\n/g, '<br>');
+
+  const optimizationSection = d.optimization_locked ? `
+    <div style="position:relative;margin-bottom:12px;">
+      <div class="efficient-prompt" style="margin-bottom:0">${(d.efficient_prompt_teaser || '').replace(/\n/g, '<br>')}…</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:0 0 var(--radius-lg) var(--radius-lg);padding:16px;text-align:center;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px;">🔒 Full optimization is a Plus/Pro feature</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Upgrade to see the complete rewrite and scoring.</div>
+        <button class="btn-upgrade-cta" style="padding:9px 22px;font-size:13px;" onclick="goToCheckout(this)">Upgrade to Plus →</button>
+      </div>
+    </div>` : `
+    <div class="efficient-prompt" style="${d.level === 'deep' ? 'font-family:\'Geist Mono\',monospace;font-size:13px;white-space:pre-wrap;font-style:normal;background:rgb(60,61,89);color:#e2e8f0;border-color:rgb(60,61,89);' : ''}">${effPrompt}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-copy" data-copy="${escHtml(effPromptRaw)}">Copy</button>
+      ${isPro ? `<button class="btn-save" data-save-id="${histId || idx}" data-saved="false">☆ Save to library</button>` : ''}
+    </div>`;
+
+  return `
     <div class="result-card">
-      <div class="result-header"><div class="result-title">Summary</div></div>
-      <div class="result-body">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:rgba(123,166,146,0.12)">📊</div>Token summary</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${isPro ? '<span class="priority-badge">⚡ Priority</span>' : ''}
+          ${d.level ? `<span class="slider-value ${d.level}" style="font-size:10px;">${(LEVEL_CONFIG[d.level]?.label || d.level)} optimization</span>` : ''}
+          <button id="share-btn" onclick="shareResults(${JSON.stringify(d.efficient_prompt||'').slice(0,50)}, ${savings}, ${Math.round(Object.values(d.scores||{}).reduce((a,b)=>a+b,0)/4)})" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:4px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Geist',sans-serif;">↗ Share</button>
+        </div>
+      </div>
+      <div class="rc-body">
         <div class="stats-grid">
-          <div class="stat-box"><div class="stat-label">Tokens</div><div class="stat-value">${result.estimated_tokens || 0}</div></div>
-          <div class="stat-box"><div class="stat-label">Optimized</div><div class="stat-value">${result.efficient_tokens || 0}</div></div>
-          <div class="stat-box"><div class="stat-label">Saved</div><div class="stat-value">${result.savings_percent || 0}%</div></div>
+          <div class="stat-box"><div class="stat-label">Input tokens</div><div class="stat-value">${(d.estimated_tokens||0).toLocaleString()}</div><div class="stat-sub">your prompt</div></div>
+          <div class="stat-box"><div class="stat-label">Est. cost</div><div class="stat-value">${cost}</div><div class="stat-sub">${MODELS[currentModel]?.note || 'Sonnet input rate'}</div></div>
+          <div class="stat-box"><div class="stat-label">Optimized to</div><div class="stat-value">${effTokens.toLocaleString()}</div><div class="stat-sub" style="color:var(--green);font-weight:500">${savings}% reduction</div></div>
         </div>
       </div>
     </div>
+
+    ${d.scores ? `
     <div class="result-card">
-      <div class="result-header">
-        <div class="result-title">Optimized prompt</div>
-        <button class="btn-secondary" onclick="copyText(${JSON.stringify(result.efficient_prompt || '')})">Copy</button>
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#f0fdf4">🎯</div>Prompt score card</div>
+        <span style="font-size:11px;color:var(--dim);">Before optimization</span>
       </div>
-      <div class="result-body">
-        <div class="efficient-prompt">${escapeHtml(result.efficient_prompt || '')}</div>
-      </div>
+      <div class="rc-body">${scoreCardHTML}</div>
+    </div>` : ''}
+
+    <div class="result-card">
+      <div class="rc-header"><div class="rc-title"><div class="rc-icon" style="background:#f0fdf4">🔍</div>Token breakdown</div></div>
+      <div class="rc-body">${breakdownHTML}</div>
     </div>
     <div class="result-card">
-      <div class="result-header"><div class="result-title">Breakdown</div></div>
-      <div class="result-body">
-        ${rows.map(row => `
-          <div class="breakdown-row">
-            <div><strong>${escapeHtml(row.category || 'Category')}</strong><div class="small-muted">${escapeHtml(row.detail || '')}</div></div>
-            <div style="font-family:'Geist Mono',monospace;">${row.tokens || 0}</div>
-          </div>
-        `).join('') || '<div class="small-muted">No breakdown returned.</div>'}
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:rgba(123,166,146,0.12)">${d.level === 'deep' ? '💻' : '✨'}</div>${d.level === 'deep' ? 'Optimized code' : 'Efficient alternative'}</div>
+        <span class="savings-badge">−${savings}% tokens</span>
       </div>
+      <div class="rc-body">${optimizationSection}</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#fefce8">💡</div>What you can learn from this</div>
+      </div>
+      <div class="rc-body">${reasonsHTML}</div>
+    </div>
+    ${(d.missing_context && d.missing_context.length > 0) ? `
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#fff7ed">🎯</div>What would make this even stronger</div>
+      </div>
+      <div class="rc-body">
+        ${d.missing_context.map(item => `
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;padding:10px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;">
+            <span style="color:#d97706;font-size:13px;flex-shrink:0;">+</span>
+            <span style="font-size:13px;color:rgb(60,61,89);line-height:1.55;">${escHtml(item)}</span>
+          </div>`).join('')}
+        <div style="font-size:11px;color:#9ca3af;margin-top:8px;">These are additions — not fixes. Your prompt is already more efficient. These would make it more precise.</div>
+      </div>
+    </div>` : ''}`;
+  } catch(err) {
+    console.error('buildResultCards error:', err, 'data:', JSON.stringify(d).slice(0, 500));
+    return `<div class="error-state"><strong>Display error: ${escHtml(err.message)}</strong>Please try again.</div>`;
+  }
+}
+
+// ── LIMIT REACHED ─────────────────────────────────
+function renderLimitReached(data) {
+  const plan   = data.plan;
+  const isPlus = plan === 'plus';
+  const isPro  = plan === 'pro';
+  document.getElementById('results').innerHTML = `
+    <div class="upgrade-card">
+      <div class="upgrade-icon">${isPro || isPlus ? '📊' : '⏱️'}</div>
+      <div class="upgrade-title">${isPro ? 'Fair use limit reached' : isPlus ? 'Monthly limit reached' : 'Daily limit reached'}</div>
+      <div class="upgrade-sub">
+        ${isPro ? `You've used ${data.used} of your ~600 monthly Pro analyses. Resets in <strong>${data.resets_in}</strong>.`
+        : isPlus ? `You've used all 120 Plus analyses this period. Resets in <strong>${data.resets_in}</strong> — or upgrade to Pro.`
+        : `You've used all 3 free analyses today. Resets in <strong>${data.resets_in}</strong> — or upgrade.`}
+      </div>
+      ${!isPro ? `
+      <div class="pricing-grid">
+        ${!isPlus ? `<div class="pricing-card">
+          <div class="pricing-name">Plus</div><div class="pricing-price">$9 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> 120 / month</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Full optimization</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ Batch mode</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ History & library</div>
+        </div>` : ''}
+        <div class="pricing-card featured">
+          <div class="featured-badge">Recommended</div>
+          <div class="pricing-name" style="color:var(--accent2)">Pro</div><div class="pricing-price">$29 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> ~600 / month</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Full optimization</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Batch mode (15 prompts)</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> History & library</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Priority processing</div>
+        </div>
+      </div>
+      <button class="btn-upgrade-cta" onclick="goToCheckout(this)">Upgrade to Pro — $29/mo</button>
+      <p style="font-size:12px;color:var(--dim);margin-top:12px">Stripe · Cancel anytime</p>` : ''}
     </div>`;
 }
 
-async function copyText(text) {
-  await navigator.clipboard.writeText(text);
+// ── UPGRADE ───────────────────────────────────────
+function showUpgrade() {
+  document.getElementById('results').innerHTML = `
+    <div class="upgrade-card">
+      <div class="upgrade-icon">⚡</div>
+      <div class="upgrade-title">Choose your plan</div>
+      <div class="upgrade-sub">Start free and upgrade as you grow.</div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-name">Free</div><div class="pricing-price">$0 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> 3 analyses / day</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Token breakdown</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ Full optimization</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ Batch mode</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ History & library</div>
+        </div>
+        <div class="pricing-card featured">
+          <div class="featured-badge">Most popular</div>
+          <div class="pricing-name" style="color:var(--accent)">Plus</div><div class="pricing-price">$9 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> 120 analyses / month</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Token breakdown</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Full optimization</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ Batch mode</div>
+          <div class="pricing-feature" style="opacity:0.4">✗ History & library</div>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-name">Pro</div><div class="pricing-price">$29 <span>/ mo</span></div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> ~600 analyses / month</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Token breakdown</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Cost estimate</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Full optimization</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Batch mode (15 prompts)</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> History & library</div>
+          <div class="pricing-feature"><span class="plan-feature-check">✓</span> Priority processing</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-upgrade-cta" onclick="goToCheckout(this)">Upgrade to Plus — $9/mo</button>
+        <button class="btn-upgrade-cta" style="background:rgb(60,61,89)" onclick="goToCheckout(this)">Upgrade to Pro — $29/mo</button>
+      </div>
+      <p style="font-size:12px;color:var(--dim);margin-top:12px">Secure payment via Stripe · Cancel anytime</p>
+    </div>`;
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── AUTH MODAL ────────────────────────────────────
+let selectedSignupPlan = 'free';
+
+function openModal(mode, plan) {
+  selectedSignupPlan = plan || 'free';
+  document.getElementById('modal').style.display = 'flex';
+  document.getElementById('modal-box').className = mode === 'login' ? 'modal' : 'modal wide';
+  renderModal(mode);
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+function closeModalOnOverlay(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+
+function selectPlan(plan) {
+  selectedSignupPlan = plan;
+  document.querySelectorAll('.plan-select-card').forEach(c => {
+    c.className = 'plan-select-card' + (c.dataset.plan === plan ? (' selected' + (plan === 'pro' ? ' pro' : '')) : '');
+  });
+  const btn = document.getElementById('auth-submit');
+  if (!btn) return;
+  if (plan === 'free') { btn.textContent = 'Create free account'; btn.style.background = ''; }
+  else if (plan === 'plus') { btn.textContent = 'Sign up & checkout — $9/mo'; btn.style.background = 'var(--accent)'; }
+  else { btn.textContent = 'Sign up & checkout — $29/mo'; btn.style.background = 'linear-gradient(135deg,rgb(60,61,89),rgb(45,46,70))'; }
+}
+
+function renderModal(mode) {
+  const isLogin = mode === 'login';
+
+  const planSelector = !isLogin ? `
+    <div style="margin-bottom:1.25rem;">
+      <div class="form-label" style="margin-bottom:8px;">Choose your plan</div>
+      <div class="plan-select-grid">
+        <div class="plan-select-card ${selectedSignupPlan === 'free' ? 'selected' : ''}" data-plan="free" onclick="selectPlan('free')">
+          <div class="plan-select-name">Free</div>
+          <div class="plan-select-price">$0 / month</div>
+          <div class="plan-select-feature">3 analyses / day<br>Token breakdown<br>1,500 char limit</div>
+        </div>
+        <div class="plan-select-card ${selectedSignupPlan === 'plus' ? 'selected' : ''}" data-plan="plus" onclick="selectPlan('plus')">
+          <div class="plan-select-name" style="color:var(--accent)">Plus</div>
+          <div class="plan-select-price">$9 / month</div>
+          <div class="plan-select-feature">120 analyses / month<br>Full optimization<br>5,000 char limit</div>
+        </div>
+        <div class="plan-select-card ${selectedSignupPlan === 'pro' ? 'selected pro' : ''}" data-plan="pro" onclick="selectPlan('pro')">
+          <div class="plan-select-name" style="color:var(--accent2)">Pro</div>
+          <div class="plan-select-price">$29 / month</div>
+          <div class="plan-select-feature">High volume<br>Batch + library<br>7,500 char limit</div>
+        </div>
+      </div>
+    </div>` : '';
+
+  const btnLabel = isLogin ? 'Log in'
+    : selectedSignupPlan === 'free' ? 'Create free account'
+    : selectedSignupPlan === 'plus' ? 'Sign up & checkout — $9/mo'
+    : 'Sign up & checkout — $29/mo';
+
+  const btnStyle = !isLogin && selectedSignupPlan === 'pro'
+    ? 'background:rgb(60,61,89)' : '';
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-title">${isLogin ? 'Welcome back' : 'Create your account'}</div>
+    <div class="modal-sub" style="margin-bottom:1.25rem">${isLogin ? 'Log in to continue.' : 'Start free or choose a plan below.'}</div>
+    <div id="modal-msg"></div>
+    ${planSelector}
+    <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="auth-email" placeholder="you@example.com" autocomplete="email"></div>
+    <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="auth-password" placeholder="••••••••" autocomplete="${isLogin ? 'current-password' : 'new-password'}"></div>
+    ${isLogin ? `<div style="text-align:right;margin-top:-6px;margin-bottom:10px;"><a href="/reset" style="font-size:12px;color:var(--accent);text-decoration:none;">Forgot password?</a></div>` : ''}
+    <button class="btn-full btn-primary-full" id="auth-submit" style="${btnStyle}" onclick="${isLogin ? 'submitLogin()' : 'submitSignup()'}">
+      ${btnLabel}
+    </button>
+    <div class="modal-switch">
+      ${isLogin
+        ? `No account? <a onclick="openModal('signup')">Sign up free</a>`
+        : `Already have one? <a onclick="openModal('login')">Log in</a>`}
+    </div>`;
+
+  setTimeout(() => document.getElementById('auth-email')?.focus(), 50);
+  document.getElementById('auth-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') isLogin ? submitLogin() : submitSignup();
+  });
+}
+
+function setModalMsg(msg, type) {
+  document.getElementById('modal-msg').innerHTML = `<div class="modal-${type}">${msg}</div>`;
+}
+
+async function submitLogin() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-password').value;
+  if (!email || !pass) { setModalMsg('Please fill in all fields.', 'error'); return; }
+  const btn = document.getElementById('auth-submit');
+  btn.disabled = true; btn.textContent = 'Logging in…';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    setModalMsg(error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Log in';
+  } else {
+    window.location.href = '/home';
+  }
+}
+
+async function submitSignup() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-password').value;
+  if (!email || !pass) { setModalMsg('Please fill in all fields.', 'error'); return; }
+  if (pass.length < 6) { setModalMsg('Password must be at least 6 characters.', 'error'); return; }
+
+  const btn  = document.getElementById('auth-submit');
+  const plan = selectedSignupPlan;
+  btn.disabled = true;
+  btn.textContent = plan === 'free' ? 'Creating account…' : 'Creating account…';
+
+  const { error } = await sb.auth.signUp({ email, password: pass });
+
+  if (error) {
+    setModalMsg(error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = plan === 'free' ? 'Create free account' : 'Sign up & checkout';
+    return;
+  }
+
+  // Send welcome email in background
+  fetch('/api/welcome', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email, plan })
+  }).catch(() => {});
+
+  if (plan !== 'free') {
+    setModalMsg('Account created! Redirecting to checkout…', 'success');
+    // Poll for session — Supabase may need a moment
+    let attempts = 0;
+    const poll = setInterval(async () => {
+      attempts++;
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        clearInterval(poll);
+        currentSession = session;
+        currentUser    = session.user;
+        try {
+          const res  = await fetch('/api/checkout', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + session.access_token },
+            body: JSON.stringify({ plan })
+          });
+          const d = await res.json();
+          if (d.url) { window.location.href = d.url; return; }
+        } catch(e) {}
+        setModalMsg('Account created! Please log in and upgrade from your Account page.', 'success');
+        btn.disabled = false;
+      } else if (attempts > 10) {
+        clearInterval(poll);
+        setModalMsg('Account created! Check your email to confirm, then log in and upgrade.', 'success');
+        btn.disabled = false;
+      }
+    }, 500);
+  } else {
+    setModalMsg('Account created! Check your email to confirm, then log in.', 'success');
+    btn.disabled = false;
+    btn.textContent = 'Create free account';
+  }
 }
 
 init();
-
 </script>
 </body>
 </html>
