@@ -81,7 +81,7 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 .nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
 .nav-link:hover{color:var(--text);background:var(--surface2);}
 .nav-right{display:flex;align-items:center;gap:8px;justify-content:flex-end;}
-@media(max-width:640px){.nav-links,.nav-right .btn-nav{display:none!important;}.hamburger{display:flex;}.nav-inner{grid-template-columns:1fr auto;}.nav-right{justify-content:flex-end;}}
+@media(max-width:640px){.nav-links,.nav-right .btn-nav,.nav-right span,.nav-right #nav-plan-pill,.nav-right #priority-badge{display:none!important;}.hamburger{display:flex!important;}.nav-inner{grid-template-columns:1fr auto!important;}.nav-right{justify-content:flex-end;}}
 </style>
 </head>
 <body>
@@ -104,6 +104,8 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
   </div>
 </nav>
 <div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-plan-row"><div id="mobile-plan-pill" style="display:flex;align-items:center;gap:8px;"></div></div>
+  <div class="mobile-menu-divider"></div>
   <a href="/app">Analyzer</a>
   <a href="/challenge">Challenge</a>
   <a href="/account">Account</a>
@@ -287,6 +289,13 @@ function toggleMobileMenu() {
   if (!menu || !btn) return;
   const open = menu.classList.toggle('open');
   btn.classList.toggle('open', open);
+  const pill = document.getElementById('nav-right');
+  const mobilePill = document.getElementById('mobile-plan-pill');
+  if (pill && mobilePill) {
+    const username = pill.querySelector('span:first-child');
+    const plan = pill.querySelector('span:nth-child(2)');
+    if (username && plan) mobilePill.innerHTML = username.outerHTML + plan.outerHTML;
+  }
 }
 
 async function logout() {
