@@ -355,6 +355,7 @@ const LEVEL_CONFIG = {
 let sb, currentUser, currentSession, currentPlan = 'free';
 let currentLevel = 'balanced';
 let prompts = [''];
+let currentProfile = null;
 
 const MODELS = {
   claude: { label: 'Claude Sonnet', provider: 'Anthropic', pricePerM: 3.00,  note: 'Estimated against Anthropic pricing' },
@@ -431,7 +432,7 @@ function renderNavPill(plan) {
   const labels = { free:'FREE', plus:'PLUS', pro:'PRO' };
   const pill = document.getElementById('nav-plan-pill');
   if (!pill) return;
-  const username = currentUser?.email?.split('@')[0] || '';
+  const username = currentProfile?.username || currentUser?.email?.split('@')[0] || '';
   pill.innerHTML = `
     <span style="font-size:13px;font-weight:500;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(username)}</span>
     <span style="${styles[plan]||styles.free};font-weight:600;font-size:13px;margin-left:6px;">${labels[plan]||'FREE'}</span>`;
@@ -487,8 +488,9 @@ async function onLoggedIn() {
   document.getElementById('mobile-btn-signup').style.display = 'none';
   document.getElementById('mobile-btn-logout').style.display = 'block';
   const profile = await refreshUsage();
+  currentProfile = profile;
   currentPlan = profile?.plan || 'free';
-  currentLevel = currentPlan === 'free' ? 'fast' : currentPlan === 'plus' ? 'balanced' : 'balanced';
+  currentLevel = currentPlan === 'free' ? 'fast' : 'balanced';
   renderNavPill(currentPlan);
   if (currentPlan === 'pro') {
     document.getElementById('priority-badge').style.display = 'inline-flex';
@@ -533,7 +535,7 @@ async function refreshUsage() {
   try {
     const timeout = new Promise(resolve => setTimeout(() => resolve({ data: null }), 5000));
     const query   = sb.from('users')
-      .select('plan, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at')
+      .select('plan, username, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at')
       .eq('id', currentUser.id)
       .single();
     const { data } = await Promise.race([query, timeout]);
