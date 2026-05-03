@@ -5,603 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TokenLens</title>
 <link rel="icon" type="image/png" href="/tokenlens_favicon.png">
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg: rgb(242,241,233);
-  --white: rgb(250,249,244);
-  --surface2: rgb(235,234,226);
-  --border: rgb(215,213,203);
-  --border2: rgb(195,193,182);
-  --text: rgb(60,61,89);
-  --muted: rgb(100,101,120);
-  --dim: rgb(140,141,158);
-  --accent: rgb(123,166,146);
-  --accent-light: rgba(123,166,146,0.12);
-  --accent-dark: rgb(95,138,118);
-  --green: #16a34a;
-  --green-light: #f0fdf4;
-  --red: #dc2626;
-  --gold: #b45309;
-  --gold-light: #fef3c7;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background: linear-gradient(160deg, rgb(242,241,233) 0%, rgb(232,231,220) 100%);
-  min-height: 100vh;
-  color: var(--text);
-  font-family: 'Geist', sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-a {
-  color: inherit;
-}
-
-nav {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  padding: 0 1.25rem;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-sm);
-}
-
-.nav-inner {
-  width: 100%;
-  max-width: 1100px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.nav-logo {
-  text-decoration: none;
-  flex-shrink: 0;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.nav-link {
-  font-size: 13px;
-  color: var(--muted);
-  text-decoration: none;
-  padding: 6px 12px;
-  border-radius: var(--radius);
-  transition: all 0.15s;
-}
-
-.nav-link:hover {
-  color: var(--text);
-  background: var(--surface2);
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.user-plan {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-
-.nav-username {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.plan-pill {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 99px;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 12px;
-  letter-spacing: 0.04em;
-  background: var(--accent-light);
-  color: var(--accent);
-  border: 1px solid rgba(123,166,146,0.3);
-}
-
-.plan-pill.free {
-  background: var(--surface2);
-  color: var(--muted);
-  border-color: var(--border);
-}
-
-.plan-pill.pro {
-  background: var(--gold-light);
-  color: var(--gold);
-  border-color: #fcd34d;
-}
-
-.btn-nav {
-  background: transparent;
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  padding: 7px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: 'Geist', sans-serif;
-  color: var(--text);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.btn-nav:hover {
-  background: var(--surface2);
-}
-
-.page {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 5rem 1.5rem;
-}
-
-.login-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow);
-  padding: 2.5rem;
-}
-
-.login-logo {
-  text-align: center;
-  margin-bottom: 1.75rem;
-}
-
-.login-title {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 4px;
-  text-align: center;
-}
-
-.login-sub {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-label {
-  font-size: 13px;
-  font-weight: 500;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.form-input {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 10px 14px;
-  font-size: 14px;
-  font-family: 'Geist', sans-serif;
-  color: var(--text);
-  background: var(--bg);
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  background: var(--white);
-  box-shadow: 0 0 0 3px rgba(123,166,146,0.16);
-}
-
-.btn-login {
-  width: 100%;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: var(--radius-lg);
-  padding: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: 'Geist', sans-serif;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: opacity 0.15s, transform 0.15s;
-}
-
-.btn-login:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
-}
-
-.btn-login:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.login-footer {
-  text-align: center;
-  margin-top: 1.25rem;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.login-footer a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.msg-error {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  font-size: 13px;
-  color: var(--red);
-  margin-bottom: 1rem;
-}
-
-.home-page {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 5rem 1.5rem;
-}
-
-.greeting {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.greeting-name {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 6px;
-}
-
-.greeting-sub {
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-}
-
-.mode-card {
-  background: var(--white);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 2rem 1.5rem;
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: all 0.2s;
-  position: relative;
-  overflow: hidden;
-}
-
-.mode-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  border-color: var(--accent);
-}
-
-.mode-icon-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  margin-bottom: 1rem;
-  background: var(--accent-light);
-}
-
-.mode-title {
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--text);
-}
-
-.mode-desc {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.65;
-  margin-bottom: 1rem;
-}
-
-.mode-badge {
-  display: inline-flex;
-  align-items: center;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 99px;
-  margin-top: auto;
-  background: var(--accent-light);
-  color: var(--accent);
-}
-
-.mode-arrow {
-  position: absolute;
-  bottom: 1.25rem;
-  right: 1.25rem;
-  font-size: 14px;
-  color: var(--border2);
-}
-
-.recent-activity {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.recent-activity-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.recent-activity-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.recent-activity-sub {
-  font-size: 11px;
-  color: var(--dim);
-  font-family: 'Geist Mono', monospace;
-}
-
-.activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.activity-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 11px 12px;
-}
-
-.activity-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.activity-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 9px;
-  background: var(--accent-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 14px;
-}
-
-.activity-main {
-  min-width: 0;
-}
-
-.activity-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.activity-meta {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 1px;
-}
-
-.activity-badge {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--green);
-  background: var(--green-light);
-  border: 1px solid #bbf7d0;
-  border-radius: 99px;
-  padding: 3px 9px;
-  white-space: nowrap;
-}
-
-.activity-empty {
-  background: var(--bg);
-  border: 1px dashed var(--border2);
-  border-radius: var(--radius-lg);
-  padding: 1rem;
-  text-align: center;
-}
-
-.activity-empty-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 3px;
-}
-
-.activity-empty-sub {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.activity-empty a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.hamburger {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: var(--radius);
-}
-
-.hamburger span {
-  display: block;
-  width: 20px;
-  height: 2px;
-  background: var(--text);
-  border-radius: 2px;
-  transition: all 0.2s;
-}
-
-.hamburger.open span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-.hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburger.open span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-.mobile-menu {
-  display: none;
-  position: absolute;
-  top: 60px;
-  left: 0;
-  right: 0;
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  z-index: 99;
-  padding: 0.75rem 1.25rem 1rem;
-}
-
-.mobile-menu.open {
-  display: block;
-}
-
-.mobile-user-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  margin-bottom: 6px;
-}
-
-.mobile-menu a,
-.mobile-menu button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
-  text-decoration: none;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  border: none;
-  background: none;
-  font-family: 'Geist', sans-serif;
-  cursor: pointer;
-}
-
-.mobile-menu a:hover,
-.mobile-menu button:hover {
-  background: var(--surface2);
-}
-
-.mobile-menu-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 6px 0;
-}
-
-@media(max-width:640px) {
-  .nav-links,
-  .nav-right .btn-nav,
-  .nav-right .user-plan {
-    display: none !important;
-  }
-
-  .hamburger {
-    display: flex;
-  }
-}
-
-@media(max-width:480px) {
-  .page,
-  .home-page {
-    padding: 3rem 1.25rem;
-  }
-
-  .cards {
-    grid-template-columns: 1fr;
-  }
-
-  .mode-card {
-    padding: 1.5rem;
-  }
-}
+:root{--bg:rgb(242,241,233);--white:rgb(250,249,244);--surface2:rgb(235,234,226);--border:rgb(215,213,203);--border2:rgb(195,193,182);--text:rgb(60,61,89);--muted:rgb(100,101,120);--dim:rgb(140,141,158);--accent:rgb(123,166,146);--accent-light:rgba(123,166,146,0.12);--accent-dark:rgb(95,138,118);--accent2:rgb(60,61,89);--red:#dc2626;--radius:8px;--radius-lg:12px;--radius-xl:16px;--shadow:0 4px 12px rgba(0,0,0,0.08);--shadow-sm:0 1px 3px rgba(0,0,0,0.08);}
+*{box-sizing:border-box;margin:0;padding:0;}
+a{color:inherit;}
+body{background:linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%);min-height:100vh;color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);}
+.nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{text-decoration:none;}
+.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.btn-nav:hover{background:var(--surface2);}
+
+/* Login */
+.page{max-width:480px;margin:0 auto;padding:5rem 1.5rem;}
+.login-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:2.5rem;}
+.login-logo{text-align:center;margin-bottom:1.75rem;}
+.login-title{font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px;text-align:center;}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:2rem;text-align:center;}
+.form-group{margin-bottom:1rem;}
+.form-label{font-size:13px;font-weight:500;display:block;margin-bottom:6px;}
+.form-input{width:100%;border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 14px;font-size:14px;font-family:'Geist',sans-serif;color:var(--text);background:var(--bg);transition:border-color 0.15s,box-shadow 0.15s;}
+.form-input:focus{outline:none;border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.btn-login{width:100%;background:rgb(123,166,146);color:white;border:none;border-radius:var(--radius-lg);padding:12px;font-size:14px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;margin-top:0.5rem;transition:opacity 0.15s,transform 0.15s;}
+.btn-login:hover{opacity:0.92;transform:translateY(-1px);}
+.btn-login:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+.login-footer{text-align:center;margin-top:1.25rem;font-size:13px;color:var(--muted);}
+.login-footer a{color:var(--accent);text-decoration:none;font-weight:500;}
+.msg-error{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:1rem;}
+
+/* Home cards */
+.home-page{max-width:560px;margin:0 auto;padding:5rem 1.5rem;}
+.greeting{text-align:center;margin-bottom:2.5rem;}
+.greeting-name{font-size:26px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px;}
+.greeting-sub{font-size:14px;color:var(--muted);}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.mode-card{background:var(--white);border:2px solid var(--border);border-radius:var(--radius-xl);padding:2rem 1.5rem;text-decoration:none;display:flex;flex-direction:column;align-items:center;text-align:center;transition:all 0.2s;position:relative;overflow:hidden;}
+.mode-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s;}
+.mode-card.analyzer::before{background:linear-gradient(135deg,rgba(37,99,235,0.04),rgba(37,99,235,0.01));}
+.mode-card.challenge::before{background:linear-gradient(135deg,rgba(123,166,146,0.06),rgba(123,166,146,0.02));}
+.mode-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.1);}
+.mode-card:hover::before{opacity:1;}
+.mode-card.analyzer:hover{border-color:var(--accent);}
+.mode-card.challenge:hover{border-color:var(--accent);}
+.mode-icon-wrap{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:1rem;}
+.analyzer .mode-icon-wrap{background:var(--accent-light);}
+.challenge .mode-icon-wrap{background:var(--accent-light);}
+.mode-title{font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.mode-desc{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:1rem;}
+.mode-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px;margin-top:auto;}
+.badge-blue{background:var(--accent-light);color:var(--accent);}
+.badge-purple{background:var(--accent-light);color:var(--accent);}
+.mode-arrow{position:absolute;bottom:1.25rem;right:1.25rem;font-size:14px;color:var(--border2);transition:all 0.2s;}
+.mode-card:hover .mode-arrow{color:var(--muted);transform:translateX(2px);}
+
+@media(max-width:480px){.page,.home-page{padding:3rem 1.25rem;}.cards{grid-template-columns:1fr;}.mode-card{padding:1.5rem;}}
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:var(--radius);}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;position:absolute;top:60px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:99;padding:0.75rem 1.25rem 1rem;}
+.mobile-menu.open{display:block;}
+.mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:var(--radius);border:none;background:none;font-family:'Geist',sans-serif;cursor:pointer;transition:background 0.15s;}
+.mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface2);}
+.mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+@media(max-width:640px){.nav-links,.nav-right .btn-nav{display:none!important;}.hamburger{display:flex;}}
 </style>
 </head>
 <body>
@@ -610,31 +83,28 @@ nav {
     <a class="nav-logo" href="/">
       <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span>
     </a>
-
     <div class="nav-links" id="nav-links" style="display:none;">
       <a class="nav-link" href="/app">Analyzer</a>
       <a class="nav-link" href="/challenge">Challenge</a>
-      <a class="nav-link" href="/library" id="nav-library" style="display:none;">Library</a>
       <a class="nav-link" href="/account">Account</a>
     </div>
-
     <div class="nav-right" id="nav-right">
       <a href="/app" style="font-size:13px;color:var(--muted);text-decoration:none;">Sign up free</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu" style="display:none;">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </nav>
-
 <div class="mobile-menu" id="mobile-menu">
-  <div id="mobile-user-area"></div>
   <a href="/app">Analyzer</a>
   <a href="/challenge">Challenge</a>
-  <a href="/library" id="mobile-nav-library" style="display:none;">Library</a>
   <a href="/account">Account</a>
   <div class="mobile-menu-divider"></div>
   <button onclick="logout()">Log out</button>
 </div>
 
-<div class="page" id="login-page">
+<div class="page">
   <div id="login-view">
     <div class="login-card">
       <div class="login-logo">
@@ -662,22 +132,19 @@ nav {
     <div class="greeting-name" id="greeting-name">Welcome back</div>
     <div class="greeting-sub">What would you like to do today?</div>
   </div>
-
-  <div id="recent-activity"></div>
-
   <div class="cards">
     <a class="mode-card analyzer" href="/app">
       <div class="mode-icon-wrap">🔍</div>
       <div class="mode-title">Analyzer</div>
       <div class="mode-desc">Paste any prompt and get a full token breakdown, cost estimate, and optimized rewrite.</div>
-      <div class="mode-badge">All plans</div>
+      <div class="mode-badge badge-blue">All plans</div>
       <span class="mode-arrow">→</span>
     </a>
     <a class="mode-card challenge" href="/challenge">
       <div class="mode-icon-wrap">🎯</div>
       <div class="mode-title">Challenge</div>
-      <div class="mode-desc">Optimize AI generated bad prompts and get scored on what you caught and missed.</div>
-      <div class="mode-badge" id="challenge-badge">1/day free</div>
+      <div class="mode-desc">Optimize AI-generated bad prompts and get scored on what you caught and missed.</div>
+      <div class="mode-badge badge-purple" id="challenge-badge">1/day free</div>
       <span class="mode-arrow">→</span>
     </a>
   </div>
@@ -686,24 +153,6 @@ nav {
 <script>
 const { createClient } = supabase;
 let sb;
-let currentSession = null;
-
-const PLAN_LABELS = { free: 'FREE', plus: 'PLUS', pro: 'PRO' };
-
-function normalizePlan(plan) {
-  const value = String(plan || 'free').trim().toLowerCase();
-  return PLAN_LABELS[value] ? value : 'free';
-}
-
-function getDisplayName(user) {
-  const metadata = user?.user_metadata || {};
-  return metadata.display_name ||
-    metadata.full_name ||
-    metadata.name ||
-    metadata.username ||
-    (user?.email || '').split('@')[0] ||
-    'there';
-}
 
 async function init() {
   const cfg = await fetch('/api/config');
@@ -711,254 +160,71 @@ async function init() {
   sb = createClient(supabaseUrl, supabaseAnonKey);
 
   const { data: { session } } = await sb.auth.getSession();
+  if (session) showHomeView(session);
 
-  if (session) {
-    await showHomeView(session);
-  }
-
-  const passwordInput = document.getElementById('password');
-  if (passwordInput) {
-    passwordInput.addEventListener('keydown', event => {
-      if (event.key === 'Enter') submitLogin();
-    });
-  }
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitLogin();
+  });
 }
 
 async function submitLogin() {
   const email = document.getElementById('email').value.trim();
-  const pass = document.getElementById('password').value;
-  const btn = document.getElementById('login-btn');
-  const msg = document.getElementById('msg');
-
-  if (!email || !pass) {
-    msg.innerHTML = '<div class="msg-error">Please fill in all fields.</div>';
-    return;
-  }
-
+  const pass  = document.getElementById('password').value;
+  const btn   = document.getElementById('login-btn');
+  const msg   = document.getElementById('msg');
+  if (!email || !pass) { msg.innerHTML = '<div class="msg-error">Please fill in all fields.</div>'; return; }
   btn.disabled = true;
   btn.textContent = 'Logging in...';
   msg.innerHTML = '';
-
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-
   if (error) {
-    msg.innerHTML = '<div class="msg-error">' + escapeHtml(error.message) + '</div>';
+    msg.innerHTML = '<div class="msg-error">' + error.message + '</div>';
     btn.disabled = false;
-    btn.textContent = 'Log in →';
-    return;
+    btn.textContent = 'Log in';
+  } else {
+    showHomeView(data.session);
   }
-
-  sessionStorage.setItem('tokenlensJustLoggedIn', 'true');
-  window.location.replace('/home');
 }
 
 async function showHomeView(session) {
-  currentSession = session;
-
-  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('login-view').style.display = 'none';
+  document.querySelector('.page').style.display = 'none';
   document.getElementById('home-view').style.display = 'block';
-
-  const displayName = getDisplayName(session.user);
-  document.getElementById('greeting-name').textContent = 'Hey ' + displayName + ' 👋';
-
-  let plan = 'free';
-
-  try {
-    const { data: profile } = await sb.from('users').select('plan').eq('id', session.user.id).single();
-    plan = normalizePlan(profile?.plan);
-  } catch (error) {
-    plan = 'free';
-  }
-
-  const badges = { free: '1/day free', plus: '5/day', pro: 'Unlimited' };
-  document.getElementById('challenge-badge').textContent = badges[plan] || badges.free;
-
-  renderNav(displayName, plan);
-  renderRecentActivityLoading();
-
-  const justLoggedIn = sessionStorage.getItem('tokenlensJustLoggedIn') === 'true';
-  if (justLoggedIn) {
-    sessionStorage.removeItem('tokenlensJustLoggedIn');
-    setTimeout(() => loadRecentActivity(), 800);
-  } else {
-    loadRecentActivity();
-  }
-}
-
-function renderNav(displayName, plan) {
   document.getElementById('nav-links').style.display = 'flex';
 
-  if (plan === 'pro') {
-    document.getElementById('nav-library').style.display = 'inline-block';
-    document.getElementById('mobile-nav-library').style.display = 'block';
-  }
-
-  document.getElementById('nav-right').innerHTML = `
-    <div class="user-plan">
-      <span class="nav-username" title="${escapeAttribute(displayName)}">${escapeHtml(displayName)}</span>
-      <span class="plan-pill ${plan}">${PLAN_LABELS[plan]}</span>
-    </div>
-    <button class="btn-nav" onclick="logout()">Log out</button>
-    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>`;
-
-  document.getElementById('mobile-user-area').innerHTML = `
-    <div class="mobile-user-row">
-      <span class="nav-username" title="${escapeAttribute(displayName)}">${escapeHtml(displayName)}</span>
-      <span class="plan-pill ${plan}">${PLAN_LABELS[plan]}</span>
-    </div>
-    <div class="mobile-menu-divider"></div>`;
-}
-
-function renderRecentActivityLoading() {
-  const container = document.getElementById('recent-activity');
-  if (!container) return;
-
-  container.innerHTML = `
-    <div class="recent-activity">
-      <div class="recent-activity-header">
-        <div class="recent-activity-title">Recent Activity</div>
-        <div class="recent-activity-sub">Loading...</div>
-      </div>
-      <div class="activity-list">
-        <div class="activity-row">
-          <div class="activity-left">
-            <div class="activity-icon">⏳</div>
-            <div class="activity-main">
-              <div class="activity-label">Checking your latest activity</div>
-              <div class="activity-meta">One moment</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-}
-
-async function loadRecentActivity() {
-  if (!currentSession?.access_token || !currentSession?.user?.id) {
-    const { data } = await sb.auth.getSession();
-    currentSession = data?.session || currentSession;
-  }
-
-  if (!currentSession?.access_token || !currentSession?.user?.id) {
-    renderRecentActivity(null, null);
-    return;
-  }
-
   try {
-    const [libraryRes, challengeRes] = await Promise.allSettled([
-      fetch('/api/library', {
-        headers: { authorization: 'Bearer ' + currentSession.access_token }
-      }),
-      sb
-        .from('challenge_scores')
-        .select('score, grade, challenge_type, created_at')
-        .eq('user_id', currentSession.user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-    ]);
+    const { data: p } = await sb.from('users').select('plan, username').eq('id', session.user.id).single();
+    const plan     = p?.plan || 'free';
+    const username = p?.username || (session.user?.email?.split('@')[0] || '');
+    const badges   = { free: '1/day free', plus: '5/day', pro: 'Unlimited' };
+    const planLabels = { free:'FREE', plus:'PLUS', pro:'PRO' };
+    const planColors = { free:'color:rgb(60,61,89)', plus:'color:rgb(60,61,89)', pro:'color:#b45309' };
 
-    let latestAnalysis = null;
-    if (libraryRes.status === 'fulfilled' && libraryRes.value.ok) {
-      const libraryData = await libraryRes.value.json();
-      latestAnalysis = Array.isArray(libraryData.history) ? libraryData.history[0] : null;
-    }
+    document.getElementById('greeting-name').textContent = 'Hey ' + username + ' \uD83D\uDC4B';
+    document.getElementById('challenge-badge').textContent = badges[plan] || '1/day free';
 
-    let latestChallenge = null;
-    if (challengeRes.status === 'fulfilled' && !challengeRes.value.error) {
-      latestChallenge = Array.isArray(challengeRes.value.data) ? challengeRes.value.data[0] : null;
-    }
-
-    renderRecentActivity(latestAnalysis, latestChallenge);
-  } catch (error) {
-    renderRecentActivity(null, null);
+    document.getElementById('nav-right').innerHTML = `
+      <span style="font-size:13px;font-weight:500;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${username}</span>
+      <span style="${planColors[plan]};font-weight:600;font-size:13px;margin-left:6px;">${planLabels[plan]}</span>
+      <button class="btn-nav" onclick="logout()" style="margin-left:6px;">Log out</button>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>`;
+  } catch(e) {
+    const name = (session.user?.email || '').split('@')[0];
+    document.getElementById('greeting-name').textContent = 'Hey ' + name + ' \uD83D\uDC4B';
+    document.getElementById('nav-right').innerHTML = `
+      <button class="btn-nav" onclick="logout()">Log out</button>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>`;
   }
-}
-
-function renderRecentActivity(latestAnalysis, latestChallenge) {
-  const container = document.getElementById('recent-activity');
-  if (!container) return;
-
-  const rows = [];
-
-  if (latestAnalysis) {
-    const savings = Number(latestAnalysis.savings_percent || 0);
-    const date = latestAnalysis.created_at ? formatActivityDate(latestAnalysis.created_at) : 'Recently';
-
-    rows.push(`
-      <div class="activity-row">
-        <div class="activity-left">
-          <div class="activity-icon">🔍</div>
-          <div class="activity-main">
-            <div class="activity-label">Last prompt analyzed</div>
-            <div class="activity-meta">${date}</div>
-          </div>
-        </div>
-        <div class="activity-badge">${savings > 0 ? savings + '% saved' : 'Analyzed'}</div>
-      </div>`);
-  }
-
-  if (latestChallenge) {
-    const date = latestChallenge.created_at ? formatActivityDate(latestChallenge.created_at) : 'Recently';
-    const scoreText = latestChallenge.grade
-      ? `${latestChallenge.grade} · ${latestChallenge.score || 0}`
-      : `${latestChallenge.score || 0}/100`;
-
-    rows.push(`
-      <div class="activity-row">
-        <div class="activity-left">
-          <div class="activity-icon">🎯</div>
-          <div class="activity-main">
-            <div class="activity-label">Last challenge score</div>
-            <div class="activity-meta">${date}</div>
-          </div>
-        </div>
-        <div class="activity-badge">${escapeHtml(scoreText)}</div>
-      </div>`);
-  }
-
-  if (!rows.length) {
-    rows.push(`
-      <div class="activity-empty">
-        <div class="activity-empty-title">No activity yet</div>
-        <div class="activity-empty-sub">Run your first <a href="/app">analysis</a> or try a <a href="/challenge">challenge</a>.</div>
-      </div>`);
-  }
-
-  container.innerHTML = `
-    <div class="recent-activity">
-      <div class="recent-activity-header">
-        <div class="recent-activity-title">Recent Activity</div>
-        <div class="recent-activity-sub">${rows.length === 1 ? 'Latest' : 'Latest updates'}</div>
-      </div>
-      <div class="activity-list">${rows.join('')}</div>
-    </div>`;
-}
-
-function formatActivityDate(value) {
-  const date = new Date(value);
-  const now = new Date();
-  const diffMs = now - date;
-  const mins = Math.floor(diffMs / 60000);
-  const hours = Math.floor(diffMs / 3600000);
-  const days = Math.floor(diffMs / 86400000);
-
-  if (Number.isNaN(date.getTime())) return 'Recently';
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days < 7) return `${days}d ago`;
-
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function toggleMobileMenu() {
   const menu = document.getElementById('mobile-menu');
-  const btn = document.getElementById('hamburger');
-
+  const btn  = document.getElementById('hamburger');
   if (!menu || !btn) return;
-
   const open = menu.classList.toggle('open');
   btn.classList.toggle('open', open);
 }
@@ -966,19 +232,6 @@ function toggleMobileMenu() {
 async function logout() {
   await sb.auth.signOut();
   window.location.href = '/';
-}
-
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function escapeAttribute(value) {
-  return escapeHtml(value).replace(/`/g, '&#096;');
 }
 
 init();
