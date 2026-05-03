@@ -33,13 +33,13 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%);min-height:100vh;color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
 nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
-.nav-inner{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;}
+.nav-inner{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;}
 .nav-logo{display:flex;align-items:center;text-decoration:none;}
 .nav-links{display:flex;align-items:center;gap:4px;}
 .nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
 .nav-link:hover{color:var(--text);background:var(--surface2);}
 .nav-link.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
-.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-right{display:flex;align-items:center;gap:10px;justify-content:flex-end;}
 .priority-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold-light);color:var(--gold);border:1px solid #fcd34d;border-radius:99px;font-size:11px;font-weight:600;padding:3px 10px;}
 .btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;}
 .btn-nav:hover{background:var(--surface2);}
