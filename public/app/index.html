@@ -310,7 +310,7 @@ footer a:hover{color:var(--text);}
   </div>
 </nav>
 <div class="mobile-menu" id="mobile-menu">
-  <div class="mobile-plan-row"><span>TokenLens</span><span id="mobile-plan-pill"></span></div>
+  <div class="mobile-plan-row" id="mobile-plan-row"><div id="mobile-plan-pill" style="display:flex;align-items:center;gap:8px;"></div></div>
   <div class="mobile-menu-divider"></div>
   <a href="/app" class="active">Analyzer</a>
   <a href="/challenge">Challenge</a>
@@ -514,9 +514,10 @@ function toggleMobileMenu() {
   const btn  = document.getElementById('hamburger');
   const open = menu.classList.toggle('open');
   btn.classList.toggle('open', open);
-  // Sync plan pill
+  // Sync username + plan into mobile menu header
   const pill = document.getElementById('nav-plan-pill');
-  if (pill) document.getElementById('mobile-plan-pill').innerHTML = pill.innerHTML;
+  const mobilePill = document.getElementById('mobile-plan-pill');
+  if (pill && mobilePill) mobilePill.innerHTML = pill.innerHTML;
 }
 
 async function logout() {
