@@ -309,6 +309,8 @@ async function loadChallengeStats() {
 
 async function logout() { await sb.auth.signOut(); window.location.href = '/'; }
 
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 function renderNavPill(plan) {
   const styles = { free: 'color:rgb(60,61,89)', plus: 'color:rgb(60,61,89)', pro: 'color:#b45309' };
   const labels = { free: 'FREE', plus: 'PLUS', pro: 'PRO' };
