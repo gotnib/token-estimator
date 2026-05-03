@@ -272,7 +272,7 @@ footer a{color:var(--muted);text-decoration:none;}
 
 <script>
 const { createClient } = supabase;
-let sb, session, userPlan;
+let sb, session, userPlan, userProfile;
 let currentChallenge = null;
 let selectedType = 'general';
 let selectedCat  = '';
@@ -397,9 +397,10 @@ async function init() {
     session = s;
 
     const { data: profile } = await sb.from('users')
-      .select('plan, challenges_today, last_challenge_at')
+      .select('plan, username, challenges_today, last_challenge_at')
       .eq('id', session.user.id).single();
     userPlan = profile?.plan || 'free';
+    userProfile = profile;
 
     if (userPlan === 'pro') { document.getElementById('nav-library').style.display = 'block'; document.getElementById('mobile-nav-library').style.display = 'block'; }
     renderNavPill(userPlan);
@@ -415,7 +416,7 @@ async function init() {
 function renderNavPill(plan) {
   const styles = { free:'color:rgb(60,61,89)', plus:'color:rgb(60,61,89)', pro:'color:#b45309' };
   const labels = { free:'FREE', plus:'PLUS', pro:'PRO' };
-  const username = session?.user?.email?.split('@')[0] || '';
+  const username = userProfile?.username || session?.user?.email?.split('@')[0] || '';
   document.getElementById('nav-plan-pill').innerHTML =
     `<span style="font-size:13px;font-weight:500;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${username}</span>
      <span style="${styles[plan]||styles.free};font-weight:600;font-size:13px;margin-left:6px;">${labels[plan]||'FREE'}</span>`;
@@ -526,7 +527,7 @@ async function startChallenge() {
     currentChallenge = data.challenge;
 
     const { data: profile } = await sb.from('users')
-      .select('plan, challenges_today, last_challenge_at')
+      .select('plan, username, challenges_today, last_challenge_at')
       .eq('id', session.user.id).single();
     updateCounter(profile);
 
