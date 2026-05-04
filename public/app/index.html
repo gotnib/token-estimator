@@ -17,7 +17,10 @@
 <meta name="twitter:title" content="TokenLens App — Analyze & Optimize AI Prompts">
 <meta name="twitter:description" content="Paste any AI prompt and instantly get a token breakdown, cost estimate, optimization score, and a leaner rewrite. Free to start — no credit card needed.">
 <meta name="twitter:image" content="https://tokenlens.live/og-image.png">
-<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="128x128" href="/tokenlens_favicon.png">
+<link rel="apple-touch-icon" href="/tokenlens_favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -684,7 +687,12 @@ document.addEventListener('mouseout', e => {
 });
 
 // ── Share results ──────────────────────────────────
-async function shareResults(prompt, savings, avgScore) {
+let currentResultData = null;
+
+async function shareResults() {
+  const d = currentResultData;
+  const savings = d?.savings_percent || 0;
+  const avgScore = Math.round(Object.values(d?.scores || {}).reduce((a,b)=>a+b,0)/4) || 0;
   const text = `I just analyzed a prompt on TokenLens:\n\n📊 ${savings}% token reduction\n🎯 Avg score: ${avgScore}/10\n\nTokenLens shows where your AI prompt tokens are going and how to fix it.\n\nhttps://tokenlens.live`;
   if (navigator.share) {
     try { await navigator.share({ title: 'My TokenLens analysis', text }); return; } catch(e) {}
@@ -934,6 +942,7 @@ function renderResults(resultArr, usage, level) {
   try {
     if (resultArr.length === 1) {
       wrap.innerHTML = `<div class="results-wrap">${buildResultCards({...resultArr[0], level}, 0)}</div>`;
+      currentResultData = resultArr[0];
     } else {
       const tabs   = resultArr.map((_, i) => `<button class="batch-tab ${i === 0 ? 'active' : ''}" onclick="switchTab(${i})" id="tab-${i}">Prompt ${i + 1}</button>`).join('');
       const panels = resultArr.map((r, i) => `<div id="panel-${i}" style="${i > 0 ? 'display:none' : ''}"><div class="results-wrap" style="padding-top:1rem">${buildResultCards({...r, level}, i)}</div></div>`).join('');
@@ -1084,7 +1093,7 @@ function buildResultCards(d, idx) {
         <div style="display:flex;align-items:center;gap:8px;">
           
           ${d.level ? `<span class="slider-value ${d.level}" style="font-size:10px;">${(LEVEL_CONFIG[d.level]?.label || d.level)} optimization</span>` : ''}
-          <button id="share-btn" onclick="shareResults(${JSON.stringify(d.efficient_prompt||'').slice(0,50)}, ${savings}, ${Math.round(Object.values(d.scores||{}).reduce((a,b)=>a+b,0)/4)})" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:4px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Geist',sans-serif;">↗ Share</button>
+          <button id="share-btn" onclick="shareResults()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:4px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Geist',sans-serif;">↗ Share</button>
         </div>
       </div>
       <div class="rc-body">
