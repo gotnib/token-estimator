@@ -134,56 +134,59 @@ nav {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  max-width: 600px;
-  margin: 0 auto 4rem;
+  max-width: 640px;
+  margin: 0 auto 1.5rem;
 }
 .download-card {
   background: var(--white);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 1.75rem;
-  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
   text-decoration: none;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  gap: 12px;
+  gap: 14px;
   transition: all 0.2s;
-  position: relative;
+  cursor: pointer;
 }
 .download-card:hover {
   border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
 }
-.download-card.active {
-  border-color: var(--accent);
-  background: var(--accent-light);
-}
-.browser-icon { font-size: 36px; }
-.browser-name { font-size: 16px; font-weight: 700; color: var(--text); }
+.browser-logo { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+.browser-info { flex: 1; min-width: 0; }
+.browser-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
 .browser-sub { font-size: 12px; color: var(--muted); }
-.download-btn {
-  display: inline-flex;
+.download-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
   align-items: center;
-  gap: 6px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: var(--radius-lg);
-  padding: 9px 20px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'Geist', sans-serif;
-  cursor: pointer;
-  width: 100%;
   justify-content: center;
-  text-decoration: none;
-  transition: background 0.15s;
-  margin-top: 4px;
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 14px;
+  transition: all 0.15s;
 }
-.download-btn:hover { background: var(--accent-dark); }
+.download-card:hover .download-icon {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.free-note {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
 
 /* SCREENSHOTS */
 .screenshots {
@@ -293,7 +296,7 @@ nav {
 .feature-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
 
 @media(max-width:640px) {
-  .download-grid { grid-template-columns: 1fr; }
+  .download-grid { grid-template-columns: 1fr; max-width: 100%; }
   .screenshots { grid-template-columns: 1fr; }
   .browsers-grid { grid-template-columns: 1fr; }
   .features { grid-template-columns: 1fr; }
@@ -333,22 +336,23 @@ nav {
   <!-- DOWNLOAD BUTTONS -->
   <div class="download-grid">
     <a class="download-card" href="/extension/tokenlens-extension-v2.zip" download>
-      <div class="browser-icon">🌐</div>
-      <div class="browser-name">Chrome</div>
-      <div class="browser-sub">Load as unpacked extension</div>
-      <a class="download-btn" href="/extension/tokenlens-extension-v2.zip" download>
-        ↓ Download for Chrome
-      </a>
+      <img class="browser-logo" src="/extension/chrome-icon.png" alt="Chrome">
+      <div class="browser-info">
+        <div class="browser-name">Download for Chrome</div>
+        <div class="browser-sub">Install the TokenLens extension for Chrome</div>
+      </div>
+      <div class="download-icon">↓</div>
     </a>
     <a class="download-card" href="/extension/ff-tokenlens-extension-v2.zip" download>
-      <div class="browser-icon">🦊</div>
-      <div class="browser-name">Firefox</div>
-      <div class="browser-sub">Install from file (.xpi)</div>
-      <a class="download-btn" href="/extension/ff-tokenlens-extension-v2.zip" download>
-        ↓ Download for Firefox
-      </a>
+      <img class="browser-logo" src="/extension/firefox-icon.png" alt="Firefox">
+      <div class="browser-info">
+        <div class="browser-name">Download for Firefox</div>
+        <div class="browser-sub">Install the TokenLens extension for Firefox</div>
+      </div>
+      <div class="download-icon">↓</div>
     </a>
   </div>
+  <div class="free-note">🔒 100% free to install and use. No credit card required.</div>
 
   <!-- SCREENSHOTS -->
   <div class="screenshots">
