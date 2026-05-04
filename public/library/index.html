@@ -17,7 +17,10 @@
 <meta name="twitter:title" content="Prompt Library | TokenLens">
 <meta name="twitter:description" content="Your saved prompt analyses and history. Available on Pro plan.">
 <meta name="twitter:image" content="https://tokenlens.live/og-image.png">
-<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="128x128" href="/tokenlens_favicon.png">
+<link rel="apple-touch-icon" href="/tokenlens_favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -124,6 +127,43 @@ footer a{color:var(--muted);text-decoration:none;}
   .nav-inner{grid-template-columns:1fr auto!important;}
   .nav-right{justify-content:flex-end;}
 }
+
+/* ── DARK MODE ──────────────────────────────────── */
+[data-theme="dark"] {
+  --bg: rgb(22,24,38);
+  --white: rgb(30,32,48);
+  --surface2: rgb(38,40,58);
+  --border: rgb(52,55,78);
+  --border2: rgb(68,72,100);
+  --text: rgb(232,231,220);
+  --muted: rgb(160,162,185);
+  --dim: rgb(110,112,140);
+  --accent: rgb(123,166,146);
+  --accent-light: rgba(123,166,146,0.15);
+  --accent-dark: rgb(95,138,118);
+}
+[data-theme="dark"] body { background: linear-gradient(160deg,rgb(22,24,38) 0%,rgb(18,20,32) 100%); }
+[data-theme="dark"] nav,[data-theme="dark"] .mobile-menu { background: rgb(28,30,46); }
+.dark-toggle-float{position:fixed;bottom:1.5rem;left:1.5rem;z-index:200;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:6px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:12px;font-weight:500;color:var(--muted);font-family:"Geist",sans-serif;transition:all 0.15s;user-select:none;}
+.dark-toggle-float:hover{border-color:var(--accent);color:var(--text);}
+.dark-toggle-track{width:28px;height:16px;border-radius:99px;background:var(--border2);position:relative;transition:background 0.2s;flex-shrink:0;}
+.dark-toggle-track.on{background:var(--accent);}
+.dark-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:white;transition:transform 0.2s;}
+.dark-toggle-track.on .dark-toggle-thumb{transform:translateX(12px);}
+@media(max-width:640px){.dark-toggle-float{display:none;}}
+.mobile-dark-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;border-radius:var(--radius);user-select:none;}
+.mobile-dark-toggle:hover{background:var(--surface2);}
+
+footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:var(--white);}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:2rem;}
+.footer-brand p{font-size:13px;color:var(--dim);margin-top:10px;max-width:260px;line-height:1.65;}
+.footer-col h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:1rem;font-family:"Geist Mono",monospace;}
+.footer-col a{display:block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:8px;transition:color 0.15s;}
+.footer-col a:hover{color:var(--text);}
+.footer-bottom{max-width:1100px;margin:0 auto;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--dim);flex-wrap:wrap;gap:8px;}
+.footer-bottom a{color:var(--dim);text-decoration:none;}
+.footer-bottom a:hover{color:var(--muted);}
+@media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-bottom{flex-direction:column;text-align:center;}}
 </style>
 </head>
 <body>
@@ -137,6 +177,7 @@ footer a{color:var(--muted);text-decoration:none;}
     <a class="nav-link" href="/app">Analyzer</a>
     <a class="nav-link" href="/challenge">Challenge</a>
     <a class="nav-link active" href="/library">Library</a>
+    <a class="nav-link" href="/extension">Extension</a>
     <a class="nav-link" href="/account">Account</a>
   </div>
   <div class="nav-right">
@@ -154,6 +195,7 @@ footer a{color:var(--muted);text-decoration:none;}
   <a href="/app">Analyzer</a>
   <a href="/challenge">Challenge</a>
   <a href="/library" class="active" id="mobile-nav-library">Library</a>
+  <a href="/extension">Extension</a>
   <a href="/account">Account</a>
   <div class="mobile-menu-divider"></div>
   <button onclick="handleMobileLogout()">Log out</button>
@@ -378,5 +420,6 @@ function renderProGate() {
 
 init();
 </script>
+<div class="dark-toggle-float" onclick="toggleDark()"><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div><span class="dark-toggle-label">Dark</span></div>
 </body>
 </html>
