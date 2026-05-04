@@ -114,6 +114,7 @@ Code optimization rules:
 - Do NOT change what the code does — only how it does it
 - Do NOT add features that weren't asked for
 - Preserve the original language and style conventions
+- In the efficient_prompt field, use single quotes instead of double quotes in all code strings
 - breakdown categories: Logic, Variable declarations, Comments, Error handling, Structure/formatting
 - Pricing: $3.00 per 1M input tokens. Max 3 breakdown items. Max 3 reasons.`
 };
@@ -167,8 +168,24 @@ async function analyzePrompt(prompt, apiKey, systemPrompt) {
 
     const data    = await res.json();
     const raw     = (data.content || []).map(c => c.text || '').join('');
-    const cleaned = raw.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim();
-    return JSON.parse(cleaned);
+    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    // Try direct parse first
+    try { return JSON.parse(cleaned); } catch(e) {}
+
+    // Extract JSON object and try again
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (match) {
+      try { return JSON.parse(match[0]); } catch(e) {}
+      // Sanitize control characters and unescaped backslashes
+      try {
+        const sanitized = match[0]
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ')
+          .replace(/\\(?!["\\/bfnrtu])/g, '\\\\');
+        return JSON.parse(sanitized);
+      } catch(e) {}
+    }
+    throw new Error('Could not parse analysis response');
   } catch(err) {
     clearTimeout(timeout);
     if (err.name === 'AbortError') throw new Error('Analysis timed out. Try a shorter prompt or use Fast optimization level.');
@@ -223,11 +240,6 @@ const DEMO_SYSTEM = `You are a prompt efficiency expert. Analyze the given promp
 Return ONLY the JSON object, no markdown, no explanation.`;
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') return res.status(204).end();
-
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   // ── Demo path — no auth required ──────────────────
