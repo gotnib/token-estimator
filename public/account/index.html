@@ -200,6 +200,10 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
 .footer-bottom a{color:var(--dim);text-decoration:none;}
 .footer-bottom a:hover{color:var(--muted);}
 @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-bottom{flex-direction:column;text-align:center;}}
+
+[data-theme="dark"] .nav-logo span:first-child,
+[data-theme="dark"] .nav-inner span[style*="color:rgb(60,61,89)"],
+[data-theme="dark"] span[style*="color:rgb(60,61,89)"] { color: rgb(232,231,220) !important; }
 </style>
 </head>
 <body>
@@ -850,5 +854,24 @@ document.getElementById('modal').addEventListener('click', function(e) {
 init();
 </script>
 <div class="dark-toggle-float" onclick="toggleDark()"><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div><span class="dark-toggle-label">Dark</span></div>
+<script>
+function initDarkMode(){
+  const s = localStorage.getItem('tl_theme');
+  if (s === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  updateDarkUI();
+}
+function applyDark(on){
+  document.documentElement.setAttribute('data-theme', on ? 'dark' : 'light');
+  localStorage.setItem('tl_theme', on ? 'dark' : 'light');
+  updateDarkUI();
+}
+function toggleDark(){ applyDark(document.documentElement.getAttribute('data-theme') !== 'dark'); }
+function updateDarkUI(){
+  const d = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.querySelectorAll('.dark-toggle-track').forEach(t => t.classList.toggle('on', d));
+  document.querySelectorAll('.dark-toggle-label').forEach(l => l.textContent = d ? 'Light' : 'Dark');
+}
+initDarkMode();
+</script>
 </body>
 </html>
