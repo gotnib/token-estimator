@@ -154,7 +154,7 @@ nav {
   box-shadow: var(--shadow);
   transform: translateY(-1px);
 }
-.browser-logo { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+.browser-logo { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; border-radius: 8px; }
 .browser-info { flex: 1; min-width: 0; }
 .browser-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
 .browser-sub { font-size: 12px; color: var(--muted); }
@@ -302,6 +302,15 @@ nav {
   .features { grid-template-columns: 1fr; }
   .page { padding: 2rem 1.25rem 4rem; }
 }
+
+.screenshot-wrap { cursor: zoom-in; transition: box-shadow 0.2s, transform 0.2s; }
+.screenshot-wrap:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.screenshot-label { display: flex; align-items: center; justify-content: space-between; }
+.screenshot-expand { font-size: 11px; color: var(--dim); font-family: 'Geist', sans-serif; text-transform: none; letter-spacing: 0; }
+.lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; align-items: center; justify-content: center; padding: 2rem; cursor: zoom-out; }
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 12px; box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
+.lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; width: 36px; height: 36px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 </style>
 </head>
 <body>
@@ -356,12 +365,12 @@ nav {
 
   <!-- SCREENSHOTS -->
   <div class="screenshots">
-    <div class="screenshot-wrap">
-      <div class="screenshot-label">Prompt optimization</div>
+    <div class="screenshot-wrap" onclick="openLightbox(this.querySelector('img'))">
+      <div class="screenshot-label"><span>Prompt optimization</span><span class="screenshot-expand">Click to expand ↗</span></div>
       <img src="/extension/screenshot-prompt.png" alt="TokenLens extension analyzing a prompt" onerror="this.style.display='none';this.parentElement.style.background='var(--surface2)';this.parentElement.style.minHeight='200px'">
     </div>
-    <div class="screenshot-wrap">
-      <div class="screenshot-label">Code optimization</div>
+    <div class="screenshot-wrap" onclick="openLightbox(this.querySelector('img'))">
+      <div class="screenshot-label"><span>Code optimization</span><span class="screenshot-expand">Click to expand ↗</span></div>
       <img src="/extension/screenshot-code.png" alt="TokenLens extension optimizing code" onerror="this.style.display='none';this.parentElement.style.background='var(--surface2)';this.parentElement.style.minHeight='200px'">
     </div>
   </div>
@@ -453,5 +462,22 @@ nav {
 
 </div>
 
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+<script>
+function openLightbox(img) {
+  document.getElementById('lightbox-img').src = img.src;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
 </body>
 </html>
