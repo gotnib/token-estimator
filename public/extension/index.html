@@ -74,8 +74,7 @@ nav {
 }
 .btn-nav:hover { background: var(--surface2); }
 
-/* PAGE */
-.page { max-width: 900px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+.page { max-width: 980px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
 
 /* HERO */
 .hero { text-align: center; margin-bottom: 3rem; }
@@ -97,12 +96,13 @@ nav {
 }
 .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 .hero h1 {
-  font-size: clamp(28px, 5vw, 42px);
+  font-size: clamp(24px, 4vw, 38px);
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.15;
+  line-height: 1.2;
   margin-bottom: 1rem;
   color: var(--text);
+  white-space: nowrap;
 }
 .hero h1 span { color: var(--accent); }
 .hero p {
@@ -323,7 +323,7 @@ nav {
   <!-- HERO -->
   <div class="hero">
     <div class="hero-badge"><div class="hero-badge-dot"></div>Browser Extension</div>
-    <h1>TokenLens<br><span>in your browser</span></h1>
+    <h1><span>TokenLens</span> in your browser</h1>
     <p>Analyze and optimize prompts directly inside Claude, ChatGPT, and other AI interfaces — without switching tabs.</p>
   </div>
 
@@ -393,7 +393,6 @@ nav {
       <!-- CHROME -->
       <div class="install-card">
         <div class="install-header">
-          <div class="install-header-icon">🌐</div>
           <div class="install-header-title">Chrome / Chromium / Arc / Brave</div>
         </div>
         <div class="install-steps">
@@ -423,7 +422,6 @@ nav {
       <!-- FIREFOX -->
       <div class="install-card">
         <div class="install-header">
-          <div class="install-header-icon">🦊</div>
           <div class="install-header-title">Firefox</div>
         </div>
         <div class="install-steps">
