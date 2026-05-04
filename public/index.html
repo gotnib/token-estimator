@@ -487,6 +487,35 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 .dark-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:white;transition:transform 0.2s;}
 .dark-toggle-track.on .dark-toggle-thumb{transform:translateX(12px);}
 @media(max-width:640px){.dark-toggle-float{display:none;}}
+
+/* Landing page dark mode fixes */
+[data-theme="dark"] .hero { background: transparent; }
+[data-theme="dark"] .hero h1 { color: var(--text); }
+[data-theme="dark"] .hero-sub { color: var(--muted); }
+[data-theme="dark"] .hero-badge { background: var(--white); border-color: var(--border); color: var(--muted); }
+[data-theme="dark"] .stats-strip { background: var(--white); border-color: var(--border); }
+[data-theme="dark"] .stat-num { color: var(--accent); }
+[data-theme="dark"] .stat-label { color: var(--muted); }
+[data-theme="dark"] .section { background: transparent; }
+[data-theme="dark"] .section-alt { background: var(--white); }
+[data-theme="dark"] .feature-card { background: var(--white); border-color: var(--border); }
+[data-theme="dark"] .feature-icon-wrap { background: var(--surface2); }
+[data-theme="dark"] .how-card { background: var(--white); border-color: var(--border); }
+[data-theme="dark"] .how-step-num { background: var(--accent); }
+[data-theme="dark"] .testimonial-card { background: var(--white); border-color: var(--border); }
+[data-theme="dark"] .pricing-card { background: var(--white); border-color: var(--border); }
+[data-theme="dark"] .pricing-card.featured { background: rgb(60,61,89); border-color: rgb(80,82,110); }
+[data-theme="dark"] .btn-ghost { border-color: var(--border2); color: var(--muted); }
+[data-theme="dark"] .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+[data-theme="dark"] .demo-card { background: var(--white); border-color: var(--border); }
+[data-theme="dark"] .demo-section { background: var(--white); border-color: var(--border); }
+[data-theme="dark"] .demo-examples { background: var(--surface2); }
+[data-theme="dark"] .demo-example-pill { background: var(--bg); border-color: var(--border2); color: var(--muted); }
+[data-theme="dark"] textarea { background: var(--bg); border-color: var(--border); color: var(--text); }
+[data-theme="dark"] textarea:focus { background: var(--white); border-color: var(--accent); }
+[data-theme="dark"] .testimonials-section { background: var(--white); }
+[data-theme="dark"] .cta-band { background: var(--surface2); }
+[data-theme="dark"] footer { background: var(--white); }
 </style>
 </head>
 <body>
@@ -495,7 +524,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 <nav>
   <div class="nav-inner-land">
   <a class="nav-logo" href="#">
-    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:#0f1623;">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;background:linear-gradient(90deg,rgb(123,166,146),rgb(60,61,89));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:var(--text);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:var(--accent);">Lens</span>
   </a>
   <div class="nav-links">
     <a href="#features">Features</a>
