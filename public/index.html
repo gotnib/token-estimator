@@ -141,7 +141,10 @@
 
 <meta name="msvalidate.01" content="EC4EA584B01F0D19B81BEB1E1E1FD680">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
-<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="128x128" href="/tokenlens_favicon.png">
+<link rel="apple-touch-icon" href="/tokenlens_favicon.png">
 <style>
 :root {
   --bg: rgb(242,241,233);
@@ -470,6 +473,20 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
   .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
   footer { padding: 2rem 1.25rem 1.5rem; }
 }
+
+[data-theme="dark"]{--bg:rgb(22,24,38);--white:rgb(30,32,48);--surface2:rgb(38,40,58);--border:rgb(52,55,78);--border2:rgb(68,72,100);--text:rgb(232,231,220);--muted:rgb(160,162,185);--dim:rgb(110,112,140);--accent:rgb(123,166,146);--accent-light:rgba(123,166,146,0.15);--accent-dark:rgb(95,138,118);}
+[data-theme="dark"] body{background:linear-gradient(160deg,rgb(22,24,38) 0%,rgb(18,20,32) 100%);}
+[data-theme="dark"] nav{background:rgba(28,30,46,0.95);}
+[data-theme="dark"] .hero{background:transparent;}
+[data-theme="dark"] .feature-card,[data-theme="dark"] .how-card,[data-theme="dark"] .testimonial-card,[data-theme="dark"] .pricing-card{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] .pricing-card.featured{background:rgb(60,61,89);}
+.dark-toggle-float{position:fixed;bottom:1.5rem;left:1.5rem;z-index:200;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:6px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:12px;font-weight:500;color:var(--muted);font-family:"Geist",sans-serif;transition:all 0.15s;user-select:none;}
+.dark-toggle-float:hover{border-color:var(--accent);color:var(--text);}
+.dark-toggle-track{width:28px;height:16px;border-radius:99px;background:var(--border2);position:relative;transition:background 0.2s;flex-shrink:0;}
+.dark-toggle-track.on{background:var(--accent);}
+.dark-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:white;transition:transform 0.2s;}
+.dark-toggle-track.on .dark-toggle-thumb{transform:translateX(12px);}
+@media(max-width:640px){.dark-toggle-float{display:none;}}
 </style>
 </head>
 <body>
@@ -484,6 +501,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
     <a href="#features">Features</a>
     <a href="#how">How it works</a>
     <a href="#pricing">Pricing</a>
+    <a href="/extension">Extension</a>
   </div>
   <div class="nav-right">
     <a class="btn-ghost" href="/home">Log in</a>
@@ -768,7 +786,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
   <div class="footer-inner">
     <div class="footer-brand">
       <div>
-        <span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:#0f1623;">Token</span><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;background:linear-gradient(90deg,rgb(123,166,146),rgb(60,61,89));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lens</span>
+        <span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--text);">Token</span><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--accent);">Lens</span>
       </div>
       <p>See every token. Save more. Prompt smarter. Every time. Powered by Anthropic Claude.</p>
     </div>
@@ -778,6 +796,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
       <a href="#pricing">Pricing</a>
       <a href="#how">How it works</a>
       <a href="/app">Get started</a>
+      <a href="/extension">Extension</a>
     </div>
     <div class="footer-col">
       <h4>Company</h4>
@@ -945,6 +964,14 @@ async function runDemo() {
 }
 
 initLanding();
+
+function initDarkMode(){const s=localStorage.getItem('tl_theme');if(s==='dark')document.documentElement.setAttribute('data-theme','dark');updateDarkUI();}
+function applyDark(on){document.documentElement.setAttribute('data-theme',on?'dark':'light');localStorage.setItem('tl_theme',on?'dark':'light');updateDarkUI();}
+function toggleDark(){applyDark(document.documentElement.getAttribute('data-theme')!=='dark');}
+function updateDarkUI(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.querySelectorAll('.dark-toggle-track').forEach(t=>t.classList.toggle('on',d));document.querySelectorAll('.dark-toggle-label').forEach(l=>l.textContent=d?'Light':'Dark');}
+initDarkMode();
+
 </script>
+<div class="dark-toggle-float" onclick="toggleDark()"><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div><span class="dark-toggle-label">Dark</span></div>
 </body>
 </html>
