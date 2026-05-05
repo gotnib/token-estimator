@@ -359,7 +359,7 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
 .mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
 .mobile-dark-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;border-radius:8px;user-select:none;}
 .mobile-dark-toggle:hover{background:var(--surface2);}
-@media(max-width:640px){.nav-links-center{display:none!important;}.nav-right-ext>*{display:none!important;}.nav-right-ext>.hamburger{display:flex!important;}.hamburger{display:flex!important;}.nav-inner{grid-template-columns:1fr auto!important;}}
+@media(max-width:640px){.nav-links-center{display:none!important;}.nav-right-ext{display:none!important;}.hamburger{display:flex!important;}.nav-inner{grid-template-columns:1fr auto!important;}}
 </style>
 </head>
 <body>
@@ -380,8 +380,8 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
       <div id="ext-nav-pill" style="display:flex;align-items:center;gap:6px;"></div>
       <button class="btn-nav-ext" id="ext-logout" style="display:none" onclick="extLogout()">Log out</button>
       <a class="btn-nav-ext" id="ext-open-app" href="/app">Open app →</a>
-      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
@@ -406,6 +406,18 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
     <div class="hero-badge"><div class="hero-badge-dot"></div>Browser Extension</div>
     <h1><span>TokenLens</span> in your browser</h1>
     <p>Analyze and optimize prompts directly inside Claude, ChatGPT, and other AI interfaces — without switching tabs.</p>
+  </div>
+
+  <!-- NOTICE -->
+  <div style="max-width:900px;margin:0 auto 2.5rem;">
+    <video
+      src="/extension/extension-demo.mp4"
+      autoplay
+      loop
+      muted
+      playsinline
+      style="width:100%;border-radius:var(--radius-xl);border:1px solid var(--border);box-shadow:var(--shadow-lg);display:block;aspect-ratio:3192/1440;background:var(--surface2);"
+    ></video>
   </div>
 
   <!-- NOTICE -->
