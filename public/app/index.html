@@ -257,6 +257,8 @@ textarea::placeholder{color:var(--dim);}
 .btn-primary-full:disabled{opacity:0.5;cursor:not-allowed;}
 .modal-switch{text-align:center;margin-top:1rem;font-size:13px;color:var(--muted);}
 .modal-switch a{color:var(--accent);text-decoration:none;cursor:pointer;font-weight:500;}
+.pwc{font-size:12px;color:var(--dim);transition:color 0.15s;display:flex;align-items:center;gap:5px;}
+.pwc.pass{color:var(--accent);}
 .modal-error{background:var(--red-light);border:1px solid #fecaca;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--red);margin-bottom:14px;}
 .modal-success{background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--green);margin-bottom:14px;}
 
@@ -1371,7 +1373,24 @@ function renderModal(mode) {
     <div id="modal-msg"></div>
     ${planSelector}
     <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="auth-email" placeholder="you@example.com" autocomplete="email"></div>
-    <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="auth-password" placeholder="••••••••" autocomplete="${isLogin ? 'current-password' : 'new-password'}"></div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div style="position:relative;">
+        <input class="form-input" type="password" id="auth-password" placeholder="••••••••" autocomplete="${isLogin ? 'current-password' : 'new-password'}" style="padding-right:42px;" ${isLogin ? '' : 'oninput="updatePwStrength(this.value)"'}>
+        <button type="button" onclick="togglePasswordReveal()" id="pw-reveal-btn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--dim);padding:4px;display:flex;align-items:center;" title="Show password">
+          <svg id="pw-eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      ${isLogin ? '' : `
+      <div id="pw-checks" style="margin-top:10px;display:none;background:var(--surface2);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;">
+        <div id="pwc-len"  class="pwc">✗ 8+ characters</div>
+        <div id="pwc-upper" class="pwc">✗ Uppercase letter</div>
+        <div id="pwc-lower" class="pwc">✗ Lowercase letter</div>
+        <div id="pwc-num"  class="pwc">✗ Number</div>
+        <div id="pwc-sym"  class="pwc">✗ Special character</div>
+        <div id="pwc-seq"  class="pwc">✗ No common patterns</div>
+      </div>`}
+    </div>
     ${isLogin ? `<div style="text-align:right;margin-top:-6px;margin-bottom:10px;"><a href="/reset" style="font-size:12px;color:var(--accent);text-decoration:none;">Forgot password?</a></div>` : ''}
     <button class="btn-full btn-primary-full" id="auth-submit" style="${btnStyle}" onclick="${isLogin ? 'submitLogin()' : 'submitSignup()'}">
       ${btnLabel}
@@ -1386,6 +1405,46 @@ function renderModal(mode) {
   document.getElementById('auth-password').addEventListener('keydown', e => {
     if (e.key === 'Enter') isLogin ? submitLogin() : submitSignup();
   });
+}
+
+function updatePwStrength(val) {
+  const checks = document.getElementById('pw-checks');
+  if (!checks) return;
+  checks.style.display = 'grid';
+  const rules = {
+    'pwc-len':   { pass: val.length >= 8,                           label: '8+ characters' },
+    'pwc-upper': { pass: /[A-Z]/.test(val),                         label: 'Uppercase letter' },
+    'pwc-lower': { pass: /[a-z]/.test(val),                         label: 'Lowercase letter' },
+    'pwc-num':   { pass: /[0-9]/.test(val),                         label: 'Number' },
+    'pwc-sym':   { pass: /[^A-Za-z0-9]/.test(val),                  label: 'Special character' },
+    'pwc-seq':   { pass: !/(012|123|234|345|456|567|678|789|abc|bcd|cde|def|password|qwerty|111|222|333|aaa)/i.test(val), label: 'No common patterns' },
+  };
+  Object.entries(rules).forEach(([id, {pass, label}]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'pwc' + (pass ? ' pass' : '');
+    el.textContent = (pass ? '✓ ' : '✗ ') + label;
+  });
+}
+
+function pwAllValid(val) {
+  return val.length >= 8
+    && /[A-Z]/.test(val)
+    && /[a-z]/.test(val)
+    && /[0-9]/.test(val)
+    && /[^A-Za-z0-9]/.test(val)
+    && !/(012|123|234|345|456|567|678|789|abc|bcd|cde|def|password|qwerty|111|222|333|aaa)/i.test(val);
+}
+
+function togglePasswordReveal() {
+  const input = document.getElementById('auth-password');
+  const icon  = document.getElementById('pw-eye-icon');
+  if (!input) return;
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  icon.innerHTML = showing
+    ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+    : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
 }
 
 function setModalMsg(msg, type) {
@@ -1419,7 +1478,8 @@ async function submitSignup() {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   if (!emailRegex.test(email)) { setModalMsg('Please enter a valid email address.', 'error'); return; }
 
-  if (pass.length < 6) { setModalMsg('Password must be at least 6 characters.', 'error'); return; }
+  if (pass.length < 8) { setModalMsg('Password must be at least 8 characters.', 'error'); return; }
+  if (!pwAllValid(pass)) { setModalMsg('Password does not meet all requirements.', 'error'); updatePwStrength(pass); return; }
 
   const btn  = document.getElementById('auth-submit');
   const plan = selectedSignupPlan;
