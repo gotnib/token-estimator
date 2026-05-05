@@ -248,6 +248,8 @@ async function submitLogin() {
   const btn   = document.getElementById('login-btn');
   const msg   = document.getElementById('msg');
   if (!email || !pass) { msg.innerHTML = '<div class="msg-error">Please fill in all fields.</div>'; return; }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!emailRegex.test(email)) { msg.innerHTML = '<div class="msg-error">Please enter a valid email address.</div>'; return; }
   btn.disabled = true;
   btn.textContent = 'Logging in...';
   msg.innerHTML = '';
