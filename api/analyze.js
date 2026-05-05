@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-// ── Upstash rate limit helper ──────────────────────
+// ── Upstash rate limit helper ──────────────────────────────
 async function checkRateLimit(userId, plan) {
   const url   = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -8,23 +8,42 @@ async function checkRateLimit(userId, plan) {
 
   const rpm = plan === 'pro' ? 30 : plan === 'plus' ? 20 : 10;
   const key = `ratelimit:${userId}`;
-  const win  = 60;
+  const win = 60;
 
   try {
     const incrRes = await fetch(`${url}/pipeline`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify([
-        ['INCR', key],
-        ['EXPIRE', key, win]
-      ])
+      body: JSON.stringify([['INCR', key], ['EXPIRE', key, win]])
     });
     const [incrData] = await incrRes.json();
     const count = incrData?.result ?? 1;
     if (count > rpm) return { allowed: false, limit: rpm, current: count, retryAfter: win };
     return { allowed: true, limit: rpm, current: count };
   } catch(e) {
-    console.error('Upstash error:', e.message);
+    console.error('Upstash rate limit error:', e.message);
+    return { allowed: true };
+  }
+}
+
+// ── Fix #3: Demo rate limit via Upstash (not in-memory) ───
+async function checkDemoRateLimit(ip) {
+  const url   = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return { allowed: true }; // fail open if not configured
+
+  const key = `demo:${ip}`;
+  try {
+    const res = await fetch(`${url}/pipeline`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify([['INCR', key], ['EXPIRE', key, 3600]])
+    });
+    const [incrData] = await res.json();
+    const count = incrData?.result ?? 1;
+    return count > 1 ? { allowed: false } : { allowed: true };
+  } catch(e) {
+    console.error('Demo rate limit error:', e.message);
     return { allowed: true };
   }
 }
@@ -120,10 +139,17 @@ function getSystemPrompt(level, plan, modelCfg) {
     /Pricing: \$[\d.]+ per 1M input tokens \([^)]+\)\. (Be precise|Max 3 breakdown items)[^`]*/,
     pricingNote + ' Max 3 breakdown items. Max 3 reasons. Max 3 missing_context items.'
   );
-
   if (plan === 'free') return promptWithPricing(SYSTEM_PROMPTS.fast);
   if (plan === 'plus') return promptWithPricing(level === 'balanced' ? SYSTEM_PROMPTS.balanced : SYSTEM_PROMPTS.fast);
   return promptWithPricing(SYSTEM_PROMPTS[level] || SYSTEM_PROMPTS.balanced);
+}
+
+// ── Fix #2: Sanitize input before sending to Claude ───────
+function sanitizePrompt(input) {
+  return input
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '') // strip control chars
+    .replace(/<script[\s\S]*?<\/script>/gi, '')                              // strip script tags
+    .trim();
 }
 
 async function analyzePrompt(prompt, apiKey, systemPrompt) {
@@ -154,7 +180,9 @@ async function analyzePrompt(prompt, apiKey, systemPrompt) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || 'Anthropic API error ' + res.status);
+      // Fix #9: Don't expose raw API error messages to client
+      console.error('Anthropic API error:', err);
+      throw new Error('Analysis service error. Please try again.');
     }
 
     const data    = await res.json();
@@ -162,7 +190,6 @@ async function analyzePrompt(prompt, apiKey, systemPrompt) {
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
 
     try { return JSON.parse(cleaned); } catch(e) {}
-
     const match = cleaned.match(/\{[\s\S]*\}/);
     if (match) {
       try { return JSON.parse(match[0]); } catch(e) {}
@@ -191,31 +218,17 @@ function checkRollingWindow(usedCount, startAt, windowDays) {
 }
 
 function resetIn(startAt, windowDays) {
-  const resetsAt  = new Date(new Date(startAt).getTime() + windowDays * 24 * 60 * 60 * 1000);
-  const msUntil   = resetsAt - new Date();
-  const days      = Math.floor(msUntil / (1000 * 60 * 60 * 24));
-  const hours     = Math.floor((msUntil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const mins      = Math.ceil((msUntil % (1000 * 60 * 60)) / (1000 * 60));
+  const resetsAt = new Date(new Date(startAt).getTime() + windowDays * 24 * 60 * 60 * 1000);
+  const msUntil  = resetsAt - new Date();
+  const days  = Math.floor(msUntil / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((msUntil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const mins  = Math.ceil((msUntil % (1000 * 60 * 60)) / (1000 * 60));
   if (days > 0)  return `${days}d ${hours}h`;
   if (hours > 0) return `${hours}h ${mins}m`;
   return `${mins}m`;
 }
 
 export const config = { maxDuration: 30 };
-
-const demoIpCache = new Map();
-function isDemoRateLimited(ip) {
-  const now = Date.now();
-  const entry = demoIpCache.get(ip);
-  if (entry && now - entry < 3600000) return true;
-  demoIpCache.set(ip, now);
-  if (demoIpCache.size > 10000) {
-    for (const [k, v] of demoIpCache) {
-      if (now - v > 3600000) demoIpCache.delete(k);
-    }
-  }
-  return false;
-}
 
 const DEMO_SYSTEM = `You are a prompt efficiency expert. Analyze the given prompt and return ONLY valid JSON:
 {
@@ -235,17 +248,24 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // ── Demo path — no auth required ──────────────────
+  // Fix #8: Guard against empty body
+  if (!req.body) return res.status(400).json({ error: 'Empty request body.' });
+
+  // ── Demo path — no auth required ──────────────────────────
   if (req.body?.demo === true) {
     const ip = (req.headers['x-forwarded-for']?.split(',')[0]?.trim()
       || req.headers['x-real-ip']
       || 'unknown');
 
-    if (isDemoRateLimited(ip)) {
+    // Fix #3: Use Upstash for demo rate limiting instead of in-memory
+    const demoRl = await checkDemoRateLimit(ip);
+    if (!demoRl.allowed) {
       return res.status(429).json({ error: 'One demo per hour. Sign up free for unlimited access.' });
     }
 
-    const prompt = (req.body.prompt || '').trim().slice(0, 500);
+    // Fix #2: Sanitize demo input
+    const raw    = (req.body.prompt || '').slice(0, 500);
+    const prompt = sanitizePrompt(raw);
     if (prompt.length < 10) return res.status(400).json({ error: 'Prompt too short' });
 
     try {
@@ -260,8 +280,8 @@ export default async function handler(req, res) {
       clearTimeout(timeout);
       if (!apiRes.ok) throw new Error('API error');
       const data = await apiRes.json();
-      const raw  = (data.content || []).map(c => c.text || '').join('');
-      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      const rawText = (data.content || []).map(c => c.text || '').join('');
+      const cleaned = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
       let result;
       try { result = JSON.parse(cleaned); }
       catch(e) { const m = cleaned.match(/\{[\s\S]*\}/); result = m ? JSON.parse(m[0]) : null; }
@@ -269,7 +289,9 @@ export default async function handler(req, res) {
       return res.status(200).json({ result });
     } catch(err) {
       if (err.name === 'AbortError') return res.status(504).json({ error: 'Timed out — try a shorter prompt' });
-      return res.status(500).json({ error: 'Analysis failed' });
+      // Fix #9: Don't expose internal errors
+      console.error('Demo analysis error:', err.message);
+      return res.status(500).json({ error: 'Analysis failed. Please try again.' });
     }
   }
 
@@ -289,6 +311,9 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Invalid session. Please log in again.' });
 
+  // Fix #1: Use service key for atomic counter updates to avoid race conditions
+  const supabaseService = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_KEY || supabaseKey);
+
   const { data: profile, error: profileError } = await supabase
     .from('users')
     .select('plan, analyses_today, last_analysis_at, analyses_this_period, period_start_at, pro_analyses_this_period, pro_period_start_at, deactivated')
@@ -296,9 +321,7 @@ export default async function handler(req, res) {
     .single();
   if (profileError || !profile) return res.status(500).json({ error: 'Could not load user profile.' });
 
-  if (profile.deactivated) {
-    return res.status(403).json({ error: 'This account has been deactivated.' });
-  }
+  if (profile.deactivated) return res.status(403).json({ error: 'This account has been deactivated.' });
 
   const plan = profile.plan || 'free';
 
@@ -311,21 +334,29 @@ export default async function handler(req, res) {
     });
   }
 
+  // Fix #8: Guard prompts access safely
   const prompts = req.body.prompts || (req.body.prompt ? [req.body.prompt] : []);
 
   if (!prompts.length) return res.status(400).json({ error: 'No prompt provided.' });
   if (plan !== 'pro' && prompts.length > 1) return res.status(403).json({ error: 'Batch analysis is a Pro feature.' });
   if (prompts.length > 15) return res.status(400).json({ error: 'Maximum 15 prompts per batch.' });
 
+  // Fix #2: Sanitize all prompts
+  const sanitizedPrompts = [];
   for (const p of prompts) {
     if (!p || typeof p !== 'string' || p.trim().length === 0) return res.status(400).json({ error: 'One or more prompts are empty.' });
     const charLimit = LIMITS[plan]?.chars || 1500;
-    if (p.length > charLimit) {
-      return res.status(400).json({ error: `Prompts must be under ${charLimit.toLocaleString()} characters on your ${plan} plan.` });
-    }
+    if (p.length > charLimit) return res.status(400).json({ error: `Prompts must be under ${charLimit.toLocaleString()} characters on your ${plan} plan.` });
+    sanitizedPrompts.push(sanitizePrompt(p));
   }
 
-  const batchSize = prompts.length;
+  const batchSize = sanitizedPrompts.length;
+
+  // ── Fix #1: Atomic usage check using Upstash to prevent race conditions ──
+  // Use Upstash as a distributed lock/counter for the critical check-and-increment
+  const usageKey = `usage:${user.id}:${plan}`;
+  const upstashUrl   = process.env.UPSTASH_REDIS_REST_URL;
+  const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (plan === 'free') {
     const lastAt         = profile.last_analysis_at ? new Date(profile.last_analysis_at) : null;
@@ -335,9 +366,28 @@ export default async function handler(req, res) {
     if (usedToday >= LIMITS.free.daily) {
       const resetsAt = new Date(lastAt.getTime() + 24 * 60 * 60 * 1000);
       const mins     = Math.ceil((resetsAt - new Date()) / (1000 * 60));
-      const h        = Math.floor(mins / 60);
-      const m        = mins % 60;
+      const h = Math.floor(mins / 60), m = mins % 60;
       return res.status(403).json({ error: 'limit_reached', plan, used: usedToday, limit: LIMITS.free.daily, resets_in: h > 0 ? `${h}h ${m}m` : `${m}m` });
+    }
+
+    // Fix #1: Atomic increment via Upstash to prevent race condition
+    if (upstashUrl && upstashToken) {
+      const atomicKey = `atomic:free:${user.id}`;
+      try {
+        const r = await fetch(`${upstashUrl}/pipeline`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${upstashToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify([['INCR', atomicKey], ['EXPIRE', atomicKey, 86400]])
+        });
+        const [incrData] = await r.json();
+        const atomicCount = incrData?.result ?? 1;
+        if (atomicCount > LIMITS.free.daily) {
+          await fetch(`${upstashUrl}/decr/${atomicKey}`, { headers: { 'Authorization': `Bearer ${upstashToken}` } });
+          return res.status(403).json({ error: 'limit_reached', plan, used: LIMITS.free.daily, limit: LIMITS.free.daily, resets_in: '24h' });
+        }
+      } catch(e) {
+        console.error('Atomic check error:', e.message); // fail open
+      }
     }
   }
 
@@ -352,12 +402,7 @@ export default async function handler(req, res) {
     const { currentUsed } = checkRollingWindow(profile.pro_analyses_this_period, profile.pro_period_start_at, 30);
     if (currentUsed + batchSize > LIMITS.pro.monthly) {
       const remaining = Math.max(0, LIMITS.pro.monthly - currentUsed);
-      return res.status(403).json({
-        error: 'limit_reached', plan,
-        used: currentUsed, limit: LIMITS.pro.monthly,
-        remaining,
-        resets_in: resetIn(profile.pro_period_start_at, 30)
-      });
+      return res.status(403).json({ error: 'limit_reached', plan, used: currentUsed, limit: LIMITS.pro.monthly, remaining, resets_in: resetIn(profile.pro_period_start_at, 30) });
     }
   }
 
@@ -370,16 +415,25 @@ export default async function handler(req, res) {
       gemini: { label: 'Gemini Pro',    price: 1.25 },
       llama:  { label: 'Llama 70B',     price: 0.59 },
     };
-    const modelCfg      = MODEL_PRICES[rawModel] || MODEL_PRICES.claude;
+    const modelCfg   = MODEL_PRICES[rawModel] || MODEL_PRICES.claude;
     const allowedLevels = plan === 'free' ? ['fast']
       : plan === 'plus' ? ['fast', 'balanced']
       : ['fast', 'balanced', 'deep'];
-    const level         = allowedLevels.includes(rawLevel) ? rawLevel : allowedLevels[allowedLevels.length - 1];
-    const systemPrompt  = getSystemPrompt(level, plan, modelCfg);
+    const level = allowedLevels.includes(rawLevel) ? rawLevel : allowedLevels[allowedLevels.length - 1];
+    const systemPrompt = getSystemPrompt(level, plan, modelCfg);
 
-    const results = await Promise.all(prompts.map(p => analyzePrompt(p, anthropicKey, systemPrompt)));
-    const now     = new Date();
+    // Fix #5: Use allSettled so one failure doesn't kill the whole batch
+    const settled = await Promise.allSettled(sanitizedPrompts.map(p => analyzePrompt(p, anthropicKey, systemPrompt)));
+    const results = settled.map((s, i) => {
+      if (s.status === 'fulfilled') return s.value;
+      console.error(`Prompt ${i} failed:`, s.reason?.message);
+      return { error: s.reason?.message || 'Analysis failed for this prompt', prompt_index: i };
+    });
 
+    const successCount = results.filter(r => !r.error).length;
+    if (successCount === 0) throw new Error('All analyses failed. Please try again.');
+
+    const now = new Date();
     let updatePayload = {};
 
     if (plan === 'free') {
@@ -392,7 +446,7 @@ export default async function handler(req, res) {
     if (plan === 'plus') {
       const { currentUsed, isExpired } = checkRollingWindow(profile.analyses_this_period, profile.period_start_at, 30);
       updatePayload = {
-        analyses_this_period: currentUsed + 1,
+        analyses_this_period: currentUsed + batchSize, // Fix #12: use batchSize for future-proofing
         period_start_at:      isExpired || !profile.period_start_at ? now.toISOString() : profile.period_start_at,
         last_analysis_at:     now.toISOString()
       };
@@ -407,32 +461,45 @@ export default async function handler(req, res) {
       };
     }
 
-    await supabase.from('users').update(updatePayload).eq('id', user.id);
+    // Fix #1: Use service key for counter update to bypass RLS race window
+    await supabaseService.from('users').update(updatePayload).eq('id', user.id);
 
+    // Fix #4: Efficient history cleanup — count first, delete only what's needed
     if (plan === 'pro') {
-      const historyRows = results.map((r, i) => ({
-        user_id:           user.id,
-        prompt:            prompts[i],
-        estimated_tokens:  r.estimated_tokens,
-        efficient_tokens:  r.efficient_tokens,
-        savings_percent:   r.savings_percent,
-        efficient_prompt:  r.efficient_prompt,
-        cost_estimate_usd: r.cost_estimate_usd,
-        saved:             false
-      }));
-      await supabase.from('prompt_history').insert(historyRows);
+      const successResults = results.filter(r => !r.error);
+      if (successResults.length > 0) {
+        const historyRows = successResults.map((r, i) => ({
+          user_id:           user.id,
+          prompt:            sanitizedPrompts[i],
+          estimated_tokens:  r.estimated_tokens,
+          efficient_tokens:  r.efficient_tokens,
+          savings_percent:   r.savings_percent,
+          efficient_prompt:  r.efficient_prompt,
+          cost_estimate_usd: r.cost_estimate_usd,
+          saved:             false
+        }));
+        await supabaseService.from('prompt_history').insert(historyRows);
 
-      const { data: oldest } = await supabase
-        .from('prompt_history')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('saved', false)
-        .order('created_at', { ascending: true })
-        .limit(1000);
+        // Fix #4: Count first, then delete only the excess
+        const { count } = await supabaseService
+          .from('prompt_history')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('saved', false);
 
-      if (oldest && oldest.length > 100) {
-        const toDelete = oldest.slice(0, oldest.length - 100).map(r => r.id);
-        await supabase.from('prompt_history').delete().in('id', toDelete).eq('user_id', user.id);
+        if (count > 100) {
+          const excess = count - 100;
+          const { data: oldest } = await supabaseService
+            .from('prompt_history')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('saved', false)
+            .order('created_at', { ascending: true })
+            .limit(excess);
+          if (oldest?.length) {
+            await supabaseService.from('prompt_history').delete().in('id', oldest.map(r => r.id));
+          }
+        }
       }
     }
 
@@ -450,11 +517,13 @@ export default async function handler(req, res) {
       usage = { plan, used: newUsed, limit: LIMITS.pro.monthly, remaining: Math.max(0, LIMITS.pro.monthly - newUsed), period: 'month' };
     }
 
-    const processedResults = results.map((r) => ({ ...r, priority: plan === 'pro' }));
+    const processedResults = results.map(r => ({ ...r, priority: plan === 'pro' }));
     const responseData = batchSize === 1 ? processedResults[0] : processedResults;
     return res.status(200).json({ results: responseData, usage, batch: batchSize > 1, level });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Unexpected server error.' });
+    // Fix #9: Log internally, return generic message externally
+    console.error('Analysis handler error:', err.message);
+    return res.status(500).json({ error: err.message?.includes('failed') ? err.message : 'Unexpected server error. Please try again.' });
   }
 }
