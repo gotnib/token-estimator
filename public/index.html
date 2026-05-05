@@ -297,17 +297,17 @@ h1 {
 
 /* ── DEMO ── */
 .demo-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 4rem 1.5rem; }
-.demo-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
-.demo-left {}
-.demo-right { display: flex; flex-direction: column; align-items: center; text-align: center; }
-.demo-right-label { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 0.5rem; }
-.demo-right-sub { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1.5rem; }
-.demo-ext-img { width: 100%; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-lg); display: block; transition: transform 0.2s, box-shadow 0.2s; }
+.demo-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: stretch; }
+.demo-left { display: flex; flex-direction: column; }
+.demo-col-label { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 4px; }
+.demo-col-sub { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
+.demo-right { display: flex; flex-direction: column; }
+.demo-ext-img { width: 100%; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-lg); display: block; transition: transform 0.2s, box-shadow 0.2s; flex: 1; object-fit: cover; }
 .demo-ext-img:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(60,61,89,0.15); }
-.demo-ext-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 1.25rem; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.demo-ext-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 1rem; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; }
 .demo-ext-link:hover { color: var(--accent-dark); }
+.demo-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; flex: 1; display: flex; flex-direction: column; }
 @media(max-width:768px){ .demo-inner { grid-template-columns: 1fr; } .demo-right { order: -1; } }
-.demo-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; }
 .demo-examples { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
 .demo-example-label { font-size: 11px; color: var(--dim); font-weight: 500; }
 .demo-example-pill { padding: 4px 10px; border: 1px solid var(--border2); border-radius: 99px; font-size: 11px; font-weight: 500; color: var(--muted); background: white; cursor: pointer; transition: all 0.15s; }
@@ -593,8 +593,8 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 <section class="demo-section" id="demo">
   <div class="demo-inner">
     <div class="demo-left">
-      <div class="demo-label">Try it now</div>
-      <div class="demo-label-sub">No account needed</div>
+      <div class="demo-col-label">Try it now</div>
+      <div class="demo-col-sub">No account needed</div>
       <div class="demo-card" id="demo-card">
         <div class="demo-examples">
           <span class="demo-example-label">Try an example:</span>
@@ -602,7 +602,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
           <button class="demo-example-pill" onclick="setDemoPrompt(1)">Hedging request</button>
           <button class="demo-example-pill" onclick="setDemoPrompt(2)">Technical prompt</button>
         </div>
-        <textarea id="demo-textarea" placeholder="Paste any AI prompt here to see a live analysis…" rows="4"></textarea>
+        <textarea id="demo-textarea" placeholder="Paste any AI prompt here to see a live analysis…" style="flex:1;min-height:160px;"></textarea>
         <div class="demo-footer">
           <span class="demo-char-count" id="demo-char-count">0 / 500 characters</span>
           <button class="demo-btn" id="demo-btn" onclick="runDemo()">
@@ -618,10 +618,10 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
       </div>
     </div>
     <div class="demo-right">
-      <div class="demo-right-label">Or get it in your browser</div>
-      <div class="demo-right-sub">Works inside Claude, ChatGPT & more</div>
-      <a href="/extension">
-        <img class="demo-ext-img" src="/extension-screenshot.png" alt="TokenLens browser extension">
+      <div class="demo-col-label">Or get it in your browser</div>
+      <div class="demo-col-sub">Works inside Claude, ChatGPT & more</div>
+      <a href="/extension" style="display:block;flex:1;">
+        <img class="demo-ext-img" src="/extension-screenshot.png" alt="TokenLens browser extension" style="height:100%;object-fit:cover;">
       </a>
       <a class="demo-ext-link" href="/extension">Get the extension →</a>
     </div>
