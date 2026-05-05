@@ -72,22 +72,24 @@ FAST rules — follow strictly:
 - Do NOT reorder any content
 - Do NOT change the vocabulary or writing style
 - Do NOT combine separate instructions into one
+- Do NOT remove any specific requirements, constraints, or details — even if they seem redundant
 - The output should look almost identical to the input — just shorter
-- Target: 10-20% token reduction maximum
-- If the prompt is already clean, savings_percent should be 0-5%`,
+- Target: 5-15% token reduction maximum. If the prompt has minimal filler, savings_percent should be 0-5%
+- When in doubt about whether something is waste or content — keep it`,
 
   balanced: `You are a prompt efficiency expert performing a BALANCED rewrite. ${BASE_STRUCTURE}
 
 BALANCED rules — follow strictly:
-- Remove all filler words and politeness overhead
+- Remove filler words and politeness overhead (please, could you, I was wondering, as an AI, etc.)
 - Consolidate redundant ideas that appear more than once
 - Tighten verbose phrasing into direct language
 - You MAY lightly restructure sentences for clarity
 - You MAY reorder content if it improves logical flow
-- Preserve all unique instructions and constraints — do not lose meaning
-- The output should be noticeably shorter and cleaner but recognisably similar to the original
-- Target: 30-50% token reduction
-- Rewrite should feel like the same prompt, edited by a professional`,
+- CRITICAL: Preserve ALL unique instructions, constraints, requirements, and specific details — never drop meaningful content to hit a token target
+- CRITICAL: A well-written detailed prompt should only be trimmed of waste — do not compress it into a vague summary
+- The output must be capable of producing the same result as the original when sent to an AI model
+- Target: remove waste only. If the prompt has little waste, savings_percent may be 5-15%. Only reach 30-50% if there is genuine redundancy at that scale
+- Rewrite should feel like the same prompt, edited by a professional — not a shorter version with less information`,
 
   deep: `You are an expert code optimizer. The user has pasted code that they want improved.
 
@@ -240,11 +242,6 @@ const DEMO_SYSTEM = `You are a prompt efficiency expert. Analyze the given promp
 Return ONLY the JSON object, no markdown, no explanation.`;
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') return res.status(204).end();
-
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   // ── Demo path — no auth required ──────────────────
