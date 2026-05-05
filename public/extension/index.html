@@ -350,7 +350,7 @@ nav{background:var(--white);border-bottom:1px solid var(--border);height:60px;di
       <a class="nav-link-item" href="/extension" style="color:var(--accent);background:var(--accent-light);">Extension</a>
       <a class="nav-link-item" href="/account">Account</a>
     </div>
-    <div class="nav-right-ext">
+    <div class="nav-right-ext" id="ext-nav-right">
       <a class="btn-nav-ext" href="/app">Open app →</a>
     </div>
   </div>
@@ -511,7 +511,21 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbo
 </script>
 <div class="dark-toggle-float" onclick="toggleDark()"><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div><span class="dark-toggle-label">Dark</span></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+(async () => {
+  try {
+    const { supabaseUrl, supabaseAnonKey } = await fetch('/api/config').then(r => r.json());
+    const sb = supabase.createClient(supabaseUrl, supabaseAnonKey);
+    const { data: { session } } = await sb.auth.getSession();
+    const navRight = document.getElementById('ext-nav-right');
+    if (navRight && session) {
+      navRight.innerHTML = `
+        <a class="btn-nav-ext" href="/home">Home</a>
+        <button class="btn-nav-ext" onclick="(async()=>{const {createClient}=supabase;const cfg=await fetch('/api/config').then(r=>r.json());const s=createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);await s.auth.signOut();window.location.href='/';})()">Log out</button>`;
+    }
+  } catch(e) {}
+})();
 function initDarkMode(){const s=localStorage.getItem('tl_theme');if(s==='dark')document.documentElement.setAttribute('data-theme','dark');updateDarkUI();}
 function applyDark(on){document.documentElement.setAttribute('data-theme',on?'dark':'light');localStorage.setItem('tl_theme',on?'dark':'light');updateDarkUI();}
 function toggleDark(){applyDark(document.documentElement.getAttribute('data-theme')!=='dark');}
