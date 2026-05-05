@@ -490,7 +490,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 
 /* Landing page dark mode fixes */
 [data-theme="dark"] .hero { background: transparent; }
-[data-theme="dark"] .hero h1 { color: var(--text); }
+[data-theme="dark"] .hero h1 { color: var(--text); color: var(--text); }
 [data-theme="dark"] .hero-sub { color: var(--muted); }
 [data-theme="dark"] .hero-badge { background: var(--white); border-color: var(--border); color: var(--muted); }
 [data-theme="dark"] .stats-strip { background: var(--white); border-color: var(--border); }
@@ -536,7 +536,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
     <a href="#pricing">Pricing</a>
     <a href="/extension">Extension</a>
   </div>
-  <div class="nav-right">
+  <div class="nav-right" id="landing-nav-right">
     <a class="btn-ghost" href="/home">Log in</a>
     <a class="btn-primary" href="/app">Start free →</a>
   </div>
@@ -857,6 +857,14 @@ async function initLanding() {
   sb = createClient(supabaseUrl, supabaseAnonKey);
   const { data: { session } } = await sb.auth.getSession();
   userSession = session;
+
+  if (session) {
+    // Swap login/signup buttons for app link
+    const navRight = document.getElementById('landing-nav-right');
+    if (navRight) {
+      navRight.innerHTML = '<a class="btn-primary" href="/home" style="font-size:13px;padding:8px 18px;">Go to app →</a>';
+    }
+  }
 }
 
 async function goToCheckout(plan) {
