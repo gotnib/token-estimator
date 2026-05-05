@@ -875,18 +875,23 @@ const { createClient } = supabase;
 let sb, userSession;
 
 async function initLanding() {
-  const res = await fetch('/api/config');
-  const { supabaseUrl, supabaseAnonKey } = await res.json();
-  sb = createClient(supabaseUrl, supabaseAnonKey);
-  const { data: { session } } = await sb.auth.getSession();
-  userSession = session;
+  try {
+    const res = await fetch('/api/config');
+    if (!res.ok) return;
+    const { supabaseUrl, supabaseAnonKey } = await res.json();
+    if (!supabaseUrl || !supabaseAnonKey) return;
+    sb = createClient(supabaseUrl, supabaseAnonKey);
+    const { data: { session } } = await sb.auth.getSession();
+    userSession = session;
 
-  if (session) {
-    // Swap login/signup buttons for app link
-    const navRight = document.getElementById('landing-nav-right');
-    if (navRight) {
-      navRight.innerHTML = '<a class="btn-primary" href="/home" style="font-size:13px;padding:8px 18px;">Go to app →</a>';
+    if (session) {
+      const navRight = document.getElementById('landing-nav-right');
+      if (navRight) {
+        navRight.innerHTML = '<a class="btn-primary" href="/home" style="font-size:13px;padding:8px 18px;">Go to app →</a>';
+      }
     }
+  } catch(e) {
+    // Silently fail — page works fine without auth state on landing
   }
 }
 
