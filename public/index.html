@@ -490,8 +490,8 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 
 /* Landing page dark mode fixes */
 [data-theme="dark"] .hero { background: transparent; }
-.hero h1 { color: rgb(60,61,89); }
-[data-theme="dark"] .hero h1 { color: rgb(232,231,220) !important; }
+.hero h1 { color: rgb(60,61,89); background: none; -webkit-text-fill-color: rgb(60,61,89); }
+[data-theme="dark"] .hero h1 { color: rgb(232,231,220) !important; background: none !important; -webkit-text-fill-color: rgb(232,231,220) !important; }
 [data-theme="dark"] .hero-sub { color: var(--muted); }
 [data-theme="dark"] .hero-badge { background: var(--white); border-color: var(--border); color: var(--muted); }
 [data-theme="dark"] .stats-strip { background: var(--white); border-color: var(--border); }
