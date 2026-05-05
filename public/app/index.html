@@ -1396,6 +1396,8 @@ async function submitLogin() {
   const email = document.getElementById('auth-email').value.trim();
   const pass  = document.getElementById('auth-password').value;
   if (!email || !pass) { setModalMsg('Please fill in all fields.', 'error'); return; }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!emailRegex.test(email)) { setModalMsg('Please enter a valid email address.', 'error'); return; }
   const btn = document.getElementById('auth-submit');
   btn.disabled = true; btn.textContent = 'Logging in…';
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
@@ -1412,6 +1414,11 @@ async function submitSignup() {
   const email = document.getElementById('auth-email').value.trim();
   const pass  = document.getElementById('auth-password').value;
   if (!email || !pass) { setModalMsg('Please fill in all fields.', 'error'); return; }
+
+  // Validate email format before hitting Supabase
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!emailRegex.test(email)) { setModalMsg('Please enter a valid email address.', 'error'); return; }
+
   if (pass.length < 6) { setModalMsg('Password must be at least 6 characters.', 'error'); return; }
 
   const btn  = document.getElementById('auth-submit');
