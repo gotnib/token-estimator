@@ -351,7 +351,9 @@ nav{background:var(--white);border-bottom:1px solid var(--border);height:60px;di
       <a class="nav-link-item" href="/account">Account</a>
     </div>
     <div class="nav-right-ext" id="ext-nav-right">
-      <a class="btn-nav-ext" href="/app">Open app →</a>
+      <div id="ext-nav-pill" style="display:flex;align-items:center;gap:6px;"></div>
+      <button class="btn-nav-ext" id="ext-logout" style="display:none" onclick="extLogout()">Log out</button>
+      <a class="btn-nav-ext" id="ext-open-app" href="/app">Open app →</a>
     </div>
   </div>
 </nav>
@@ -513,19 +515,33 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbo
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+let _extSb;
 (async () => {
   try {
     const { supabaseUrl, supabaseAnonKey } = await fetch('/api/config').then(r => r.json());
-    const sb = supabase.createClient(supabaseUrl, supabaseAnonKey);
-    const { data: { session } } = await sb.auth.getSession();
-    const navRight = document.getElementById('ext-nav-right');
-    if (navRight && session) {
-      navRight.innerHTML = `
-        <a class="btn-nav-ext" href="/home">Home</a>
-        <button class="btn-nav-ext" onclick="(async()=>{const {createClient}=supabase;const cfg=await fetch('/api/config').then(r=>r.json());const s=createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);await s.auth.signOut();window.location.href='/';})()">Log out</button>`;
+    _extSb = supabase.createClient(supabaseUrl, supabaseAnonKey);
+    const { data: { session } } = await _extSb.auth.getSession();
+    if (session) {
+      const { data: profile } = await _extSb.from('users').select('plan, username').eq('id', session.user.id).single();
+      const plan = profile?.plan || 'free';
+      const username = profile?.username || session.user.email?.split('@')[0] || '';
+      const planLabels = { free:'FREE', plus:'PLUS', pro:'PRO' };
+      const planColors = { free:'color:rgb(60,61,89)', plus:'color:rgb(60,61,89)', pro:'color:#b45309' };
+      const pill = document.getElementById('ext-nav-pill');
+      if (pill) pill.innerHTML = `
+        <span style="font-size:13px;font-weight:500;color:var(--muted);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${username}</span>
+        <span style="${planColors[plan]};font-weight:600;font-size:13px;">${planLabels[plan]}</span>`;
+      const logout = document.getElementById('ext-logout');
+      const openApp = document.getElementById('ext-open-app');
+      if (logout) logout.style.display = 'block';
+      if (openApp) openApp.style.display = 'none';
     }
   } catch(e) {}
 })();
+async function extLogout() {
+  if (_extSb) await _extSb.auth.signOut();
+  window.location.href = '/';
+}
 function initDarkMode(){const s=localStorage.getItem('tl_theme');if(s==='dark')document.documentElement.setAttribute('data-theme','dark');updateDarkUI();}
 function applyDark(on){document.documentElement.setAttribute('data-theme',on?'dark':'light');localStorage.setItem('tl_theme',on?'dark':'light');updateDarkUI();}
 function toggleDark(){applyDark(document.documentElement.getAttribute('data-theme')!=='dark');}
