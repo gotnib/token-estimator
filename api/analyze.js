@@ -1,20 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 
 // ── Upstash rate limit helper ──────────────────────
-// Uses REST API directly — no SDK needed
 async function checkRateLimit(userId, plan) {
   const url   = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return { allowed: true }; // skip if not configured
+  if (!url || !token) return { allowed: true };
 
-  // Per-plan limits: requests per minute
   const rpm = plan === 'pro' ? 30 : plan === 'plus' ? 20 : 10;
   const key = `ratelimit:${userId}`;
-  const now  = Math.floor(Date.now() / 1000);
-  const win  = 60; // 60 second window
+  const win  = 60;
 
   try {
-    // Increment counter with 60s expiry
     const incrRes = await fetch(`${url}/pipeline`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -25,13 +21,9 @@ async function checkRateLimit(userId, plan) {
     });
     const [incrData] = await incrRes.json();
     const count = incrData?.result ?? 1;
-
-    if (count > rpm) {
-      return { allowed: false, limit: rpm, current: count, retryAfter: win };
-    }
+    if (count > rpm) return { allowed: false, limit: rpm, current: count, retryAfter: win };
     return { allowed: true, limit: rpm, current: count };
   } catch(e) {
-    // If Upstash is down, fail open — don't block users
     console.error('Upstash error:', e.message);
     return { allowed: true };
   }
@@ -123,7 +115,6 @@ Code optimization rules:
 
 function getSystemPrompt(level, plan, modelCfg) {
   const model = modelCfg || { label: 'Claude Sonnet', price: 3.00 };
-  // Inject model-specific pricing into the prompt
   const pricingNote = `Pricing: $${model.price.toFixed(2)} per 1M input tokens (${model.label}). Be precise.`;
   const promptWithPricing = (p) => p.replace(
     /Pricing: \$[\d.]+ per 1M input tokens \([^)]+\)\. (Be precise|Max 3 breakdown items)[^`]*/,
@@ -136,11 +127,9 @@ function getSystemPrompt(level, plan, modelCfg) {
 }
 
 async function analyzePrompt(prompt, apiKey, systemPrompt) {
-  // Scale max_tokens with prompt length — longer prompts need more output tokens
   const promptLen = prompt.length;
   const maxTok = promptLen < 500 ? 1000 : promptLen < 1500 ? 1400 : 1800;
 
-  // 25 second timeout — Vercel functions cut off at 30s
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25000);
 
@@ -172,14 +161,11 @@ async function analyzePrompt(prompt, apiKey, systemPrompt) {
     const raw     = (data.content || []).map(c => c.text || '').join('');
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
 
-    // Try direct parse first
     try { return JSON.parse(cleaned); } catch(e) {}
 
-    // Extract JSON object and try again
     const match = cleaned.match(/\{[\s\S]*\}/);
     if (match) {
       try { return JSON.parse(match[0]); } catch(e) {}
-      // Sanitize control characters and unescaped backslashes
       try {
         const sanitized = match[0]
           .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ')
@@ -217,7 +203,6 @@ function resetIn(startAt, windowDays) {
 
 export const config = { maxDuration: 30 };
 
-// Simple in-memory IP rate limit for demo — 1 per hour
 const demoIpCache = new Map();
 function isDemoRateLimited(ip) {
   const now = Date.now();
@@ -242,6 +227,12 @@ const DEMO_SYSTEM = `You are a prompt efficiency expert. Analyze the given promp
 Return ONLY the JSON object, no markdown, no explanation.`;
 
 export default async function handler(req, res) {
+  // ── CORS headers — required for browser extension access ──
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).end();
+
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   // ── Demo path — no auth required ──────────────────
@@ -309,9 +300,8 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'This account has been deactivated.' });
   }
 
-  const plan    = profile.plan || 'free';
+  const plan = profile.plan || 'free';
 
-  // ── Upstash rate limit check ───────────────────────────────
   const rl = await checkRateLimit(user.id, plan);
   if (!rl.allowed) {
     return res.status(429).json({
@@ -320,6 +310,7 @@ export default async function handler(req, res) {
       retry_after: rl.retryAfter
     });
   }
+
   const prompts = req.body.prompts || (req.body.prompt ? [req.body.prompt] : []);
 
   if (!prompts.length) return res.status(400).json({ error: 'No prompt provided.' });
@@ -336,7 +327,6 @@ export default async function handler(req, res) {
 
   const batchSize = prompts.length;
 
-  // ── FREE: rolling 24hr ─────────────────────────────────────
   if (plan === 'free') {
     const lastAt         = profile.last_analysis_at ? new Date(profile.last_analysis_at) : null;
     const hoursSinceLast = lastAt ? (new Date() - lastAt) / (1000 * 60 * 60) : 999;
@@ -351,17 +341,15 @@ export default async function handler(req, res) {
     }
   }
 
-  // ── PLUS: rolling 30 days ──────────────────────────────────
   if (plan === 'plus') {
-    const { currentUsed, isExpired } = checkRollingWindow(profile.analyses_this_period, profile.period_start_at, 30);
+    const { currentUsed } = checkRollingWindow(profile.analyses_this_period, profile.period_start_at, 30);
     if (currentUsed >= LIMITS.plus.monthly) {
       return res.status(403).json({ error: 'limit_reached', plan, used: currentUsed, limit: LIMITS.plus.monthly, resets_in: resetIn(profile.period_start_at, 30) });
     }
   }
 
-  // ── PRO: rolling 30 days, fair use ~600 ───────────────────
   if (plan === 'pro') {
-    const { currentUsed, isExpired } = checkRollingWindow(profile.pro_analyses_this_period, profile.pro_period_start_at, 30);
+    const { currentUsed } = checkRollingWindow(profile.pro_analyses_this_period, profile.pro_period_start_at, 30);
     if (currentUsed + batchSize > LIMITS.pro.monthly) {
       const remaining = Math.max(0, LIMITS.pro.monthly - currentUsed);
       return res.status(403).json({
@@ -373,9 +361,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // ── Run analysis (parallel for batch) ─────────────────────
   try {
-    // Get optimization level from request — gate by plan
     const rawLevel = req.body.level || 'balanced';
     const rawModel = req.body.model || 'claude';
     const MODEL_PRICES = {
@@ -384,17 +370,16 @@ export default async function handler(req, res) {
       gemini: { label: 'Gemini Pro',    price: 1.25 },
       llama:  { label: 'Llama 70B',     price: 0.59 },
     };
-    const modelCfg   = MODEL_PRICES[rawModel] || MODEL_PRICES.claude;
+    const modelCfg      = MODEL_PRICES[rawModel] || MODEL_PRICES.claude;
     const allowedLevels = plan === 'free' ? ['fast']
       : plan === 'plus' ? ['fast', 'balanced']
       : ['fast', 'balanced', 'deep'];
-    const level      = allowedLevels.includes(rawLevel) ? rawLevel : allowedLevels[allowedLevels.length - 1];
-    const systemPrompt = getSystemPrompt(level, plan, modelCfg);
+    const level         = allowedLevels.includes(rawLevel) ? rawLevel : allowedLevels[allowedLevels.length - 1];
+    const systemPrompt  = getSystemPrompt(level, plan, modelCfg);
 
     const results = await Promise.all(prompts.map(p => analyzePrompt(p, anthropicKey, systemPrompt)));
     const now     = new Date();
 
-    // ── Update usage counters ──────────────────────────────
     let updatePayload = {};
 
     if (plan === 'free') {
@@ -424,21 +409,19 @@ export default async function handler(req, res) {
 
     await supabase.from('users').update(updatePayload).eq('id', user.id);
 
-    // ── Save to history for pro users ──────────────────────
     if (plan === 'pro') {
       const historyRows = results.map((r, i) => ({
-        user_id:          user.id,
-        prompt:           prompts[i],
-        estimated_tokens: r.estimated_tokens,
-        efficient_tokens: r.efficient_tokens,
-        savings_percent:  r.savings_percent,
-        efficient_prompt: r.efficient_prompt,
+        user_id:           user.id,
+        prompt:            prompts[i],
+        estimated_tokens:  r.estimated_tokens,
+        efficient_tokens:  r.efficient_tokens,
+        savings_percent:   r.savings_percent,
+        efficient_prompt:  r.efficient_prompt,
         cost_estimate_usd: r.cost_estimate_usd,
-        saved:            false
+        saved:             false
       }));
       await supabase.from('prompt_history').insert(historyRows);
 
-      // Enforce 100 entry cap — delete oldest entries beyond the limit
       const { data: oldest } = await supabase
         .from('prompt_history')
         .select('id')
@@ -453,10 +436,9 @@ export default async function handler(req, res) {
       }
     }
 
-    // ── Build usage summary ────────────────────────────────
     let usage = { plan };
     if (plan === 'free') {
-      const newUsed = (updatePayload.analyses_today);
+      const newUsed = updatePayload.analyses_today;
       usage = { plan, used: newUsed, limit: LIMITS.free.daily, remaining: Math.max(0, LIMITS.free.daily - newUsed), period: 'day' };
     }
     if (plan === 'plus') {
@@ -468,12 +450,7 @@ export default async function handler(req, res) {
       usage = { plan, used: newUsed, limit: LIMITS.pro.monthly, remaining: Math.max(0, LIMITS.pro.monthly - newUsed), period: 'month' };
     }
 
-    // ── Restrict output by plan ────────────────────────────
-    const processedResults = results.map((r, i) => {
-      return { ...r, priority: plan === 'pro' };
-    });
-
-    // Single prompt returns object, batch returns array
+    const processedResults = results.map((r) => ({ ...r, priority: plan === 'pro' }));
     const responseData = batchSize === 1 ? processedResults[0] : processedResults;
     return res.status(200).json({ results: responseData, usage, batch: batchSize > 1, level });
 
