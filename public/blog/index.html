@@ -46,6 +46,50 @@ footer{border-top:1px solid var(--border);padding:2rem 1.5rem;background:var(--w
 .footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--dim);}
 .footer-inner a{color:var(--dim);}
 .footer-inner a:hover{color:var(--muted);}
+
+[data-theme="dark"]{--bg:rgb(22,24,38);--white:rgb(30,32,48);--surface2:rgb(38,40,58);--border:rgb(52,55,78);--border2:rgb(68,72,100);--text:rgb(232,231,220);--muted:rgb(160,162,185);--dim:rgb(110,112,140);--accent:rgb(123,166,146);--accent-dark:rgb(95,138,118);}
+[data-theme="dark"] body{background:linear-gradient(160deg,rgb(22,24,38) 0%,rgb(18,20,32) 100%);}
+[data-theme="dark"] nav,[data-theme="dark"] footer,[data-theme="dark"] .mobile-menu{background:rgb(28,30,46);}
+[data-theme="dark"] .post-card,[data-theme="dark"] .compare-box,[data-theme="dark"] .waste-card,
+[data-theme="dark"] .cta-box,[data-theme="dark"] .price-card,[data-theme="dark"] .prompt-example,
+[data-theme="dark"] .note{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] table th{background:var(--surface2);}
+[data-theme="dark"] table td{border-color:var(--border);}
+[data-theme="dark"] table tr:hover td{background:var(--surface2);}
+.dark-toggle-float{position:fixed;bottom:1.5rem;left:1.5rem;z-index:200;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:6px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:12px;font-weight:500;color:var(--muted);font-family:'Geist',sans-serif;user-select:none;transition:all 0.15s;}
+.dark-toggle-float:hover{border-color:var(--accent);color:var(--text);}
+.dark-toggle-track{width:28px;height:16px;border-radius:99px;background:rgb(195,193,182);position:relative;transition:background 0.2s;flex-shrink:0;}
+.dark-toggle-track.on{background:var(--accent);}
+.dark-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:white;transition:transform 0.2s;}
+.dark-toggle-track.on .dark-toggle-thumb{transform:translateX(12px);}
+@media(max-width:640px){.dark-toggle-float{display:none;}}
+.mobile-dark-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;border-radius:8px;user-select:none;}
+.mobile-dark-toggle:hover{background:var(--surface2);}
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;position:absolute;top:60px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:99;padding:0.75rem 1.25rem 1rem;}
+.mobile-menu.open{display:block;}
+.mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:8px;border:none;background:none;font-family:'Geist',sans-serif;cursor:pointer;transition:background 0.15s;}
+.mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface2);}
+.mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
+@media(max-width:640px){
+  .nav-links{display:none!important;}
+  .nav-right>*{display:none!important;}
+  .nav-right>.hamburger,.hamburger{display:flex!important;}
+  .nav-inner{grid-template-columns:1fr auto!important;}
+  .nav-right{justify-content:flex-end;}
+  .page,.article-wrap{padding:2rem 1.25rem 3rem!important;}
+  h1{font-size:24px!important;}
+  .compare{grid-template-columns:1fr!important;}
+  .prompt-stats{grid-template-columns:1fr 1fr!important;}
+  table{font-size:12px;display:block;overflow-x:auto;}
+  .posts{gap:1rem;}
+  .post-card{padding:1.25rem;}
+  .cta-box{padding:1.5rem;}
+}
 </style>
 </head>
 <body>
@@ -58,9 +102,22 @@ footer{border-top:1px solid var(--border);padding:2rem 1.5rem;background:var(--w
       <a class="nav-link" href="/extension">Extension</a>
       <a class="nav-link active" href="/blog">Blog</a>
     </div>
-    <div class="nav-right"><a class="btn-nav" href="/app">Try free →</a></div>
+    <div class="nav-right" style="display:flex;align-items:center;gap:8px;justify-content:flex-end;">
+      <a class="btn-nav" href="/app">Try free</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
   </div>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="/app">Analyzer</a>
+  <a href="/challenge">Challenge</a>
+  <a href="/extension">Extension</a>
+  <a href="/blog">Blog</a>
+  <div class="mobile-menu-divider"></div>
+  <div class="mobile-dark-toggle" onclick="toggleDark()"><span>Dark mode</span><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div></div>
+  <div class="mobile-menu-divider"></div>
+  <a href="/app" style="color:var(--accent);font-weight:600;">Try TokenLens free</a>
+</div>
 
 <div class="page">
   <div class="blog-header">
@@ -101,5 +158,14 @@ footer{border-top:1px solid var(--border);padding:2rem 1.5rem;background:var(--w
     <div style="display:flex;gap:16px;"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/support">Support</a><a href="/app">Try TokenLens free →</a></div>
   </div>
 </footer>
+<div class="dark-toggle-float" onclick="toggleDark()"><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div><span class="dark-toggle-label">Dark</span></div>
+<script>
+function initDarkMode(){const s=localStorage.getItem('tl_theme');if(s==='dark')document.documentElement.setAttribute('data-theme','dark');updateDarkUI();}
+function applyDark(on){document.documentElement.setAttribute('data-theme',on?'dark':'light');localStorage.setItem('tl_theme',on?'dark':'light');updateDarkUI();}
+function toggleDark(){applyDark(document.documentElement.getAttribute('data-theme')!=='dark');}
+function updateDarkUI(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.querySelectorAll('.dark-toggle-track').forEach(t=>t.classList.toggle('on',d));document.querySelectorAll('.dark-toggle-label').forEach(l=>l.textContent=d?'Light':'Dark');}
+function toggleMobileMenu(){const m=document.getElementById('mobile-menu');const b=document.getElementById('hamburger');if(!m||!b)return;const o=m.classList.toggle('open');b.classList.toggle('open',o);}
+initDarkMode();
+</script>
 </body>
 </html>
