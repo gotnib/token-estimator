@@ -1,10 +1,15 @@
 User-agent: *
 Allow: /
 Allow: /api/config
+
+# Auth-required pages — no value for Google to index
 Disallow: /admin
 Disallow: /account
 Disallow: /library
+Disallow: /home
 Disallow: /reset
+
+# API endpoints
 Disallow: /api/
 
 Sitemap: https://tokenlens.live/sitemap.xml
