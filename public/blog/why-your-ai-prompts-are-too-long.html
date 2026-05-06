@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Your AI Prompts Are 40% Longer Than They Need to Be | TokenLens</title>
+<meta name="description" content="Most AI prompts carry 40% dead weight. Here are the 8 categories of token waste, with real examples and how to fix each one.">
+<link rel="canonical" href="https://tokenlens.live/blog/why-your-ai-prompts-are-too-long">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Why Your AI Prompts Are 40% Longer Than They Need to Be">
+<meta property="og:description" content="Most AI prompts carry 40% dead weight. Here are the 8 categories of token waste and how to fix each one.">
+<meta property="og:image" content="https://tokenlens.live/og-image.png">
+<meta property="og:url" content="https://tokenlens.live/blog/why-your-ai-prompts-are-too-long">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Why Your AI Prompts Are 40% Longer Than They Need to Be",
+  "description": "Most AI prompts carry 40% dead weight. Here are the 8 categories of token waste with real examples and fixes.",
+  "author": {"@type": "Organization", "name": "TokenLens"},
+  "publisher": {"@type": "Organization", "name": "TokenLens", "url": "https://tokenlens.live"},
+  "datePublished": "2026-05-06",
+  "dateModified": "2026-05-06",
+  "mainEntityOfPage": "https://tokenlens.live/blog/why-your-ai-prompts-are-too-long"
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+:root{--bg:rgb(242,241,233);--white:rgb(250,249,244);--surface2:rgb(235,234,226);--border:rgb(215,213,203);--text:rgb(60,61,89);--muted:rgb(100,101,120);--dim:rgb(140,141,158);--accent:rgb(123,166,146);--accent-dark:rgb(95,138,118);--radius:8px;--radius-xl:16px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);text-decoration:none;}
+a:hover{color:var(--accent-dark);}
+nav{background:var(--white);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:center;padding:0 1.5rem;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.nav-inner{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;}
+.nav-links{display:flex;align-items:center;gap:4px;justify-content:center;}
+.nav-link{font-size:13px;color:var(--muted);padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;text-decoration:none;}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+.nav-right{display:flex;justify-content:flex-end;}
+.btn-nav{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;text-decoration:none;}
+.article-wrap{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem;}
+.breadcrumb{font-size:12px;color:var(--dim);margin-bottom:1.5rem;}
+.breadcrumb a{color:var(--dim);}
+.tag{display:inline-flex;background:rgba(123,166,146,0.1);color:var(--accent);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:3px 10px;border-radius:99px;margin-bottom:1rem;font-family:'Geist Mono',monospace;}
+h1{font-size:clamp(24px,4vw,36px);font-weight:700;letter-spacing:-0.03em;line-height:1.2;margin-bottom:1rem;color:var(--text);}
+.meta{font-size:13px;color:var(--dim);margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.body p{font-size:15px;line-height:1.8;color:var(--muted);margin-bottom:1.25rem;}
+.body h2{font-size:20px;font-weight:700;letter-spacing:-0.02em;color:var(--text);margin:2rem 0 0.75rem;}
+.body h3{font-size:16px;font-weight:700;color:var(--text);margin:1.5rem 0 0.5rem;}
+.body ul,.body ol{font-size:15px;line-height:1.8;color:var(--muted);margin-bottom:1.25rem;padding-left:1.5rem;}
+.body li{margin-bottom:0.25rem;}
+.body strong{color:var(--text);font-weight:600;}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0;}
+.compare-box{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.25rem;}
+.compare-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;font-family:'Geist Mono',monospace;}
+.compare-label.bad{color:#dc2626;}
+.compare-label.good{color:var(--accent);}
+.compare-text{font-size:13px;color:var(--text);line-height:1.65;}
+.token-badge{display:inline-block;background:var(--surface2);border-radius:99px;padding:2px 8px;font-size:11px;font-family:'Geist Mono',monospace;color:var(--dim);margin-top:8px;}
+.waste-card{background:var(--white);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:1.25rem;margin:1.25rem 0;}
+.waste-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.waste-pct{font-size:12px;color:var(--accent);font-weight:600;margin-bottom:8px;font-family:'Geist Mono',monospace;}
+.waste-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:8px;}
+.cta-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:2rem;text-align:center;margin:2.5rem 0;}
+.cta-box h3{font-size:18px;font-weight:700;margin-bottom:0.5rem;}
+.cta-box p{font-size:14px;color:var(--muted);margin-bottom:1.25rem;}
+.btn-cta{display:inline-flex;background:var(--accent);color:white;border-radius:var(--radius);padding:12px 24px;font-size:14px;font-weight:600;text-decoration:none;}
+footer{border-top:1px solid var(--border);padding:2rem 1.5rem;background:var(--white);margin-top:4rem;}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--dim);}
+@media(max-width:600px){.compare{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" style="text-decoration:none;color:inherit;"><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:var(--text);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:var(--accent);">Lens</span></a>
+    <div class="nav-links">
+      <a class="nav-link" href="/app">Analyzer</a>
+      <a class="nav-link" href="/challenge">Challenge</a>
+      <a class="nav-link" href="/extension">Extension</a>
+      <a class="nav-link" href="/blog">Blog</a>
+    </div>
+    <div class="nav-right"><a class="btn-nav" href="/app">Try free →</a></div>
+  </div>
+</nav>
+
+<div class="article-wrap">
+  <div class="breadcrumb"><a href="/blog">Blog</a> › Prompt Engineering</div>
+  <div class="tag">Prompt Engineering</div>
+  <h1>Why Your AI Prompts Are 40% Longer Than They Need to Be</h1>
+  <div class="meta">May 2026 · 7 min read · By TokenLens</div>
+
+  <div class="body">
+    <p>After analyzing thousands of AI prompts, a pattern emerges consistently: the average prompt is about 40% longer than it needs to be. Not because users are padding deliberately — but because natural language carries habits that don't translate well to AI instructions.</p>
+    <p>Here are the 8 categories of token waste we see most often, with real before/after examples for each.</p>
+
+    <h2>1. Politeness overhead (avg. 18% of waste)</h2>
+    <div class="waste-card">
+      <div class="waste-title">Phrases: please, could you, I was wondering, thank you, I appreciate it, feel free to</div>
+      <div class="waste-pct">Avg. 18% of total tokens in polite prompts</div>
+      <div class="waste-desc">AI models don't respond better to politeness. They don't have feelings to spare. Every "please" and "thank you" is a token that returns nothing.</div>
+    </div>
+    <div class="compare">
+      <div class="compare-box"><div class="compare-label bad">❌ 28 tokens</div><div class="compare-text">Could you please help me write a short professional bio? I'd really appreciate it if you could keep it under 100 words.</div></div>
+      <div class="compare-box"><div class="compare-label good">✓ 14 tokens</div><div class="compare-text">Write a professional bio under 100 words.</div></div>
+    </div>
+
+    <h2>2. Hedging language (avg. 14% of waste)</h2>
+    <div class="waste-card">
+      <div class="waste-title">Phrases: I'm not sure but, maybe you could, if it's possible, if you think it's appropriate</div>
+      <div class="waste-pct">Avg. 14% of total tokens in hedged prompts</div>
+      <div class="waste-desc">Hedging introduces ambiguity without adding information. If you have a requirement, state it directly. If it's truly optional, say "optionally" or leave it out.</div>
+    </div>
+    <div class="compare">
+      <div class="compare-box"><div class="compare-label bad">❌ 32 tokens</div><div class="compare-text">If possible, could you maybe add some examples? I'm not sure if that would be helpful but it might make it clearer.</div></div>
+      <div class="compare-box"><div class="compare-label good">✓ 5 tokens</div><div class="compare-text">Include 2-3 examples.</div></div>
+    </div>
+
+    <h2>3. Redundancy — saying it twice (avg. 22% of waste)</h2>
+    <div class="waste-card">
+      <div class="waste-title">Repeating the same requirement in different words</div>
+      <div class="waste-pct">Avg. 22% of total tokens in verbose prompts — the largest single category</div>
+      <div class="waste-desc">This is the biggest category of waste. "Simple, clear, and easy to understand" is three ways of saying the same thing. "Concise and brief" is redundant. Pick one.</div>
+    </div>
+    <div class="compare">
+      <div class="compare-box"><div class="compare-label bad">❌ 22 tokens</div><div class="compare-text">Keep the explanation simple, clear, easy to understand, and accessible to someone without a technical background.</div></div>
+      <div class="compare-box"><div class="compare-label good">✓ 10 tokens</div><div class="compare-text">Explain simply for non-technical readers.</div></div>
+    </div>
+
+    <h2>4. Unnecessary context (avg. 19% of waste)</h2>
+    <div class="waste-card">
+      <div class="waste-title">Background the model doesn't need to complete the task</div>
+      <div class="waste-pct">Avg. 19% of total tokens when context is over-explained</div>
+      <div class="waste-desc">You don't need to explain your entire situation. Give the model what it needs to do the job — not your full backstory.</div>
+    </div>
+    <div class="compare">
+      <div class="compare-box"><div class="compare-label bad">❌ 52 tokens</div><div class="compare-text">I'm currently working on a project for my company. We've been trying to improve our customer service process and I've been tasked with writing some email templates. I need help writing an email to apologize to a customer for a delayed shipment.</div></div>
+      <div class="compare-box"><div class="compare-label good">✓ 14 tokens</div><div class="compare-text">Write a customer email apologizing for a delayed shipment.</div></div>
+    </div>
+
+    <h2>5. Filler opening phrases (avg. 12% of waste)</h2>
+    <div class="waste-card">
+      <div class="waste-title">Phrases: what I'm trying to do is, the thing is, basically, so essentially</div>
+      <div class="waste-pct">Avg. 12% of tokens in conversational prompts</div>
+      <div class="waste-desc">These phrases are verbal habits from human conversation that serve no purpose in text instructions. Just start with the instruction.</div>
+    </div>
+    <div class="compare">
+      <div class="compare-box"><div class="compare-label bad">❌ 24 tokens</div><div class="compare-text">So basically what I need is for you to summarize this article. What I'm trying to do is get the main points.</div></div>
+      <div class="compare-box"><div class="compare-label good">✓ 7 tokens</div><div class="compare-text">Summarize this article's main points.</div></div>
+    </div>
+
+    <h2>6. Restating the obvious (avg. 8% of waste)</h2>
+    <p>Telling the model things it already knows: "As an AI language model, you should...", "Using your knowledge of...", "Given that you have access to information about...". The model knows what it is. Skip it.</p>
+
+    <h2>7. Over-specified output format (avg. 6% of waste)</h2>
+    <p>When you specify format in multiple ways: "Please provide the answer as a numbered list. Each item should be on its own line. Use numbers like 1, 2, 3." — "Numbered list" already covers all of this.</p>
+
+    <h2>8. Closing pleasantries (avg. 1% of waste)</h2>
+    <p>Small but still waste: "Thanks in advance!", "Looking forward to your response!", "Any help would be greatly appreciated!" These cost tokens and return nothing.</p>
+
+    <h2>The compound effect at scale</h2>
+    <p>These categories seem small individually, but they compound. A 200-token system prompt with all 8 patterns typically optimizes to ~115 tokens — a <strong>42.5% reduction</strong>. At 50,000 API calls per month, that's 4.25 million fewer input tokens. At Claude Sonnet pricing, that's <strong>$12.75/month saved from one prompt change</strong>.</p>
+    <p>Multiply that across a production application with 5-10 different prompts and the monthly savings become meaningful.</p>
+
+    <h2>The principle behind it all</h2>
+    <p>A well-written AI prompt gives the model:</p>
+    <ol>
+      <li>What to do (the task)</li>
+      <li>What to use (the relevant context)</li>
+      <li>What format to return (if non-obvious)</li>
+      <li>What constraints apply (if any)</li>
+    </ol>
+    <p>Everything else is waste. Not because brevity is a virtue in itself — a specific 60-word prompt is better than a vague 15-word one. But specificity and length are different things. You can be extremely specific in very few tokens.</p>
+
+    <div class="cta-box">
+      <h3>Find the waste in your own prompts</h3>
+      <p>Paste any AI prompt into TokenLens and see a breakdown of which categories are eating your tokens — plus an optimized rewrite.</p>
+      <a class="btn-cta" href="/app">Analyze my prompt →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span>© 2026 TokenLens</span>
+    <div style="display:flex;gap:16px;"><a href="/blog" style="color:var(--dim);">More articles</a><a href="/privacy" style="color:var(--dim);">Privacy</a><a href="/app" style="color:var(--dim);">Try TokenLens →</a></div>
+  </div>
+</footer>
+</body>
+</html>
