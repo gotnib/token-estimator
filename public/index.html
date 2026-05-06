@@ -94,7 +94,6 @@
 }
 </script>
 
-<!-- Structured Data: FAQPage -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -105,7 +104,15 @@
       "name": "What is a prompt token estimator?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "A prompt token estimator analyzes your AI prompt and tells you how many tokens it will consume, what it will cost to run, and which parts of your prompt are using the most tokens. TokenLens breaks your prompt down by category and provides an optimized rewrite that achieves the same result with fewer tokens."
+        "text": "A prompt token estimator analyzes your AI prompt and tells you how many tokens it will consume when sent to an AI model like Claude or GPT-4o. TokenLens breaks your prompt down by category — core instruction, context, filler, politeness overhead — and provides an optimized rewrite that achieves the same result with fewer tokens and lower cost."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many tokens does my Claude prompt use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can find out exactly by pasting your prompt into TokenLens. As a rough guide, 1 token is approximately 4 characters or 0.75 words in English. A typical system prompt runs 200-800 tokens. TokenLens gives you a precise count, broken down by category, so you know exactly what is and isn't necessary."
       }
     },
     {
@@ -113,31 +120,31 @@
       "name": "How can I reduce my AI prompt token usage?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "You can reduce token usage by removing politeness overhead, eliminating redundant context, tightening phrasing, and specifying your output format precisely. TokenLens analyzes your prompt and provides an optimized version automatically, with explanations of each change."
+        "text": "The biggest token savings come from removing politeness overhead (please, could you, as an AI), eliminating redundant context that repeats the same point twice, tightening verbose phrasing into direct instructions, and specifying your output format precisely. TokenLens analyzes your specific prompt and provides an optimized version automatically, with explanations of each change so you learn the principles."
       }
     },
     {
       "@type": "Question",
-      "name": "How much does it cost to use TokenLens?",
+      "name": "What does the Claude API cost per token?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "TokenLens offers a free plan with 5 analyses per day. Paid plans start at $9/month for Plus (120 analyses/month) and $29/month for Pro (high volume with batch optimization, prompt library, and priority processing)."
+        "text": "As of 2026, Claude Sonnet costs $3.00 per million input tokens and $15.00 per million output tokens. GPT-4o costs $2.50 per million input tokens. TokenLens calculates the exact cost of your prompt at current pricing and shows you how much you can save with an optimized version."
       }
     },
     {
       "@type": "Question",
-      "name": "Does TokenLens work with Claude, ChatGPT, and other AI models?",
+      "name": "Does TokenLens work with ChatGPT, Gemini, and other AI models?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. TokenLens analyzes any AI prompt regardless of which model you intend to use it with. Cost estimates are based on Anthropic Claude Sonnet pricing, but the token breakdown and optimization principles apply universally across all major LLMs."
+        "text": "Yes. TokenLens analyzes any AI prompt regardless of which model you intend to use it with. Cost estimates are available for Claude Sonnet ($3/1M tokens), GPT-4o ($2.50/1M tokens), Gemini Pro ($1.25/1M tokens), and Llama 70B ($0.59/1M tokens). The token breakdown and optimization principles apply universally."
       }
     },
     {
       "@type": "Question",
-      "name": "Are my prompts stored or used for training?",
+      "name": "How much does TokenLens cost?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. Prompts submitted by Free and Plus users are not stored after analysis. Pro users' prompts are stored only to power the Library feature and can be deleted at any time. No prompts are ever used for AI training."
+        "text": "TokenLens has a free plan with 5 analyses per day — no credit card required. The Plus plan is $9/month (120 analyses, balanced optimization, 5 challenges/day). The Pro plan is $29/month (high volume, all optimization modes including code optimization, unlimited challenges, batch mode, prompt library)."
       }
     }
   ]
@@ -535,6 +542,20 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 [data-theme="dark"] span[style*="color:rgb(60,61,89)"] { color: rgb(232,231,220) !important; }
 </style>
 <script defer src="/_vercel/insights/script.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "TokenLens",
+  "url": "https://tokenlens.live",
+  "description": "AI prompt token analyzer and optimizer",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://tokenlens.live/app",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
 </head>
 <body>
 
@@ -861,6 +882,7 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
       <a href="#">About</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
+      <a href="/blog">Blog</a>
       <a href="https://anthropic.com" target="_blank">Powered by Anthropic</a>
     </div>
   </div>
