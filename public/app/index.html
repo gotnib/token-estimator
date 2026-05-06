@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TokenLens App — Analyze & Optimize AI Prompts</title>
-<meta name="description" content="Paste any AI prompt and instantly get a token breakdown, cost estimate, optimization score, and a leaner rewrite. Free to start — no credit card needed.">
+<title>AI Prompt Token Analyzer — TokenLens</title>
+<meta name="description" content="Paste any AI prompt and instantly see its token count, cost estimate, and an optimized rewrite. Supports Claude, GPT-4o, Gemini, and Llama 70B pricing.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://tokenlens.live/app">
 <meta property="og:type" content="website">
@@ -345,6 +345,7 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
     <a class="nav-link" href="/challenge">Challenge</a>
     <a class="nav-link" href="/library" id="nav-library" style="display:none">Library</a>
     <a class="nav-link" href="/extension">Extension</a>
+    <a class="nav-link" href="/blog">Blog</a>
     <a class="nav-link" href="/account">Account</a>
   </div>
   <div class="nav-right">
@@ -383,6 +384,19 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
     <p class="hero-sub">Get a token breakdown, cost estimate, and a leaner rewrite — instantly.</p>
   </div>
   <div id="app-body"></div>
+  <!-- Static SEO content — indexed by Google, hidden after JS loads -->
+  <div id="seo-content" style="max-width:800px;margin:3rem auto;padding:0 1.5rem;">
+    <h1 style="font-size:28px;font-weight:700;color:var(--text);margin-bottom:1rem;">AI Prompt Token Analyzer</h1>
+    <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;">TokenLens analyzes any AI prompt and shows you exactly where your tokens are going. Get an instant token count, cost estimate across Claude, GPT-4o, Gemini, and Llama 70B, and an optimized rewrite that cuts waste without losing meaning.</p>
+    <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:0.75rem;">What the analyzer shows you</h2>
+    <ul style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem;padding-left:1.25rem;">
+      <li>Token breakdown by category: core instruction, context, filler, politeness overhead, redundancy</li>
+      <li>Cost estimate at current API pricing — Claude Sonnet, GPT-4o, Gemini Pro, Llama 70B</li>
+      <li>Optimized rewrite with same intent, fewer tokens</li>
+      <li>Score card: clarity, conciseness, structure, specificity</li>
+      <li>Learning notes explaining each change — not just what was cut, but why</li>
+    </ul>
+  </div>
 </div>
 
 <footer>
@@ -559,6 +573,8 @@ async function init() {
 }
 
 async function onLoggedIn() {
+  const seo = document.getElementById('seo-content');
+  if (seo) seo.style.display = 'none';
   closeModal();
   document.getElementById('btn-login').style.display = 'none';
   document.getElementById('btn-signup').style.display = 'none';
