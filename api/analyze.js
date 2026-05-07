@@ -26,11 +26,10 @@ async function checkRateLimit(userId, plan) {
   }
 }
 
-// ── Fix #3: Demo rate limit via Upstash (not in-memory) ───
 async function checkDemoRateLimit(ip) {
   const url   = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return { allowed: true }; // fail open if not configured
+  if (!url || !token) return { allowed: true };
 
   const key = `demo:${ip}`;
   try {
@@ -158,11 +157,10 @@ function getSystemPrompt(level, plan, modelCfg) {
   return promptWithPricing(SYSTEM_PROMPTS[level] || SYSTEM_PROMPTS.balanced);
 }
 
-// ── Fix #2: Sanitize input before sending to Claude ───────
 function sanitizePrompt(input) {
   return input
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '') // strip control chars
-    .replace(/<script[\s\S]*?<\/script>/gi, '')                              // strip script tags
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
     .trim();
 }
 
@@ -194,7 +192,6 @@ async function analyzePrompt(prompt, apiKey, systemPrompt) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      // Fix #9: Don't expose raw API error messages to client
       console.error('Anthropic API error:', err);
       throw new Error('Analysis service error. Please try again.');
     }
@@ -242,6 +239,76 @@ function resetIn(startAt, windowDays) {
   return `${mins}m`;
 }
 
+// ── Tracker provider config ───────────────────────────────────────────
+// Used by the extension's live tracker tab. Proxied here to avoid
+// CORS restrictions on direct browser-to-provider API calls.
+const TRACKER_PROVIDERS = {
+  anthropic: {
+    endpoint: 'https://api.anthropic.com/v1/messages',
+    buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' }),
+    buildBody: (messages, model) => JSON.stringify({ model, max_tokens: 4096, messages }),
+    parseUsage: (data) => ({
+      input:      data.usage?.input_tokens ?? 0,
+      output:     data.usage?.output_tokens ?? 0,
+      cacheWrite: data.usage?.cache_creation_input_tokens ?? 0,
+      cacheRead:  data.usage?.cache_read_input_tokens ?? 0,
+    }),
+    extractText: (data) => (data.content || []).map(c => c.text || '').join(''),
+  },
+  openai: {
+    endpoint: 'https://api.openai.com/v1/chat/completions',
+    buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }),
+    buildBody: (messages, model) => JSON.stringify({ model, messages }),
+    parseUsage: (data) => ({
+      input:      (data.usage?.prompt_tokens ?? 0) - (data.usage?.prompt_tokens_details?.cached_tokens ?? 0),
+      output:     data.usage?.completion_tokens ?? 0,
+      cacheWrite: 0,
+      cacheRead:  data.usage?.prompt_tokens_details?.cached_tokens ?? 0,
+    }),
+    extractText: (data) => data.choices?.[0]?.message?.content || '',
+  },
+  gemini: {
+    buildEndpoint: (model) => `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+    buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'x-goog-api-key': key }),
+    buildBody: (messages) => JSON.stringify({
+      contents: messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }))
+    }),
+    parseUsage: (data) => ({
+      input:      data.usageMetadata?.promptTokenCount ?? 0,
+      output:     data.usageMetadata?.candidatesTokenCount ?? 0,
+      cacheWrite: 0,
+      cacheRead:  data.usageMetadata?.cachedContentTokenCount ?? 0,
+    }),
+    extractText: (data) => (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join(''),
+  },
+  perplexity: {
+    endpoint: 'https://api.perplexity.ai/chat/completions',
+    buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }),
+    buildBody: (messages, model) => JSON.stringify({ model, messages }),
+    parseUsage: (data) => ({ input: data.usage?.prompt_tokens ?? 0, output: data.usage?.completion_tokens ?? 0, cacheWrite: 0, cacheRead: 0 }),
+    extractText: (data) => data.choices?.[0]?.message?.content || '',
+  },
+  mistral: {
+    endpoint: 'https://api.mistral.ai/v1/chat/completions',
+    buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }),
+    buildBody: (messages, model) => JSON.stringify({ model, messages }),
+    parseUsage: (data) => ({ input: data.usage?.prompt_tokens ?? 0, output: data.usage?.completion_tokens ?? 0, cacheWrite: 0, cacheRead: 0 }),
+    extractText: (data) => data.choices?.[0]?.message?.content || '',
+  },
+  groq: {
+    endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+    buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }),
+    buildBody: (messages, model) => JSON.stringify({ model, messages }),
+    parseUsage: (data) => ({
+      input:      data.usage?.prompt_tokens ?? 0,
+      output:     data.usage?.completion_tokens ?? 0,
+      cacheWrite: 0,
+      cacheRead:  data.usage?.prompt_tokens_details?.cached_tokens ?? 0,
+    }),
+    extractText: (data) => data.choices?.[0]?.message?.content || '',
+  },
+};
+
 export const config = { maxDuration: 30 };
 
 const DEMO_SYSTEM = `You are a prompt efficiency expert. Analyze the given prompt and return ONLY valid JSON:
@@ -262,22 +329,19 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Fix #8: Guard against empty body
   if (!req.body) return res.status(400).json({ error: 'Empty request body.' });
 
-  // ── Demo path — no auth required ──────────────────────────
+  // ── Demo path ─────────────────────────────────────────────────────────
   if (req.body?.demo === true) {
     const ip = (req.headers['x-forwarded-for']?.split(',')[0]?.trim()
       || req.headers['x-real-ip']
       || 'unknown');
 
-    // Fix #3: Use Upstash for demo rate limiting instead of in-memory
     const demoRl = await checkDemoRateLimit(ip);
     if (!demoRl.allowed) {
       return res.status(429).json({ error: 'One demo per hour. Sign up free for unlimited access.' });
     }
 
-    // Fix #2: Sanitize demo input
     const raw    = (req.body.prompt || '').slice(0, 500);
     const prompt = sanitizePrompt(raw);
     if (prompt.length < 10) return res.status(400).json({ error: 'Prompt too short' });
@@ -303,16 +367,15 @@ export default async function handler(req, res) {
       return res.status(200).json({ result });
     } catch(err) {
       if (err.name === 'AbortError') return res.status(504).json({ error: 'Timed out — try a shorter prompt' });
-      // Fix #9: Don't expose internal errors
       console.error('Demo analysis error:', err.message);
       return res.status(500).json({ error: 'Analysis failed. Please try again.' });
     }
   }
 
-  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  // ── Shared auth for tracker + analyze paths ───────────────────────────
   const supabaseUrl  = process.env.SUPABASE_URL;
   const supabaseKey  = process.env.SUPABASE_ANON_KEY;
-  if (!anthropicKey || !supabaseUrl || !supabaseKey) return res.status(500).json({ error: 'Server misconfiguration.' });
+  if (!supabaseUrl || !supabaseKey) return res.status(500).json({ error: 'Server misconfiguration.' });
 
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ error: 'Not logged in.' });
@@ -325,7 +388,62 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Invalid session. Please log in again.' });
 
-  // Fix #1: Use service key for atomic counter updates to avoid race conditions
+  // ── Tracker proxy path — Pro only ─────────────────────────────────────
+  if (req.body?.track === true) {
+    const { data: profile } = await supabase
+      .from('users').select('plan, deactivated').eq('id', user.id).single();
+
+    if (profile?.deactivated) return res.status(403).json({ error: 'Account deactivated.' });
+    if (profile?.plan !== 'pro') return res.status(403).json({ error: 'Live tracker is a Pro feature.' });
+
+    const { provider, model, messages, apiKey } = req.body;
+    if (!provider || !model || !messages || !apiKey)
+      return res.status(400).json({ error: 'Missing required fields.' });
+
+    const cfg = TRACKER_PROVIDERS[provider];
+    if (!cfg) return res.status(400).json({ error: 'Unsupported provider: ' + provider });
+    if (!Array.isArray(messages) || !messages.length)
+      return res.status(400).json({ error: 'messages must be a non-empty array.' });
+    if (typeof apiKey !== 'string' || apiKey.length < 10)
+      return res.status(400).json({ error: 'Invalid API key format.' });
+
+    try {
+      const endpoint = cfg.buildEndpoint ? cfg.buildEndpoint(model) : cfg.endpoint;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 25000);
+
+      const provRes = await fetch(endpoint, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: cfg.buildHeaders(apiKey),
+        body: cfg.buildBody(messages, model),
+      });
+      clearTimeout(timeout);
+
+      if (!provRes.ok) {
+        const errData = await provRes.json().catch(() => ({}));
+        const msg = errData.error?.message || errData.message || ('Provider error ' + provRes.status);
+        if (provRes.status === 401) return res.status(400).json({ error: 'Invalid API key for ' + provider + '. Check your key in the Tracker tab.' });
+        if (provRes.status === 429) return res.status(429).json({ error: 'Rate limited by ' + provider + '. Try again shortly.' });
+        return res.status(400).json({ error: msg });
+      }
+
+      const data  = await provRes.json();
+      const usage = cfg.parseUsage(data);
+      const text  = cfg.extractText(data);
+      return res.status(200).json({ usage, text, provider, model });
+
+    } catch (err) {
+      if (err.name === 'AbortError') return res.status(504).json({ error: provider + ' request timed out.' });
+      console.error('Tracker proxy error:', err.message);
+      return res.status(500).json({ error: 'Proxy error. Please try again.' });
+    }
+  }
+
+  // ── Main analyze path ─────────────────────────────────────────────────
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (!anthropicKey) return res.status(500).json({ error: 'Server misconfiguration.' });
+
   const supabaseService = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_KEY || supabaseKey);
 
   const { data: profile, error: profileError } = await supabase
@@ -348,14 +466,12 @@ export default async function handler(req, res) {
     });
   }
 
-  // Fix #8: Guard prompts access safely
   const prompts = req.body.prompts || (req.body.prompt ? [req.body.prompt] : []);
 
   if (!prompts.length) return res.status(400).json({ error: 'No prompt provided.' });
   if (plan !== 'pro' && prompts.length > 1) return res.status(403).json({ error: 'Batch analysis is a Pro feature.' });
   if (prompts.length > 15) return res.status(400).json({ error: 'Maximum 15 prompts per batch.' });
 
-  // Fix #2: Sanitize all prompts
   const sanitizedPrompts = [];
   for (const p of prompts) {
     if (!p || typeof p !== 'string' || p.trim().length === 0) return res.status(400).json({ error: 'One or more prompts are empty.' });
@@ -366,9 +482,6 @@ export default async function handler(req, res) {
 
   const batchSize = sanitizedPrompts.length;
 
-  // ── Fix #1: Atomic usage check using Upstash to prevent race conditions ──
-  // Use Upstash as a distributed lock/counter for the critical check-and-increment
-  const usageKey = `usage:${user.id}:${plan}`;
   const upstashUrl   = process.env.UPSTASH_REDIS_REST_URL;
   const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
@@ -384,7 +497,6 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'limit_reached', plan, used: usedToday, limit: LIMITS.free.daily, resets_in: h > 0 ? `${h}h ${m}m` : `${m}m` });
     }
 
-    // Fix #1: Atomic increment via Upstash to prevent race condition
     if (upstashUrl && upstashToken) {
       const atomicKey = `atomic:free:${user.id}`;
       try {
@@ -400,7 +512,7 @@ export default async function handler(req, res) {
           return res.status(403).json({ error: 'limit_reached', plan, used: LIMITS.free.daily, limit: LIMITS.free.daily, resets_in: '24h' });
         }
       } catch(e) {
-        console.error('Atomic check error:', e.message); // fail open
+        console.error('Atomic check error:', e.message);
       }
     }
   }
@@ -436,7 +548,6 @@ export default async function handler(req, res) {
     const level = allowedLevels.includes(rawLevel) ? rawLevel : allowedLevels[allowedLevels.length - 1];
     const systemPrompt = getSystemPrompt(level, plan, modelCfg);
 
-    // Fix #5: Use allSettled so one failure doesn't kill the whole batch
     const settled = await Promise.allSettled(sanitizedPrompts.map(p => analyzePrompt(p, anthropicKey, systemPrompt)));
     const results = settled.map((s, i) => {
       if (s.status === 'fulfilled') return s.value;
@@ -460,7 +571,7 @@ export default async function handler(req, res) {
     if (plan === 'plus') {
       const { currentUsed, isExpired } = checkRollingWindow(profile.analyses_this_period, profile.period_start_at, 30);
       updatePayload = {
-        analyses_this_period: currentUsed + batchSize, // Fix #12: use batchSize for future-proofing
+        analyses_this_period: currentUsed + batchSize,
         period_start_at:      isExpired || !profile.period_start_at ? now.toISOString() : profile.period_start_at,
         last_analysis_at:     now.toISOString()
       };
@@ -475,10 +586,8 @@ export default async function handler(req, res) {
       };
     }
 
-    // Fix #1: Use service key for counter update to bypass RLS race window
     await supabaseService.from('users').update(updatePayload).eq('id', user.id);
 
-    // Fix #4: Efficient history cleanup — count first, delete only what's needed
     if (plan === 'pro') {
       const successResults = results.filter(r => !r.error);
       if (successResults.length > 0) {
@@ -494,7 +603,6 @@ export default async function handler(req, res) {
         }));
         await supabaseService.from('prompt_history').insert(historyRows);
 
-        // Fix #4: Count first, then delete only the excess
         const { count } = await supabaseService
           .from('prompt_history')
           .select('id', { count: 'exact', head: true })
@@ -536,7 +644,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ results: responseData, usage, batch: batchSize > 1, level });
 
   } catch (err) {
-    // Fix #9: Log internally, return generic message externally
     console.error('Analysis handler error:', err.message);
     return res.status(500).json({ error: err.message?.includes('failed') ? err.message : 'Unexpected server error. Please try again.' });
   }
