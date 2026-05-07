@@ -304,7 +304,7 @@ function renderDashboard(data) {
       <div class="stat-card">
         <div class="stat-card-label">Total users</div>
         <div class="stat-card-value">${s.total.toLocaleString()}</div>
-        <div class="stat-card-sub">${s.deactivated} deactivated</div>
+        <div class="stat-card-sub">${s.active} active · ${s.deactivated} deactivated</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-label">Active today</div>
@@ -312,9 +312,9 @@ function renderDashboard(data) {
         <div class="stat-card-sub">${s.activeWeek} this week</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-label">Avg analyses / active user</div>
-        <div class="stat-card-value">${s.avgAnalysesPerActiveUser}</div>
-        <div class="stat-card-sub">per active user this week</div>
+        <div class="stat-card-label">Free avg analyses/day</div>
+        <div class="stat-card-value">${s.avgFreeAnalysesPerUser}</div>
+        <div class="stat-card-sub">free users · daily counter</div>
       </div>
     </div>
 
@@ -343,9 +343,9 @@ function renderDashboard(data) {
     <!-- TOKEN SAVINGS -->
     <div class="token-grid">
       <div class="stat-card">
-        <div class="stat-card-label">Total tokens analyzed</div>
+        <div class="stat-card-label">Tokens analyzed <span style='font-size:9px;background:var(--surface2);padding:1px 5px;border-radius:4px;color:var(--dim);font-weight:700;'>PRO ONLY</span></div>
         <div class="stat-card-value">${(s.totalTokensAnalyzed / 1000000).toFixed(1)}M</div>
-        <div class="stat-card-sub">across ${s.totalAnalyses.toLocaleString()} analyses</div>
+        <div class="stat-card-sub">across ${s.totalProAnalyses.toLocaleString()} Pro analyses</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-label">Total tokens saved</div>
@@ -394,8 +394,9 @@ function renderDashboard(data) {
         <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px;">
           ${metricRow('Active today',        s.activeToday,  'had an analysis')}
           ${metricRow('Active this week',    s.activeWeek,   'had an analysis')}
-          ${metricRow('Analyses today',      s.analysesToday, 'across all users')}
-          ${metricRow('Avg analyses / user', s.avgAnalysesPerActiveUser, 'active users this week')}
+          ${metricRow('Free analyses today', s.freeAnalysesToday, 'free plan only — daily counter')}
+          ${metricRow('Paid users active today', s.paidActiveToday, 'Plus/Pro with analysis in last 24h')}
+          ${metricRow('Avg daily analyses', s.avgFreeAnalysesPerUser, 'free users only — daily counter reliable')}
         </div>
       </div>
     </div>
