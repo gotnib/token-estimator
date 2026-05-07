@@ -17,7 +17,10 @@
 <meta name="twitter:title" content="Admin | TokenLens">
 <meta name="twitter:description" content="TokenLens admin dashboard.">
 <meta name="twitter:image" content="https://tokenlens.live/og-image.png">
-<link rel="icon" type="image/png" href="/tokenlens_favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="128x128" href="/tokenlens_favicon.png">
+<link rel="apple-touch-icon" href="/tokenlens_favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -115,7 +118,27 @@ tr:hover td{background:var(--bg);}
   .grid-2{grid-template-columns:1fr;}
   nav{padding:0 1rem;}
 }
+
+/* MRR TREND */
+.mrr-trend-chart { height: 80px; display: flex; align-items: flex-end; gap: 2px; }
+.mrr-bar { flex: 1; border-radius: 2px 2px 0 0; background: var(--accent); min-height: 2px; transition: height 0.4s; }
+.mrr-bar:hover { opacity: 0.8; }
+
+/* CHURN CARD */
+.churn-good { color: var(--green); }
+.churn-warn { color: var(--amber); }
+.churn-bad  { color: var(--red); }
+
+/* METRIC HIGHLIGHT */
+.metric-highlight { background: var(--green-light); border: 1px solid #bbf7d0; border-radius: var(--radius-lg); padding: 1rem 1.25rem; }
+.metric-highlight.warn { background: var(--amber-light); border-color: #fcd34d; }
+.metric-highlight.alert { background: var(--red-light); border-color: #fecaca; }
+
+/* TOKEN STATS */
+.token-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 1.5rem; }
+@media(max-width:768px){ .token-grid { grid-template-columns: 1fr 1fr; } }
 </style>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -216,33 +239,47 @@ async function loadData() {
 
 // ── RENDER ────────────────────────────────────────
 function renderDashboard(data) {
-  const s = data.stats;
-  const signups = data.signupsByDay;
-  const recent  = data.recentSignups;
+  const s        = data.stats;
+  const signups  = data.signupsByDay;
+  const mrrByDay = data.mrrByDay || {};
+  const recent   = data.recentSignups;
 
-  // Chart
+  // ── Signup chart ──────────────────────────────────────────────────────
   const days   = Object.keys(signups).sort();
   const vals   = days.map(d => signups[d]);
   const maxVal = Math.max(...vals, 1);
   const chartBars = days.map((d, i) => {
-    const h    = Math.max(2, Math.round((vals[i] / maxVal) * 110));
-    const date = new Date(d + 'T00:00:00');
-    const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const showLabel = i % 5 === 0 || i === days.length - 1;
-    return `<div class="chart-bar-wrap" title="${label}: ${vals[i]} signups">
-      <div class="chart-bar" style="height:${h}px" title="${vals[i]}"></div>
-      <div class="chart-label">${showLabel ? label : ''}</div>
+    const h   = Math.max(2, Math.round((vals[i] / maxVal) * 110));
+    const lbl = new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const show = i % 5 === 0 || i === days.length - 1;
+    return `<div class="chart-bar-wrap" title="${lbl}: ${vals[i]}">
+      <div class="chart-bar" style="height:${h}px"></div>
+      <div class="chart-label">${show ? lbl : ''}</div>
     </div>`;
   }).join('');
+  const totalSignups30 = vals.reduce((a,b) => a+b, 0);
 
-  const totalSignups30 = vals.reduce((a, b) => a + b, 0);
+  // ── MRR trend chart (90 days) ─────────────────────────────────────────
+  const mrrDays = Object.keys(mrrByDay).sort();
+  const mrrVals = mrrDays.map(d => mrrByDay[d]);
+  const mrrMax  = Math.max(...mrrVals, 1);
+  const mrrBars = mrrDays.map((d, i) => {
+    const h   = Math.max(2, Math.round((mrrVals[i] / mrrMax) * 70));
+    const lbl = new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `<div class="mrr-bar" style="height:${h}px" title="${lbl}: $${mrrVals[i]}"></div>`;
+  }).join('');
 
-  // Recent signups table
+  // ── Churn color ───────────────────────────────────────────────────────
+  const churnColor = s.churnRate === 0 ? 'churn-good' : s.churnRate < 5 ? 'churn-warn' : 'churn-bad';
+
+  // ── Conversion rate ───────────────────────────────────────────────────
+  const totalPaid = s.byPlan.plus + s.byPlan.pro;
+  const convRate  = s.total > 0 ? Math.round((totalPaid / s.total) * 100) : 0;
+
+  // ── Recent signups table ──────────────────────────────────────────────
   const tableRows = recent.map(u => {
     const joined = new Date(u.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const active = u.last_active
-      ? new Date(u.last_active).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-      : 'Never';
+    const active = u.last_active ? new Date(u.last_active).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Never';
     return `<tr>
       <td style="font-family:'Geist Mono',monospace;font-size:12px;color:var(--text);">${u.email}</td>
       <td><span class="plan-badge ${u.plan}">${u.plan.charAt(0).toUpperCase() + u.plan.slice(1)}</span></td>
@@ -250,9 +287,6 @@ function renderDashboard(data) {
       <td>${active}</td>
     </tr>`;
   }).join('');
-
-  const totalPaid = s.byPlan.plus + s.byPlan.pro;
-  const convRate  = s.total > 0 ? Math.round((totalPaid / s.total) * 100) : 0;
 
   document.getElementById('dash-content').innerHTML = `
 
@@ -262,6 +296,10 @@ function renderDashboard(data) {
         <div class="stat-card-label">Monthly Recurring Revenue</div>
         <div class="stat-card-value">$${s.mrr.toLocaleString()}</div>
         <div class="stat-card-sub">${totalPaid} paying user${totalPaid !== 1 ? 's' : ''}</div>
+        <div class="mrr-trend-chart" style="margin-top:12px;">${mrrBars}</div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.5);margin-top:4px;font-family:'Geist Mono',monospace;">
+          <span>${mrrDays[0]}</span><span>Today</span>
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-label">Total users</div>
@@ -274,9 +312,9 @@ function renderDashboard(data) {
         <div class="stat-card-sub">${s.activeWeek} this week</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-label">Analyses today</div>
-        <div class="stat-card-value">${s.analysesToday.toLocaleString()}</div>
-        <div class="stat-card-sub">across all users</div>
+        <div class="stat-card-label">Avg analyses / active user</div>
+        <div class="stat-card-value">${s.avgAnalysesPerActiveUser}</div>
+        <div class="stat-card-sub">per active user this week</div>
       </div>
     </div>
 
@@ -302,26 +340,62 @@ function renderDashboard(data) {
       </div>
     </div>
 
+    <!-- TOKEN SAVINGS -->
+    <div class="token-grid">
+      <div class="stat-card">
+        <div class="stat-card-label">Total tokens analyzed</div>
+        <div class="stat-card-value">${(s.totalTokensAnalyzed / 1000000).toFixed(1)}M</div>
+        <div class="stat-card-sub">across ${s.totalAnalyses.toLocaleString()} analyses</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Total tokens saved</div>
+        <div class="stat-card-value" style="color:var(--green)">${(s.totalTokensSaved / 1000000).toFixed(1)}M</div>
+        <div class="stat-card-sub">$${((s.totalTokensSaved / 1000000) * 3).toFixed(2)} saved at Claude pricing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Avg token reduction</div>
+        <div class="stat-card-value" style="color:var(--green)">${s.avgSavingsPct}%</div>
+        <div class="stat-card-sub">per analysis across all users</div>
+      </div>
+    </div>
+
+    <!-- CHURN + LIMIT HITS -->
+    <div class="grid-2" style="margin-bottom:1.5rem;">
+      <div class="chart-card">
+        <div class="chart-title">Churn & retention</div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px;">
+          ${metricRow('Churned users',      s.churned,        'cancelled subscription')}
+          ${metricRow('Churned this month', s.churnedMonth,   '')}
+          ${metricRow('Churn rate',         `<span class="${churnColor}">${s.churnRate}%</span>`, 'of all paid users')}
+          ${metricRow('Conversion rate',    convRate + '%',   'free → paid')}
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Upgrade signals</div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px;">
+          ${metricRow('Free users at limit', s.freeAtLimit, '5/day cap hit today')}
+          ${metricRow('Plus users near limit', s.plusNearLimit, '100+ of 120 used')}
+          ${metricRow('New today',    s.newToday,    '')}
+          ${metricRow('New this week', s.newThisWeek, '')}
+          ${metricRow('New this month', s.newThisMonth, '')}
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
     <div class="grid-2">
-      <!-- SIGNUPS CHART -->
       <div class="chart-card">
         <div class="chart-title">New signups — last 30 days <span style="font-size:12px;font-weight:400;color:var(--muted);">(${totalSignups30} total)</span></div>
         <div class="chart-wrap">${chartBars}</div>
-        <div class="chart-footer">
-          <span>${days[0]}</span>
-          <span>Today</span>
-        </div>
+        <div class="chart-footer"><span>${days[0]}</span><span>Today</span></div>
       </div>
-
-      <!-- QUICK METRICS -->
       <div class="chart-card">
         <div class="chart-title">Growth metrics</div>
         <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px;">
-          ${metricRow('New today',       s.newToday,     '')}
-          ${metricRow('New this week',   s.newThisWeek,  '')}
-          ${metricRow('New this month',  s.newThisMonth, '')}
-          ${metricRow('Conversion rate', convRate + '%', 'free → paid')}
-          ${metricRow('Active this week',s.activeWeek,   'had an analysis')}
+          ${metricRow('Active today',        s.activeToday,  'had an analysis')}
+          ${metricRow('Active this week',    s.activeWeek,   'had an analysis')}
+          ${metricRow('Analyses today',      s.analysesToday, 'across all users')}
+          ${metricRow('Avg analyses / user', s.avgAnalysesPerActiveUser, 'active users this week')}
         </div>
       </div>
     </div>
@@ -330,14 +404,7 @@ function renderDashboard(data) {
     <div class="table-card">
       <div class="table-header">Recent signups</div>
       <table>
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Plan</th>
-            <th>Joined</th>
-            <th>Last active</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Email</th><th>Plan</th><th>Joined</th><th>Last active</th></tr></thead>
         <tbody>${tableRows || '<tr><td colspan="4" style="text-align:center;color:var(--dim);">No users yet</td></tr>'}</tbody>
       </table>
     </div>`;
