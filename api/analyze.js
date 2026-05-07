@@ -245,6 +245,7 @@ function resetIn(startAt, windowDays) {
 const TRACKER_PROVIDERS = {
   anthropic: {
     endpoint: 'https://api.anthropic.com/v1/messages',
+    defaultModel: 'claude-sonnet-4-20250514',
     buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' }),
     buildBody: (messages, model) => JSON.stringify({ model, max_tokens: 4096, messages }),
     parseUsage: (data) => ({
@@ -257,6 +258,7 @@ const TRACKER_PROVIDERS = {
   },
   openai: {
     endpoint: 'https://api.openai.com/v1/chat/completions',
+    defaultModel: 'gpt-4o',
     buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }),
     buildBody: (messages, model) => JSON.stringify({ model, messages }),
     parseUsage: (data) => ({
@@ -268,6 +270,7 @@ const TRACKER_PROVIDERS = {
     extractText: (data) => data.choices?.[0]?.message?.content || '',
   },
   gemini: {
+    defaultModel: 'gemini-2.5-pro',
     buildEndpoint: (model) => `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'x-goog-api-key': key }),
     buildBody: (messages) => JSON.stringify({
@@ -283,6 +286,7 @@ const TRACKER_PROVIDERS = {
   },
   perplexity: {
     endpoint: 'https://api.perplexity.ai/chat/completions',
+    defaultModel: 'sonar-pro',
     buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }),
     buildBody: (messages, model) => JSON.stringify({ model, messages }),
     parseUsage: (data) => ({ input: data.usage?.prompt_tokens ?? 0, output: data.usage?.completion_tokens ?? 0, cacheWrite: 0, cacheRead: 0 }),
@@ -290,6 +294,7 @@ const TRACKER_PROVIDERS = {
   },
   mistral: {
     endpoint: 'https://api.mistral.ai/v1/chat/completions',
+    defaultModel: 'mistral-large-latest',
     buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }),
     buildBody: (messages, model) => JSON.stringify({ model, messages }),
     parseUsage: (data) => ({ input: data.usage?.prompt_tokens ?? 0, output: data.usage?.completion_tokens ?? 0, cacheWrite: 0, cacheRead: 0 }),
@@ -297,6 +302,7 @@ const TRACKER_PROVIDERS = {
   },
   groq: {
     endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+    defaultModel: 'llama-3.3-70b-versatile',
     buildHeaders: (key) => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }),
     buildBody: (messages, model) => JSON.stringify({ model, messages }),
     parseUsage: (data) => ({
@@ -308,6 +314,24 @@ const TRACKER_PROVIDERS = {
     extractText: (data) => data.choices?.[0]?.message?.content || '',
   },
 };
+
+function normalizeTrackerProvider(value) {
+  const raw = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  if (!raw) return null;
+  if (raw.includes('anthropic') || raw.includes('claude')) return 'anthropic';
+  if (raw.includes('openai') || raw.includes('chatgpt') || raw.includes('gpt')) return 'openai';
+  if (raw.includes('google') || raw.includes('gemini')) return 'gemini';
+  if (raw.includes('perplexity')) return 'perplexity';
+  if (raw.includes('mistral')) return 'mistral';
+  if (raw.includes('groq')) return 'groq';
+  return raw;
+}
+
+function resolveTrackerModel(provider, model) {
+  const raw = typeof model === 'string' ? model.trim() : '';
+  if (raw && raw.toLowerCase() !== 'auto') return raw;
+  return TRACKER_PROVIDERS[provider]?.defaultModel || null;
+}
 
 export const config = { maxDuration: 30 };
 
@@ -396,19 +420,23 @@ export default async function handler(req, res) {
     if (profile?.deactivated) return res.status(403).json({ error: 'Account deactivated.' });
     if (profile?.plan !== 'pro') return res.status(403).json({ error: 'Live tracker is a Pro feature.' });
 
-    const { provider, model, messages, apiKey } = req.body;
-    if (!provider || !model || !messages || !apiKey)
+    const { model, messages, apiKey } = req.body;
+    const provider = normalizeTrackerProvider(req.body.provider || req.body.host || req.body.hostname || req.body.url);
+    if (!provider || !messages || !apiKey)
       return res.status(400).json({ error: 'Missing required fields.' });
 
     const cfg = TRACKER_PROVIDERS[provider];
     if (!cfg) return res.status(400).json({ error: 'Unsupported provider: ' + provider });
+
+    const trackerModel = resolveTrackerModel(provider, model);
+    if (!trackerModel) return res.status(400).json({ error: 'Could not auto-detect tracker model.' });
     if (!Array.isArray(messages) || !messages.length)
       return res.status(400).json({ error: 'messages must be a non-empty array.' });
     if (typeof apiKey !== 'string' || apiKey.length < 10)
       return res.status(400).json({ error: 'Invalid API key format.' });
 
     try {
-      const endpoint = cfg.buildEndpoint ? cfg.buildEndpoint(model) : cfg.endpoint;
+      const endpoint = cfg.buildEndpoint ? cfg.buildEndpoint(trackerModel) : cfg.endpoint;
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 25000);
 
@@ -416,7 +444,7 @@ export default async function handler(req, res) {
         method: 'POST',
         signal: controller.signal,
         headers: cfg.buildHeaders(apiKey),
-        body: cfg.buildBody(messages, model),
+        body: cfg.buildBody(messages, trackerModel),
       });
       clearTimeout(timeout);
 
@@ -431,7 +459,7 @@ export default async function handler(req, res) {
       const data  = await provRes.json();
       const usage = cfg.parseUsage(data);
       const text  = cfg.extractText(data);
-      return res.status(200).json({ usage, text, provider, model });
+      return res.status(200).json({ usage, text, provider, model: trackerModel });
 
     } catch (err) {
       if (err.name === 'AbortError') return res.status(504).json({ error: provider + ' request timed out.' });
