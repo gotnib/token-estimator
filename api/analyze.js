@@ -564,6 +564,7 @@ export default async function handler(req, res) {
     const rawLevel = req.body.level || 'balanced';
     const rawModel = req.body.model || 'claude';
     const MODEL_PRICES = {
+      auto:   { label: 'Auto',          price: 3.00 },
       claude: { label: 'Claude Sonnet', price: 3.00 },
       gpt4o:  { label: 'GPT-4o',        price: 2.50 },
       gemini: { label: 'Gemini Pro',    price: 1.25 },
