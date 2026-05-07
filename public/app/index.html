@@ -172,6 +172,39 @@ textarea::placeholder{color:var(--dim);}
 /* LESSON CARDS */
 .reason-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;}
 .reason-card:last-child{margin-bottom:0;}
+
+/* ── CODE MODE SPECIFIC ─────────────────────────── */
+.lang-badge{display:inline-flex;align-items:center;gap:5px;background:rgb(60,61,89);color:#e2e8f0;font-size:11px;font-weight:600;font-family:'Geist Mono',monospace;padding:3px 10px;border-radius:99px;letter-spacing:0.04em;}
+[data-theme="dark"] .lang-badge{background:rgba(232,231,220,0.1);color:var(--text);}
+.complexity-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.complexity-label{font-size:12px;color:var(--muted);width:90px;flex-shrink:0;}
+.complexity-track{flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden;}
+.complexity-fill{height:100%;border-radius:99px;transition:width 0.5s ease;}
+.complexity-val{font-size:12px;font-weight:600;color:var(--text);width:20px;text-align:right;flex-shrink:0;}
+.severity-badge{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 6px;border-radius:4px;margin-left:6px;font-family:'Geist Mono',monospace;}
+.severity-badge.high{background:#fef2f2;color:#dc2626;}
+.severity-badge.medium{background:#fffbeb;color:#d97706;}
+.severity-badge.low{background:#f0fdf4;color:#16a34a;}
+[data-theme="dark"] .severity-badge.high{background:rgba(220,38,38,0.15);color:#f87171;}
+[data-theme="dark"] .severity-badge.medium{background:rgba(217,119,6,0.15);color:#fbbf24;}
+[data-theme="dark"] .severity-badge.low{background:rgba(22,163,74,0.15);color:#4ade80;}
+.diff-table{width:100%;border-collapse:collapse;font-family:'Geist Mono',monospace;font-size:12px;margin-bottom:4px;}
+.diff-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--dim);padding:6px 10px;background:var(--surface2);text-align:left;border-bottom:1px solid var(--border);}
+.diff-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55;}
+.diff-table tr:last-child td{border-bottom:none;}
+.diff-table td.diff-ref{color:var(--muted);font-size:11px;white-space:nowrap;}
+.diff-table td.diff-type{white-space:nowrap;}
+.diff-table td.diff-before{color:#dc2626;background:rgba(220,38,38,0.04);}
+.diff-table td.diff-after{color:#16a34a;background:rgba(22,163,74,0.04);}
+[data-theme="dark"] .diff-table td.diff-before{color:#f87171;background:rgba(220,38,38,0.08);}
+[data-theme="dark"] .diff-table td.diff-after{color:#4ade80;background:rgba(22,163,74,0.08);}
+.diff-type-badge{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:2px 6px;border-radius:4px;background:var(--surface2);color:var(--muted);}
+.behavior-warning{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#fffbeb;border:1px solid #fcd34d;border-radius:var(--radius);margin-bottom:8px;font-size:13px;color:rgb(60,61,89);line-height:1.55;}
+[data-theme="dark"] .behavior-warning{background:rgba(217,119,6,0.1);border-color:rgba(217,119,6,0.3);color:var(--text);}
+.behavior-warning:last-child{margin-bottom:0;}
+.code-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px;}
+@media(max-width:600px){.code-stats-grid{grid-template-columns:repeat(2,1fr);}}
+
 .reason-change{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;}
 .reason-change-num{width:20px;height:20px;background:var(--accent-light);color:var(--accent);border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .reason-principle{font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:4px;margin-left:28px;}
@@ -1082,19 +1115,25 @@ function switchTab(i) {
 
 function buildResultCards(d, idx) {
   try {
-    const maxTok    = Math.max(...(d.breakdown || []).map(b => b.tokens), 1);
+  const isCode    = d.level === 'deep';
+  const maxTok    = Math.max(...(d.breakdown || []).map(b => b.tokens), 1);
   const savings   = d.savings_percent || 0;
   const effTokens = d.efficient_tokens || Math.round((d.estimated_tokens || 0) * (1 - savings / 100));
   const cost      = typeof d.cost_estimate_usd === 'number' ? '$' + d.cost_estimate_usd.toFixed(5) : 'N/A';
   const isPro     = currentPlan === 'pro';
   const histId    = d.history_id || null;
 
+  // ── Shared: breakdown ────────────────────────────────────────────────
   const breakdownHTML = (d.breakdown || []).map((item, i) => {
     const pct  = Math.round((item.tokens / Math.max(d.estimated_tokens, 1)) * 100);
     const barW = Math.round((item.tokens / maxTok) * 100);
+    const sev  = item.severity;
     return `<div class="breakdown-row">
       <div class="breakdown-left">
-        <div class="breakdown-name">${escHtml(item.category)}</div>
+        <div class="breakdown-name">
+          ${escHtml(item.category)}
+          ${sev ? `<span class="severity-badge ${sev}">${sev}</span>` : ''}
+        </div>
         <div class="breakdown-detail">${escHtml(item.detail)}</div>
         <div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:${COLORS[i % COLORS.length]}"></div></div>
       </div>
@@ -1105,30 +1144,39 @@ function buildResultCards(d, idx) {
     </div>`;
   }).join('');
 
-  // ── Score card ──
+  // ── Score card — prompt mode vs code mode ───────────────────────────
   const scores     = d.scores || {};
   const scoreNotes = d.score_notes || {};
-  const scoreLabels = { clarity: 'Clarity', conciseness: 'Conciseness', structure: 'Structure', specificity: 'Specificity' };
-  const scoreColors = (s) => s >= 8 ? '#16a34a' : s >= 5 ? 'rgb(123,166,146)' : '#dc2626';
-  const scoreTooltips = {
-    clarity:     'How unambiguous is the instruction? A clear prompt leaves no room for misinterpretation.',
-    conciseness: 'How free of waste is it? A concise prompt has no filler, hedging, or repeated ideas.',
-    structure:   'How logically organized is it? A well-structured prompt flows naturally from context to instruction.',
-    specificity: 'How well-defined is the expected output? A specific prompt tells the AI exactly what format and scope to use.'
+  const scoreColors = s => s >= 8 ? '#16a34a' : s >= 5 ? 'rgb(123,166,146)' : '#dc2626';
+
+  const PROMPT_SCORE_META = {
+    clarity:     { label: 'Clarity',     tip: 'How unambiguous is the instruction? A clear prompt leaves no room for misinterpretation.' },
+    conciseness: { label: 'Conciseness', tip: 'How free of waste is it? A concise prompt has no filler, hedging, or repeated ideas.' },
+    structure:   { label: 'Structure',   tip: 'How logically organized is it? Flows naturally from context to instruction.' },
+    specificity: { label: 'Specificity', tip: 'How well-defined is the expected output? A specific prompt tells the AI exactly what format and scope to use.' },
+  };
+  const CODE_SCORE_META = {
+    readability:     { label: 'Readability',     tip: 'How easily can another developer understand this code at a glance?' },
+    maintainability: { label: 'Maintainability', tip: 'How safely can this code be modified without breaking something?' },
+    robustness:      { label: 'Robustness',      tip: 'How well does the code handle edge cases, nulls, and unexpected inputs?' },
+    efficiency:      { label: 'Efficiency',      tip: 'How efficient is the algorithm and structure? Avoids unnecessary work.' },
   };
 
-  const scoreCardHTML = Object.keys(scoreLabels).length && d.scores ? `
+  const scoreMeta   = isCode ? CODE_SCORE_META : PROMPT_SCORE_META;
+  const scoreKeys   = Object.keys(scoreMeta).filter(k => scores[k] !== undefined);
+
+  const scoreCardHTML = scoreKeys.length ? `
     <div class="score-grid">
-      ${Object.entries(scoreLabels).map(([key, label]) => {
-        const val  = scores[key] || 0;
-        const circ = 2 * Math.PI * 20;
-        const pct  = val / 10;
-        const dash = circ * pct;
+      ${scoreKeys.map(key => {
+        const val   = scores[key] || 0;
+        const circ  = 2 * Math.PI * 20;
+        const dash  = circ * (val / 10);
         const color = scoreColors(val);
+        const meta  = scoreMeta[key];
         return `<div class="score-item">
           <div class="score-label" style="display:flex;align-items:center;justify-content:center;gap:4px;">
-            ${label}
-            <span class="score-tooltip-trigger" data-tip="${escHtml(scoreTooltips[key])}" style="width:13px;height:13px;border-radius:50%;background:var(--border2);color:var(--muted);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex-shrink:0;">?</span>
+            ${meta.label}
+            <span class="score-tooltip-trigger" data-tip="${escHtml(meta.tip)}" style="width:13px;height:13px;border-radius:50%;background:var(--border2);color:var(--muted);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex-shrink:0;">?</span>
           </div>
           <div class="score-ring">
             <svg width="52" height="52" viewBox="0 0 52 52">
@@ -1145,13 +1193,53 @@ function buildResultCards(d, idx) {
       }).join('')}
     </div>` : '';
 
-  // ── Reasons with lessons ──
+  // ── Complexity meter (code mode only) ────────────────────────────────
+  const complexityHTML = (isCode && d.complexity_before != null) ? (() => {
+    const before = d.complexity_before || 0;
+    const after  = d.complexity_after  || 0;
+    const color  = v => v <= 3 ? '#16a34a' : v <= 6 ? '#d97706' : '#dc2626';
+    const label  = v => v <= 3 ? 'Low' : v <= 6 ? 'Moderate' : 'High';
+    return `<div style="margin-bottom:4px;">
+      <div class="complexity-row">
+        <div class="complexity-label" style="font-size:12px;color:var(--muted);">Before</div>
+        <div class="complexity-track"><div class="complexity-fill" style="width:${before*10}%;background:${color(before)};"></div></div>
+        <div class="complexity-val" style="color:${color(before)}">${before}</div>
+        <div style="font-size:11px;color:${color(before)};width:60px;flex-shrink:0;">${label(before)}</div>
+      </div>
+      <div class="complexity-row" style="margin-bottom:0;">
+        <div class="complexity-label" style="font-size:12px;color:var(--muted);">After</div>
+        <div class="complexity-track"><div class="complexity-fill" style="width:${after*10}%;background:${color(after)};"></div></div>
+        <div class="complexity-val" style="color:${color(after)}">${after}</div>
+        <div style="font-size:11px;color:${color(after)};width:60px;flex-shrink:0;">${label(after)}</div>
+      </div>
+    </div>`;
+  })() : '';
+
+  // ── Diff summary (code mode only) ────────────────────────────────────
+  const diffHTML = (isCode && d.diff_summary && d.diff_summary.length) ? `
+    <table class="diff-table">
+      <thead><tr><th>Location</th><th>Change</th><th>Before</th><th>After</th></tr></thead>
+      <tbody>
+        ${d.diff_summary.map(row => `<tr>
+          <td class="diff-ref">${escHtml(row.line_ref || '')}</td>
+          <td class="diff-type"><span class="diff-type-badge">${escHtml(row.type || '')}</span></td>
+          <td class="diff-before">${escHtml(row.before || '')}</td>
+          <td class="diff-after">${escHtml(row.after || '')}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '';
+
+  // ── Behavior warnings (code mode only) ──────────────────────────────
+  const warningsHTML = (isCode && d.behavior_warnings && d.behavior_warnings.length) ? `
+    ${d.behavior_warnings.map(w => `
+      <div class="behavior-warning">
+        <span style="font-size:14px;flex-shrink:0;">⚠️</span>
+        <span>${escHtml(w)}</span>
+      </div>`).join('')}` : '';
+
+  // ── Reasons ──────────────────────────────────────────────────────────
   const reasonsHTML = (d.reasons || []).map((r, i) => {
-    if (typeof r === 'string') {
-      return `<div class="reason-card">
-        <div class="reason-change"><div class="reason-change-num">${i+1}</div>${escHtml(r)}</div>
-      </div>`;
-    }
+    if (typeof r === 'string') return `<div class="reason-card"><div class="reason-change"><div class="reason-change-num">${i+1}</div>${escHtml(r)}</div></div>`;
     return `<div class="reason-card">
       <div class="reason-change"><div class="reason-change-num">${i+1}</div>${escHtml(r.change || '')}</div>
       ${r.principle ? `<div class="reason-principle">📌 ${escHtml(r.principle)}</div>` : ''}
@@ -1159,8 +1247,9 @@ function buildResultCards(d, idx) {
     </div>`;
   }).join('');
 
+  // ── Optimized output section ──────────────────────────────────────────
   const effPromptRaw = d.efficient_prompt || '';
-  const effPrompt = escHtml(effPromptRaw).replace(/\n/g, '<br>');
+  const effPrompt    = escHtml(effPromptRaw).replace(/\n/g, '<br>');
 
   const optimizationSection = d.optimization_locked ? `
     <div style="position:relative;margin-bottom:12px;">
@@ -1171,61 +1260,114 @@ function buildResultCards(d, idx) {
         <button class="btn-upgrade-cta" style="padding:9px 22px;font-size:13px;" onclick="goToCheckout(this)">Upgrade to Plus →</button>
       </div>
     </div>` : `
-    <div class="efficient-prompt" style="${d.level === 'deep' ? 'font-family:\'Geist Mono\',monospace;font-size:13px;white-space:pre-wrap;font-style:normal;background:rgb(60,61,89);color:#e2e8f0;border-color:rgb(60,61,89);' : ''}">${effPrompt}</div>
+    <div class="efficient-prompt" style="${isCode ? "font-family:'Geist Mono',monospace;font-size:13px;white-space:pre-wrap;font-style:normal;background:rgb(28,30,46);color:#e2e8f0;border-color:rgb(52,55,78);" : ''}">${effPrompt}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn-copy" data-copy="${escHtml(effPromptRaw)}">Copy</button>
       ${isPro ? `<button class="btn-save" data-save-id="${histId || idx}" data-saved="false">☆ Save to library</button>` : ''}
     </div>`;
 
+  // ── Token summary stats (different framing for code) ─────────────────
+  const summaryStatsHTML = isCode ? `
+    <div class="code-stats-grid">
+      <div class="stat-box"><div class="stat-label">Original tokens</div><div class="stat-value">${(d.estimated_tokens||0).toLocaleString()}</div><div class="stat-sub">as AI context</div></div>
+      <div class="stat-box"><div class="stat-label">Optimized tokens</div><div class="stat-value">${effTokens.toLocaleString()}</div><div class="stat-sub" style="color:var(--green);font-weight:500">−${savings}% smaller</div></div>
+      <div class="stat-box"><div class="stat-label">Context cost</div><div class="stat-value">${cost}</div><div class="stat-sub">if sent as context</div></div>
+      <div class="stat-box"><div class="stat-label">Complexity</div><div class="stat-value">${d.complexity_before != null ? d.complexity_before + ' → ' + d.complexity_after : '—'}</div><div class="stat-sub">cyclomatic (1–10)</div></div>
+    </div>` : `
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-label">Input tokens</div><div class="stat-value">${(d.estimated_tokens||0).toLocaleString()}</div><div class="stat-sub">your prompt</div></div>
+      <div class="stat-box"><div class="stat-label">Est. cost</div><div class="stat-value">${cost}</div><div class="stat-sub">${MODELS[currentModel]?.note || 'Sonnet input rate'}</div></div>
+      <div class="stat-box"><div class="stat-label">Optimized to</div><div class="stat-value">${effTokens.toLocaleString()}</div><div class="stat-sub" style="color:var(--green);font-weight:500">${savings}% reduction</div></div>
+    </div>`;
+
+  // ── Assemble all cards ────────────────────────────────────────────────
   return `
+    <!-- TOKEN / CODE SUMMARY -->
     <div class="result-card">
       <div class="rc-header">
-        <div class="rc-title"><div class="rc-icon" style="background:rgba(123,166,146,0.12)">📊</div>Token summary</div>
+        <div class="rc-title">
+          <div class="rc-icon" style="background:rgba(123,166,146,0.12)">${isCode ? '💻' : '📊'}</div>
+          ${isCode ? 'Code analysis' : 'Token summary'}
+          ${isCode && d.language ? `<span class="lang-badge" style="margin-left:8px;">${escHtml(d.language)}</span>` : ''}
+        </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          
-          ${d.level ? `<span class="slider-value ${d.level}" style="font-size:10px;">${(LEVEL_CONFIG[d.level]?.label || d.level)} optimization</span>` : ''}
+          ${d.level ? `<span class="slider-value ${d.level}" style="font-size:10px;">${(LEVEL_CONFIG[d.level]?.label || d.level)} mode</span>` : ''}
           <button id="share-btn" onclick="shareResults()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:4px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Geist',sans-serif;">↗ Share</button>
         </div>
       </div>
-      <div class="rc-body">
-        <div class="stats-grid">
-          <div class="stat-box"><div class="stat-label">Input tokens</div><div class="stat-value">${(d.estimated_tokens||0).toLocaleString()}</div><div class="stat-sub">your prompt</div></div>
-          <div class="stat-box"><div class="stat-label">Est. cost</div><div class="stat-value">${cost}</div><div class="stat-sub">${MODELS[currentModel]?.note || 'Sonnet input rate'}</div></div>
-          <div class="stat-box"><div class="stat-label">Optimized to</div><div class="stat-value">${effTokens.toLocaleString()}</div><div class="stat-sub" style="color:var(--green);font-weight:500">${savings}% reduction</div></div>
-        </div>
-      </div>
+      <div class="rc-body">${summaryStatsHTML}</div>
     </div>
 
-    ${d.scores ? `
+    <!-- SCORE CARD -->
+    ${scoreKeys.length ? `
     <div class="result-card">
       <div class="rc-header">
-        <div class="rc-title"><div class="rc-icon" style="background:#f0fdf4">🎯</div>Prompt score card</div>
+        <div class="rc-title"><div class="rc-icon" style="background:#f0fdf4">🎯</div>${isCode ? 'Code quality scores' : 'Prompt score card'}</div>
         <span style="font-size:11px;color:var(--dim);">Before optimization</span>
       </div>
       <div class="rc-body">${scoreCardHTML}</div>
     </div>` : ''}
 
-    <div class="result-card">
-      <div class="rc-header"><div class="rc-title"><div class="rc-icon" style="background:#f0fdf4">🔍</div>Token breakdown</div></div>
-      <div class="rc-body">${breakdownHTML}</div>
-    </div>
+    <!-- COMPLEXITY (code only) -->
+    ${(isCode && complexityHTML) ? `
     <div class="result-card">
       <div class="rc-header">
-        <div class="rc-title"><div class="rc-icon" style="background:rgba(123,166,146,0.12)">${d.level === 'deep' ? '💻' : '✨'}</div>${d.level === 'deep' ? 'Optimized code' : 'Efficient alternative'}</div>
+        <div class="rc-title"><div class="rc-icon" style="background:#fefce8">📈</div>Cyclomatic complexity</div>
+        <span style="font-size:11px;color:var(--dim);">1 = trivial · 10 = very complex</span>
+      </div>
+      <div class="rc-body">${complexityHTML}</div>
+    </div>` : ''}
+
+    <!-- BREAKDOWN -->
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#f0fdf4">🔍</div>${isCode ? 'Issue breakdown' : 'Token breakdown'}</div>
+      </div>
+      <div class="rc-body">${breakdownHTML}</div>
+    </div>
+
+    <!-- DIFF SUMMARY (code only) -->
+    ${(isCode && diffHTML) ? `
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:rgba(22,163,74,0.1)">↔</div>Change summary</div>
+        <span style="font-size:11px;color:var(--dim);">What changed and where</span>
+      </div>
+      <div class="rc-body">${diffHTML}</div>
+    </div>` : ''}
+
+    <!-- OPTIMIZED OUTPUT -->
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:rgba(123,166,146,0.12)">${isCode ? '✅' : '✨'}</div>${isCode ? 'Optimized code' : 'Efficient alternative'}</div>
         <span class="savings-badge">−${savings}% tokens</span>
       </div>
       <div class="rc-body">${optimizationSection}</div>
     </div>
+
+    <!-- BEHAVIOR WARNINGS (code only) -->
+    ${(isCode && warningsHTML) ? `
     <div class="result-card">
       <div class="rc-header">
-        <div class="rc-title"><div class="rc-icon" style="background:#fefce8">💡</div>What you can learn from this</div>
+        <div class="rc-title"><div class="rc-icon" style="background:#fffbeb">⚠️</div>Review before using</div>
+        <span style="font-size:11px;color:#d97706;">Changes that may affect behavior</span>
+      </div>
+      <div class="rc-body">${warningsHTML}</div>
+    </div>` : ''}
+
+    <!-- REASONS / LESSONS -->
+    <div class="result-card">
+      <div class="rc-header">
+        <div class="rc-title"><div class="rc-icon" style="background:#fefce8">💡</div>${isCode ? 'Engineering principles applied' : 'What you can learn from this'}</div>
       </div>
       <div class="rc-body">${reasonsHTML}</div>
     </div>
+
+    <!-- MISSING CONTEXT -->
     ${(d.missing_context && d.missing_context.length > 0) ? `
     <div class="result-card">
       <div class="rc-header">
-        <div class="rc-title"><div class="rc-icon" style="background:#fff7ed">🎯</div>What would make this even stronger</div>
+        <div class="rc-title"><div class="rc-icon" style="background:#fff7ed">🎯</div>${isCode ? 'What would make this more robust' : 'What would make this even stronger'}</div>
       </div>
       <div class="rc-body">
         ${d.missing_context.map(item => `
@@ -1233,14 +1375,16 @@ function buildResultCards(d, idx) {
             <span style="color:#d97706;font-size:13px;flex-shrink:0;">+</span>
             <span style="font-size:13px;color:rgb(60,61,89);line-height:1.55;">${escHtml(item)}</span>
           </div>`).join('')}
-        <div style="font-size:11px;color:#9ca3af;margin-top:8px;">These are additions — not fixes. Your prompt is already more efficient. These would make it more precise.</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:8px;">${isCode ? 'These are improvements — not required fixes. The optimized code works as-is.' : 'These are additions — not fixes. Your prompt is already more efficient.'}</div>
       </div>
     </div>` : ''}`;
+
   } catch(err) {
     console.error('buildResultCards error:', err, 'data:', JSON.stringify(d).slice(0, 500));
     return `<div class="error-state"><strong>Display error: ${escHtml(err.message)}</strong>Please try again.</div>`;
   }
 }
+
 
 // ── LIMIT REACHED ─────────────────────────────────
 function renderLimitReached(data) {
