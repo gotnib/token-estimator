@@ -1,1 +1,7 @@
 .vercel
+
+*.zip
+*.xpi
+
+__pycache__/
+*.pyc

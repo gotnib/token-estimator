@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "TokenLens",
+  "version": "1.1.5",
+  "description": "Live token & cost analysis for your prompts \u2014 powered by TokenLens.live",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://tokenlens.live/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://tokenlens.live/*"
+      ],
+      "js": [
+        "auth_bridge.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*",
+        "https://copilot.microsoft.com/*",
+        "https://grok.com/*",
+        "https://poe.com/*",
+        "https://perplexity.ai/*",
+        "https://runable.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "widget.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "widget.css"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}
