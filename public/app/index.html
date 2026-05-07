@@ -485,12 +485,14 @@ let prompts = [''];
 let currentProfile = null;
 
 const MODELS = {
+  auto:   { label: 'Auto',          provider: 'TokenLens', pricePerM: 3.00,  note: 'Auto-selected estimate' },
   claude: { label: 'Claude Sonnet', provider: 'Anthropic', pricePerM: 3.00,  note: 'Estimated against Anthropic pricing' },
   gpt4o:  { label: 'GPT-4o',        provider: 'OpenAI',    pricePerM: 2.50,  note: 'Estimated against OpenAI pricing' },
   gemini: { label: 'Gemini Pro',    provider: 'Google',    pricePerM: 1.25,  note: 'Estimated against Google pricing' },
   llama:  { label: 'Llama 70B',     provider: 'Meta',      pricePerM: 0.59,  note: 'Estimated against Meta/Groq pricing' },
 };
-let currentModel = localStorage.getItem('tl_model') || 'claude';
+let currentModel = localStorage.getItem('tl_model') || 'auto';
+if (!MODELS[currentModel]) currentModel = 'auto';
 
 function setModel(key) {
   currentModel = key;
