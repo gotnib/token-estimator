@@ -227,8 +227,8 @@ nav {
   color: var(--text);
 }
 .browsers-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: center;
   gap: 1.5rem;
 }
 .install-card {
@@ -508,41 +508,7 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
         </div>
       </div>
 
-      <!-- FIREFOX -->
-      <div class="install-card">
-        <div class="install-header">
-          <div class="install-header-title">Firefox</div>
-        </div>
-        <div class="install-steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div class="step-text"><strong>Download</strong> the Firefox .zip file above — do not extract it.</div>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div class="step-text">Open a new tab and navigate to <span class="step-code">about:addons</span></div>
-          </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <div class="step-text">Click the <strong>gear icon ⚙️</strong> and select <strong>Install Add-on From File…</strong></div>
-          </div>
-          <div class="step">
-            <div class="step-num">4</div>
-            <div class="step-text">Select the downloaded <span class="step-code">tokenlens-firefox.xpi</span> file and click Add.</div>
-          </div>
-          <div class="step">
-            <div class="step-num">5</div>
-            <div class="step-text">The TL icon will appear in your toolbar. Log in with your TokenLens account to get started.</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-</div>
-
-
+     
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">×</button>
   <img id="lightbox-img" src="" alt="">
