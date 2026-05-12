@@ -3,97 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Primary SEO -->
-<title>TokenLens — AI Prompt Token Estimator & Optimizer | Reduce Token Costs</title>
-<meta name="description" content="Analyze any AI prompt for token usage, cost, and efficiency. Get a detailed breakdown, instant cost estimate, and an optimized rewrite — plus learn the principles behind every change. Free to start.">
-<meta name="keywords" content="prompt token estimator, AI prompt analyzer, prompt optimization tool, reduce AI tokens, Claude token calculator, Anthropic cost estimator, prompt engineering tool, AI prompt cost calculator, token usage analyzer, prompt efficiency tool">
+<title>TokenLens — Optimize Prompts, Save Workflows, Rebuild Blueprints</title>
+<meta name="description" content="The browser extension that optimizes your AI prompts, saves entire chat workflows, and extracts reusable blueprints with variable slots. Works inside Claude, ChatGPT, and more.">
+<meta name="keywords" content="AI prompt optimizer, browser extension, prompt blueprint, chat workflow, token optimizer, Claude extension, ChatGPT extension">
 <meta name="author" content="TokenLens">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://tokenlens.live/">
-
-<!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://tokenlens.live/">
-<meta property="og:title" content="TokenLens — AI Prompt Token Estimator & Optimizer">
-<meta property="og:description" content="See exactly where your AI prompt tokens are going, what they cost, and how to cut them down — without losing any meaning. Free token breakdown and optimized rewrite instantly.">
+<meta property="og:title" content="TokenLens — Optimize Prompts, Save Workflows, Rebuild Blueprints">
+<meta property="og:description" content="The browser extension that optimizes your AI prompts, saves entire chat workflows, and extracts reusable blueprints with variable slots.">
 <meta property="og:image" content="https://tokenlens.live/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
 <meta property="og:site_name" content="TokenLens">
-<meta property="og:locale" content="en_US">
-
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://tokenlens.live/">
-<meta name="twitter:title" content="TokenLens — AI Prompt Token Estimator & Optimizer">
-<meta name="twitter:description" content="See exactly where your AI prompt tokens are going, what they cost, and how to cut them down. Free token breakdown and optimized rewrite instantly.">
+<meta name="twitter:title" content="TokenLens — Optimize Prompts, Save Workflows, Rebuild Blueprints">
+<meta name="twitter:description" content="The browser extension that optimizes your AI prompts and extracts reusable blueprints from your best chat sessions.">
 <meta name="twitter:image" content="https://tokenlens.live/og-image.png">
 <meta name="theme-color" content="rgb(242,241,233)">
 <meta name="twitter:site" content="@tokenlens">
-<meta property="og:image:alt" content="TokenLens — AI prompt token analyzer showing token breakdown, cost estimate and optimized rewrite">
-<meta name="twitter:image:alt" content="TokenLens — AI prompt token analyzer">
-
-<!-- Structured Data: SoftwareApplication -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "TokenLens",
   "url": "https://tokenlens.live",
-  "description": "AI prompt token analyzer and optimizer. See exactly where your tokens are going, get a cost estimate, and an optimized rewrite instantly. Includes challenge mode, prompt library, code optimization, and a browser extension.",
-  "applicationCategory": "DeveloperApplication",
-  "operatingSystem": "Web",
+  "description": "Browser extension that optimizes AI prompts, saves chat workflows, and extracts reusable blueprints with variable slots. Works inside Claude, ChatGPT, Gemini, and more.",
+  "applicationCategory": "BrowserApplication",
+  "operatingSystem": "Chrome, Firefox",
   "offers": [
-    {
-      "@type": "Offer",
-      "name": "Free",
-      "price": "0",
-      "priceCurrency": "USD",
-      "description": "5 analyses per day, token breakdown, cost estimate, fast optimization, 1 challenge per day, browser extension"
-    },
-    {
-      "@type": "Offer",
-      "name": "Plus",
-      "price": "9",
-      "priceCurrency": "USD",
-      "priceSpecification": {
-        "@type": "UnitPriceSpecification",
-        "billingDuration": "P1M"
-      },
-      "description": "120 analyses per month, fast and balanced optimization, 5 challenges per day, prompt history, browser extension"
-    },
-    {
-      "@type": "Offer",
-      "name": "Pro",
-      "price": "29",
-      "priceCurrency": "USD",
-      "priceSpecification": {
-        "@type": "UnitPriceSpecification",
-        "billingDuration": "P1M"
-      },
-      "description": "High volume usage, all optimization modes including code, unlimited challenges, batch optimization, prompt history and library, browser extension"
-    }
-  ],
-  "featureList": [
-    "Token breakdown by category",
-    "Cost estimation for Claude Sonnet",
-    "Optimized prompt rewrite",
-    "Prompt score card",
-    "Batch optimization",
-    "Prompt history and library",
-    "Challenge mode for learning"
+    { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD", "description": "5 analyses per day, save chat logs, browser extension" },
+    { "@type": "Offer", "name": "Plus", "price": "9", "priceCurrency": "USD", "description": "120 analyses per month, 10 blueprint generations, full extension features" },
+    { "@type": "Offer", "name": "Pro", "price": "29", "priceCurrency": "USD", "description": "Unlimited blueprints, all optimization modes, batch analysis, live token tracker" }
   ],
   "screenshot": "https://tokenlens.live/og-image.png",
-  "publisher": {
-    "@type": "Organization",
-    "name": "TokenLens",
-    "url": "https://tokenlens.live"
-  }
+  "publisher": { "@type": "Organization", "name": "TokenLens", "url": "https://tokenlens.live" }
 }
 </script>
-
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -101,648 +49,469 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "What is a prompt token estimator?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "A prompt token estimator analyzes your AI prompt and tells you how many tokens it will consume when sent to an AI model like Claude or GPT-4o. TokenLens breaks your prompt down by category — core instruction, context, filler, politeness overhead — and provides an optimized rewrite that achieves the same result with fewer tokens and lower cost."
-      }
+      "name": "What does the TokenLens extension do?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The TokenLens browser extension works inside Claude, ChatGPT, Gemini, and other AI interfaces. It shows a live token count as you type, optimizes your prompt with one click, and lets you save entire chat sessions as blueprints — reusable workflow templates with variable slots you can fill in for any new project." }
     },
     {
       "@type": "Question",
-      "name": "How many tokens does my Claude prompt use?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "You can find out exactly by pasting your prompt into TokenLens. As a rough guide, 1 token is approximately 4 characters or 0.75 words in English. A typical system prompt runs 200-800 tokens. TokenLens gives you a precise count, broken down by category, so you know exactly what is and isn't necessary."
-      }
+      "name": "What is a blueprint?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A blueprint is a structured, reusable template extracted from one of your best chat workflows. TokenLens analyzes the chat log and extracts the step-by-step prompt sequence, identifies every variable element (project name, tech stack, design choices), wraps them in [VARIABLE_NAME] slots, and includes setup steps for any services detected. You fill in the variables and export clean plain text ready to paste into any new chat." }
     },
     {
       "@type": "Question",
-      "name": "How can I reduce my AI prompt token usage?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The biggest token savings come from removing politeness overhead (please, could you, as an AI), eliminating redundant context that repeats the same point twice, tightening verbose phrasing into direct instructions, and specifying your output format precisely. TokenLens analyzes your specific prompt and provides an optimized version automatically, with explanations of each change so you learn the principles."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What does the Claude API cost per token?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "As of 2026, Claude Sonnet costs $3.00 per million input tokens and $15.00 per million output tokens. GPT-4o costs $2.50 per million input tokens. TokenLens calculates the exact cost of your prompt at current pricing and shows you how much you can save with an optimized version."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Does TokenLens work with ChatGPT, Gemini, and other AI models?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. TokenLens analyzes any AI prompt regardless of which model you intend to use it with. Cost estimates are available for Claude Sonnet ($3/1M tokens), GPT-4o ($2.50/1M tokens), Gemini Pro ($1.25/1M tokens), and Llama 70B ($0.59/1M tokens). The token breakdown and optimization principles apply universally."
-      }
+      "name": "How many tokens does my prompt use?",
+      "acceptedAnswer": { "@type": "Answer", "text": "You can find out instantly with the TokenLens extension or by pasting your prompt into the analyzer at tokenlens.live/app. As a rough guide, 1 token is approximately 4 characters. The extension shows your live token count as you type inside Claude, ChatGPT, or Gemini." }
     },
     {
       "@type": "Question",
       "name": "How much does TokenLens cost?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "TokenLens has a free plan with 5 analyses per day — no credit card required. The Plus plan is $9/month (120 analyses, balanced optimization, 5 challenges/day). The Pro plan is $29/month (high volume, all optimization modes including code optimization, unlimited challenges, batch mode, prompt library)."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "Free plan includes 5 analyses per day, chat log saving, and the browser extension with no credit card required. Plus is $9/month with 120 analyses and 10 blueprint generations. Pro is $29/month with unlimited blueprint generations, all optimization modes, and the live token tracker." }
     }
   ]
 }
 </script>
-
-<meta name="msvalidate.01" content="EC4EA584B01F0D19B81BEB1E1E1FD680">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="128x128" href="/tokenlens_favicon.png">
 <link rel="apple-touch-icon" href="/tokenlens_favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="/_vercel/insights/script.js"></script>
 <style>
-:root {
-  --bg: rgb(242,241,233);
-  --surface: #ffffff;
-  --surface2: #f0f2f7;
-  --border: #e2e6f0;
-  --border2: #c8cfe0;
-  --text: #0f1623;
-  --muted: #5a6480;
-  --dim: #9ba3b8;
-  --accent: rgb(123,166,146);
-  --accent2: rgb(60,61,89);
-  --accent-glow: rgba(47,111,232,0.12);
-  --green: #16a34a;
-  --amber: #d97706;
-  --radius: 8px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+:root{
+  --bg:rgb(242,241,233);--white:rgb(250,249,244);--surface2:rgb(235,234,226);
+  --border:rgb(215,213,203);--border2:rgb(195,193,182);
+  --text:rgb(60,61,89);--muted:rgb(100,101,120);--dim:rgb(140,141,158);
+  --accent:rgb(123,166,146);--accent-light:rgba(123,166,146,0.12);--accent-dark:rgb(95,138,118);
+  --green:#16a34a;--green-light:#f0fdf4;--amber:#d97706;--amber-light:#fffbeb;
+  --gold:#b45309;--gold-light:#fef3c7;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;--radius-2xl:24px;
+  --shadow:0 4px 16px rgba(60,61,89,0.1);--shadow-lg:0 12px 40px rgba(60,61,89,0.14);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { background: linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%); min-height:100vh; color: var(--text); font-family: 'Geist', sans-serif; font-weight: 400; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:linear-gradient(160deg,rgb(242,241,233) 0%,rgb(232,231,220) 100%);min-height:100vh;color:var(--text);font-family:'Geist',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
 
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 2.5rem; height: 64px;
-  background: rgba(248,249,251,0.85);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-}
-.nav-inner-land { width: 100%; max-width: 1100px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
-.nav-logo { display: flex; align-items: center; gap: 0; text-decoration: none; }
-.nav-links { display: flex; align-items: center; gap: 2rem; justify-content: center; }
-.nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
-.nav-links a:hover { color: var(--text); }
-.nav-right { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
-.btn-ghost { background: transparent; border: 1px solid var(--border2); border-radius: var(--radius); padding: 8px 18px; font-size: 13px; font-weight: 500; font-family: 'Geist', sans-serif; color: var(--muted); cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-flex; align-items: center; }
-.btn-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
-.btn-primary { background: var(--accent); border: none; border-radius: var(--radius); padding: 9px 20px; font-size: 13px; font-weight: 600; font-family: 'Geist', sans-serif; color: white; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; box-shadow: none; }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(91,142,240,0.45); }
-.btn-primary:active { transform: translateY(0); }
+/* ── NAV ─────────────────────────────────────────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:center;padding:0 2rem;background:rgba(250,249,244,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+.nav-inner{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;}
+.nav-logo{text-decoration:none;}
+.nav-links{display:flex;align-items:center;gap:4px;justify-content:center;}
+.nav-link{font-size:13px;color:var(--muted);padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+.nav-right{display:flex;align-items:center;gap:10px;justify-content:flex-end;}
+.btn-ghost{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.15s;font-family:'Geist',sans-serif;}
+.btn-ghost:hover{color:var(--text);background:var(--surface2);}
+.btn-cta{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'Geist',sans-serif;display:inline-flex;align-items:center;gap:6px;}
+.btn-cta:hover{background:var(--accent-dark);transform:translateY(-1px);}
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:var(--radius);}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;position:absolute;top:64px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:99;padding:0.75rem 1.25rem 1rem;}
+.mobile-menu.open{display:block;}
+.mobile-menu a{display:block;font-size:14px;font-weight:500;color:var(--text);padding:10px 12px;border-radius:var(--radius);transition:background 0.15s;}
+.mobile-menu a:hover{background:var(--surface2);}
+.mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
+.mobile-dark-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;border-radius:var(--radius);user-select:none;}
+.mobile-dark-toggle:hover{background:var(--surface2);}
 
-/* ── HERO ── */
-.hero {
-  min-height: 100vh;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center;
-  padding: 8rem 1.5rem 6rem;
-  position: relative;
-  overflow: hidden;
-}
+/* ── HERO ────────────────────────────────────────── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 1.5rem 6rem;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:20%;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(123,166,146,0.08) 0%,rgba(60,61,89,0.04) 50%,transparent 70%);pointer-events:none;}
+.hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:0.4;pointer-events:none;mask-image:radial-gradient(ellipse 80% 60% at 50% 40%,black,transparent);}
+.hero-inner{position:relative;z-index:1;max-width:780px;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:2rem;font-family:'Geist Mono',monospace;letter-spacing:0.04em;}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero-logo{font-size:clamp(56px,10vw,96px);font-weight:700;letter-spacing:-0.04em;line-height:1;margin-bottom:2rem;animation:float 7s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hero h1{font-size:clamp(20px,3vw,28px);font-weight:500;color:var(--muted);letter-spacing:-0.01em;line-height:1.5;margin-bottom:1rem;max-width:560px;margin-left:auto;margin-right:auto;}
+.hero-sub{font-size:clamp(15px,2vw,17px);color:var(--dim);max-width:480px;margin:0 auto 2.5rem;line-height:1.75;font-weight:400;}
+.hero-cta-wrap{margin-bottom:3rem;}
+.btn-hero{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:white;border:none;border-radius:var(--radius-xl);padding:16px 36px;font-size:17px;font-weight:700;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 24px rgba(123,166,146,0.35);}
+.btn-hero:hover{background:var(--accent-dark);transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,166,146,0.45);}
+.hero-secondary{display:block;margin-top:1rem;font-size:13px;color:var(--dim);}
+.hero-secondary a{color:var(--accent);font-weight:500;}
+.hero-secondary a:hover{color:var(--accent-dark);}
+.social-proof{display:flex;align-items:center;gap:16px;justify-content:center;flex-wrap:wrap;}
+.proof-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--dim);}
+.proof-check{color:var(--accent);font-size:12px;}
+.proof-divider{width:1px;height:14px;background:var(--border);}
 
-/* Radial glow behind hero */
-.hero::before {
-  content: '';
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 700px; height: 500px;
-  background: radial-gradient(ellipse, rgba(47,111,232,0.07) 0%, rgba(124,82,224,0.04) 50%, transparent 70%);
-  pointer-events: none;
-}
+/* ── HOW IT WORKS ────────────────────────────────── */
+.how-section{padding:7rem 1.5rem;background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.how-inner{max-width:1000px;margin:0 auto;}
+.section-label{font-family:'Geist Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:0.75rem;}
+.section-title{font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-0.03em;line-height:1.15;margin-bottom:1rem;}
+.section-sub{font-size:16px;color:var(--muted);line-height:1.7;max-width:480px;}
+.workflow-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:4rem;position:relative;}
+.workflow-steps::before{content:'';position:absolute;top:28px;left:16%;right:16%;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);}
+.workflow-step{text-align:center;}
+.step-num{width:56px;height:56px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-family:'Geist Mono',monospace;font-size:15px;font-weight:600;color:var(--accent);position:relative;z-index:1;}
+.step-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.65;}
 
-/* Subtle grid */
-.hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 60px 60px;
-  opacity: 0.5;
-  pointer-events: none;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent);
-}
+/* ── WORKFLOW DETAIL ─────────────────────────────── */
+.detail-section{padding:7rem 1.5rem;max-width:1100px;margin:0 auto;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.detail-grid.reverse{direction:rtl;}
+.detail-grid.reverse > *{direction:ltr;}
+.detail-content{}
+.detail-visual{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-2xl);padding:2rem;box-shadow:var(--shadow-lg);}
+.detail-tag{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent-dark);border-radius:99px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:4px 12px;font-family:'Geist Mono',monospace;margin-bottom:1rem;}
+.detail-title{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;line-height:1.2;margin-bottom:1rem;}
+.detail-desc{font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:1.5rem;}
+.detail-points{display:flex;flex-direction:column;gap:10px;}
+.detail-point{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--muted);line-height:1.55;}
+.detail-point-check{color:var(--accent);flex-shrink:0;font-weight:700;margin-top:1px;}
 
-.hero-inner { position: relative; z-index: 1; max-width: 800px; }
+/* ── BLUEPRINT PREVIEW ───────────────────────────── */
+.blueprint-mock{font-family:'Geist Mono',monospace;font-size:12px;line-height:1.8;color:var(--text);}
+.bp-line{padding:2px 0;}
+.bp-header{color:var(--text);font-weight:700;}
+.bp-section{color:var(--accent);font-weight:700;margin-top:8px;}
+.bp-var{background:var(--amber-light);color:var(--amber);border-radius:3px;padding:0 4px;font-weight:600;}
+[data-theme="dark"] .bp-var{background:rgba(217,119,6,0.2);}
+.bp-dim{color:var(--dim);}
+.bp-step{color:var(--muted);}
+.bp-step strong{color:var(--accent);}
+.var-chip{display:inline-flex;align-items:center;gap:4px;background:var(--amber-light);color:var(--amber);border:1px solid #fcd34d;border-radius:4px;font-size:10px;font-weight:700;padding:2px 7px;font-family:'Geist Mono',monospace;margin:2px;}
+[data-theme="dark"] .var-chip{background:rgba(217,119,6,0.15);border-color:rgba(217,119,6,0.3);}
+.token-counter{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:13px;}
+.token-count{font-family:'Geist Mono',monospace;font-size:22px;font-weight:700;color:var(--text);}
+.token-label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;}
+.savings-chip{background:var(--green-light);color:var(--green);font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;}
 
+/* ── PLATFORMS ───────────────────────────────────── */
+.platforms-section{background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4rem 1.5rem;text-align:center;}
+.platforms-inner{max-width:700px;margin:0 auto;}
+.platforms-title{font-size:14px;color:var(--dim);font-weight:500;margin-bottom:2rem;text-transform:uppercase;letter-spacing:0.08em;font-family:'Geist Mono',monospace;}
+.platforms-grid{display:flex;align-items:center;justify-content:center;gap:2.5rem;flex-wrap:wrap;}
+.platform-item{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--muted);}
+.platform-dot{width:8px;height:8px;border-radius:50%;}
 
+/* ── PRICING ─────────────────────────────────────── */
+.pricing-section{padding:7rem 1.5rem;max-width:960px;margin:0 auto;text-align:center;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:4rem;text-align:left;}
+.pricing-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:2rem;display:flex;flex-direction:column;position:relative;transition:border-color 0.2s,box-shadow 0.2s;}
+.pricing-card:hover{border-color:var(--border2);box-shadow:var(--shadow);}
+.pricing-card.featured{background:rgb(60,61,89);border-color:rgb(60,61,89);color:white;box-shadow:var(--shadow-lg);}
+.featured-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;font-size:11px;font-weight:700;padding:3px 14px;border-radius:99px;white-space:nowrap;}
+.plan-name{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:0.75rem;}
+.pricing-card.featured .plan-name{color:rgba(255,255,255,0.5);}
+.plan-price{font-size:44px;font-weight:700;letter-spacing:-0.04em;line-height:1;margin-bottom:4px;}
+.plan-price-sub{font-size:14px;font-weight:400;color:var(--dim);}
+.pricing-card.featured .plan-price-sub{color:rgba(255,255,255,0.4);}
+.plan-tagline{font-size:13px;color:var(--dim);margin-bottom:1.5rem;margin-top:4px;}
+.pricing-card.featured .plan-tagline{color:rgba(255,255,255,0.5);}
+.plan-divider{height:1px;background:var(--border);margin-bottom:1.25rem;}
+.pricing-card.featured .plan-divider{background:rgba(255,255,255,0.1);}
+.plan-features{display:flex;flex-direction:column;gap:9px;flex:1;}
+.plan-feature{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--muted);line-height:1.4;}
+.pricing-card.featured .plan-feature{color:rgba(255,255,255,0.7);}
+.plan-feature-check{color:var(--accent);font-weight:700;flex-shrink:0;font-size:12px;margin-top:1px;}
+.pricing-card.featured .plan-feature-check{color:var(--accent);}
+.plan-feature-dim{color:var(--dim);}
+.pricing-card.featured .plan-feature-dim{color:rgba(255,255,255,0.3);}
+.plan-cta{display:block;width:100%;margin-top:1.75rem;padding:11px;border-radius:var(--radius-lg);font-size:14px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;text-align:center;border:none;transition:all 0.2s;text-decoration:none;}
+.plan-cta-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted);}
+.plan-cta-ghost:hover{color:var(--text);background:var(--surface2);}
+.plan-cta-primary{background:var(--accent);color:white;}
+.plan-cta-primary:hover{background:var(--accent-dark);transform:translateY(-1px);}
+.blueprint-highlight{background:rgba(123,166,146,0.1);border:1px solid rgba(123,166,146,0.25);border-radius:var(--radius);padding:8px 12px;font-size:12px;color:var(--accent-dark);font-weight:500;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px;}
+.pricing-card.featured .blueprint-highlight{background:rgba(123,166,146,0.2);border-color:rgba(123,166,146,0.35);color:rgb(166,210,192);}
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
+/* ── FOUNDER NOTE ─────────────────────────────────── */
+.founder-section{background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:5rem 1.5rem;}
+.founder-inner{max-width:640px;margin:0 auto;text-align:center;}
 
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(91,142,240,0.1);
-  border: 1px solid rgba(91,142,240,0.25);
-  border-radius: 99px;
-  padding: 5px 14px;
-  font-size: 12px; font-weight: 500; color: var(--accent);
-  margin-bottom: 1.5rem;
-  font-family: 'Geist Mono', monospace;
-  letter-spacing: 0.04em;
-}
-.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+/* ── CTA BAND ────────────────────────────────────── */
+.cta-band{padding:7rem 1.5rem;text-align:center;position:relative;overflow:hidden;}
+.cta-band::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(123,166,146,0.08),transparent 70%);pointer-events:none;}
+.cta-inner{position:relative;z-index:1;max-width:560px;margin:0 auto;}
+.cta-title{font-size:clamp(26px,4vw,40px);font-weight:700;letter-spacing:-0.03em;margin-bottom:1rem;}
+.cta-sub{font-size:16px;color:var(--muted);margin-bottom:2rem;line-height:1.7;}
 
-h1 {
-  font-size: clamp(28px, 4vw, 44px);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
-  margin-bottom: 1.25rem;
-  background: linear-gradient(160deg, #0f1623 30%, #5a6480 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* ── FOOTER ──────────────────────────────────────── */
+footer{border-top:1px solid var(--border);padding:3rem 2rem 2rem;background:var(--white);}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:2rem;}
+.footer-brand p{font-size:13px;color:var(--dim);margin-top:10px;max-width:260px;line-height:1.65;}
+.footer-col h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:1rem;font-family:'Geist Mono',monospace;}
+.footer-col a{display:block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:8px;transition:color 0.15s;}
+.footer-col a:hover{color:var(--text);}
+.footer-bottom{max-width:1100px;margin:0 auto;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;color:var(--dim);flex-wrap:wrap;gap:8px;}
+.footer-bottom a{color:var(--dim);}
 
-.hero-sub {
-  font-size: clamp(16px, 2vw, 19px);
-  color: var(--muted);
-  max-width: 500px;
-  margin: 0 auto 2.5rem;
-  line-height: 1.65;
-  font-weight: 300;
-}
-
-.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 4rem; }
-
-.btn-hero {
-  background: var(--accent);
-  border: none; border-radius: var(--radius-lg);
-  padding: 14px 32px; font-size: 16px; font-weight: 600;
-  font-family: 'Geist', sans-serif; color: white; cursor: pointer;
-  transition: all 0.2s; text-decoration: none;
-  box-shadow: 0 0 40px rgba(91,142,240,0.35), 0 4px 16px rgba(0,0,0,0.3);
-  display: inline-flex; align-items: center; gap: 8px;
-}
-.btn-hero:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(123,166,146,0.4); }
-.btn-hero-ghost {
-  background: transparent; border: 1px solid var(--border2);
-  border-radius: var(--radius-lg); padding: 14px 32px;
-  font-size: 16px; font-weight: 500; font-family: 'Geist', sans-serif;
-  color: var(--muted); cursor: pointer; transition: all 0.2s;
-  text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
-}
-.btn-hero-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
-
-/* Social proof */
-.social-proof { display: flex; align-items: center; gap: 16px; justify-content: center; flex-wrap: wrap; }
-.proof-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--dim); }
-.proof-check { color: var(--green); font-size: 12px; }
-.proof-divider { width: 1px; height: 16px; background: var(--border); }
-
-/* ── DEMO ── */
-.demo-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 4rem 1.5rem; }
-.demo-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: stretch; }
-.demo-left { display: flex; flex-direction: column; }
-.demo-col-label { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 4px; }
-.demo-col-sub { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
-.demo-right { display: flex; flex-direction: column; }
-.demo-ext-img { width: 100%; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-lg); display: block; transition: transform 0.2s, box-shadow 0.2s; flex: 1; object-fit: cover; }
-.demo-ext-img:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(60,61,89,0.15); }
-.demo-ext-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 1rem; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; }
-.demo-ext-link:hover { color: var(--accent-dark); }
-.demo-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; flex: 1; display: flex; flex-direction: column; }
-@media(max-width:768px){ .demo-inner { grid-template-columns: 1fr; } .demo-left { order: 1; } .demo-right { order: 2; } }
-.demo-examples { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
-.demo-example-label { font-size: 11px; color: var(--dim); font-weight: 500; }
-.demo-example-pill { padding: 4px 10px; border: 1px solid var(--border2); border-radius: 99px; font-size: 11px; font-weight: 500; color: var(--muted); background: white; cursor: pointer; transition: all 0.15s; }
-.demo-example-pill:hover { border-color: var(--accent); color: var(--accent); }
-.demo-section textarea { width: 100%; border: none; background: var(--bg); color: var(--text); font-family: 'Geist', sans-serif; font-size: 14px; padding: 16px; line-height: 1.7; resize: none; min-height: 110px; outline: none; }
-.demo-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-top: 1px solid var(--border); background: var(--surface); }
-.demo-char-count { font-size: 11px; color: var(--dim); font-family: 'Geist Mono', monospace; }
-.demo-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: white; border: none; border-radius: var(--radius-lg); padding: 9px 20px; font-size: 13px; font-weight: 600; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.2s; }
-.demo-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(47,111,232,0.35); }
-.demo-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-.demo-result-card { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; margin-top: 1rem; }
-.demo-result-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.demo-result-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-.demo-result-body { padding: 16px; }
-.demo-stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-.demo-stat { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; text-align: center; }
-.demo-stat-val { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
-.demo-stat-lbl { font-size: 10px; color: var(--dim); margin-top: 2px; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; }
-.demo-efficient { background: var(--accent-light); border: 1px solid rgba(123,166,146,0.3); border-radius: var(--radius-lg); padding: 14px; font-size: 13px; color: rgb(60,61,89); line-height: 1.7; margin-bottom: 10px; }
-.demo-savings-badge { background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
-.demo-cta-wrap { text-align: center; margin-top: 1.5rem; }
-.demo-cta-text { font-size: 14px; color: var(--muted); margin-bottom: 1rem; }
-.stats-strip {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 3rem 2rem;
-}.stats-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: center; }
-.stat-num { font-size: 42px; font-weight: 700; letter-spacing: -0.03em; background: var(--accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
-.stat-desc { font-size: 14px; color: var(--muted); }
-
-/* ── FEATURES ── */
-.section { padding: 7rem 1.5rem; max-width: 1100px; margin: 0 auto; }
-.section-label { font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
-.section-title { font-size: clamp(28px, 4vw, 42px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 1rem; }
-.section-sub { font-size: 16px; color: var(--muted); max-width: 480px; line-height: 1.65; font-weight: 300; }
-
-.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; margin-top: 4rem; }
-.feature-card { background: var(--surface); padding: 2rem; transition: background 0.2s; }
-.feature-card:hover { background: var(--surface2); }
-.feature-icon { width: 44px; height: 44px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 1.25rem; }
-.feature-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-.feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
-
-/* ── HOW IT WORKS ── */
-.how-section { padding: 7rem 1.5rem; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }.how-inner { max-width: 900px; margin: 0 auto; }
-.how-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem; position: relative; }
-.how-steps::before { content: ''; position: absolute; top: 28px; left: 16%; right: 16%; height: 1px; background: linear-gradient(90deg, transparent, var(--border2), transparent); }
-.step { text-align: center; }
-.step-num { width: 56px; height: 56px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; font-family: 'Geist Mono', monospace; font-size: 16px; font-weight: 500; color: var(--accent); position: relative; z-index: 1; }.step-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--accent); }
-.step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
-
-/* ── PRICING ── */
-.pricing-section { padding: 7rem 1.5rem; max-width: 900px; margin: 0 auto; text-align: center; }
-.pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 680px; margin: 4rem auto 0; text-align: left; }
-.pricing-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 2rem;
-  position: relative;
-  transition: border-color 0.2s;
-}
-.pricing-card:hover { border-color: var(--border2); }
-.pricing-card.featured {
-  background: rgb(60,61,89);
-  border-color: rgb(60,61,89);
-  box-shadow: 0 8px 32px rgba(60,61,89,0.25);
-  color: white;
-}
-.pricing-card.featured .plan-name { color: rgba(255,255,255,0.6); }
-.pricing-card.featured .plan-price { color: white; }
-.pricing-card.featured .plan-price span { color: rgba(255,255,255,0.5); }
-.pricing-card.featured .plan-desc { color: rgba(255,255,255,0.5); }
-.pricing-card.featured .plan-divider { background: rgba(255,255,255,0.1); }
-.pricing-card.featured .plan-feature { color: rgba(255,255,255,0.7); }
-.pricing-card.featured .plan-feature-check { color: rgb(123,166,146); }
-.pricing-card.featured .btn-pricing { background: rgb(123,166,146); color: white; }
-.pricing-card.featured .btn-pricing:hover { background: rgb(95,138,118); }
-.featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: rgb(123,166,146); color: white; font-size: 11px; font-weight: 600; padding: 3px 14px; border-radius: 99px; white-space: nowrap; }
-.plan-name { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
-.plan-price { font-size: 48px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
-.plan-price span { font-size: 16px; font-weight: 400; color: var(--muted); }
-.plan-desc { font-size: 13px; color: var(--dim); margin-bottom: 1.5rem; }
-.plan-divider { height: 1px; background: var(--border); margin-bottom: 1.5rem; }
-.plan-feature { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
-.plan-feature-check { color: var(--green); font-size: 13px; flex-shrink: 0; }
-.plan-cta { display: block; width: 100%; margin-top: 1.75rem; padding: 12px; border-radius: var(--radius-lg); font-size: 14px; font-weight: 600; font-family: 'Geist', sans-serif; cursor: pointer; text-align: center; border: none; transition: all 0.2s; text-decoration: none; }
-.plan-cta-ghost { background: transparent; border: 1px solid var(--border2); color: var(--muted); }
-.plan-cta-ghost:hover { color: var(--text); background: var(--surface2); }
-.plan-cta-primary { background: var(--accent); color: white; box-shadow: none; }
-.plan-cta-primary:hover { transform: translateY(-1px); box-shadow: 0 0 40px rgba(91,142,240,0.45); }
-
-/* ── TESTIMONIALS ── */
-.testimonials-section { padding: 7rem 1.5rem; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.testimonials-inner { max-width: 900px; margin: 0 auto; }
-.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 4rem; }
-.testimonial-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1.5rem; }.testimonial-stars { color: var(--amber); font-size: 13px; margin-bottom: 1rem; letter-spacing: 2px; }
-.testimonial-text { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; font-style: italic; }
-.testimonial-author { display: flex; align-items: center; gap: 10px; }
-.author-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
-.author-name { font-size: 13px; font-weight: 600; }
-.author-role { font-size: 11px; color: var(--dim); }
-
-/* ── CTA BAND ── */
-.cta-band { padding: 7rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
-.cta-band::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(47,111,232,0.07), transparent 70%); pointer-events: none; }
-.cta-band-inner { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; }
-.cta-band h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 1rem; }
-.cta-band p { font-size: 16px; color: var(--muted); margin-bottom: 2rem; font-weight: 300; }
-
-/* ── FOOTER ── */
-footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
-.footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
-.footer-brand p { font-size: 13px; color: var(--dim); margin-top: 10px; max-width: 260px; line-height: 1.65; }
-.footer-col h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim); margin-bottom: 1rem; }
-.footer-col a { display: block; font-size: 13px; color: var(--muted); text-decoration: none; margin-bottom: 8px; transition: color 0.15s; }
-.footer-col a:hover { color: var(--text); }
-.footer-bottom { max-width: 1100px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--dim); }
-.footer-bottom a { color: var(--dim); text-decoration: none; }
-.footer-bottom a:hover { color: var(--muted); }
-
-@media (max-width: 768px) {
-  /* Nav */
-  nav { padding: 0 1.25rem; }
-  .nav-links { display: none; } .nav-inner-land { grid-template-columns: 1fr auto; } .nav-right { justify-content: flex-end; } .btn-ghost { display: none; }
-  .btn-ghost { padding: 7px 14px; font-size: 12px; }
-  .btn-primary { padding: 8px 16px; font-size: 12px; }
-
-  /* Hero */
-  .hero { padding: 6rem 1.25rem 3rem; min-height: auto; }
-  .hero-cta { flex-direction: column; align-items: center; gap: 10px; }
-  .btn-hero { width: 100%; justify-content: center; padding: 13px 24px; font-size: 15px; }
-  .btn-hero-ghost { width: 100%; justify-content: center; padding: 13px 24px; font-size: 15px; }
-  .social-proof { gap: 10px; }
-  .proof-divider { display: none; }
-
-  /* Social proof */
-  .social-proof { gap: 8px; justify-content: center; }
-  .proof-divider { display: none; }
-  .proof-item { font-size: 12px; }
-  .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-  #stats-inner { grid-template-columns: repeat(2, 1fr) !important; }
-
-  /* Features */
-  .section { padding: 4rem 1.25rem; }
-  .features-grid { grid-template-columns: 1fr; }
-
-  /* How it works */
-  .how-steps { grid-template-columns: 1fr; gap: 1.5rem; }
-  .how-steps::before { display: none; }
-
-  /* Pricing */
-  .pricing-section { padding: 4rem 1.25rem; }
-  .pricing-grid { grid-template-columns: 1fr; }
-  #pricing-grid { grid-template-columns: 1fr !important; max-width: 100% !important; }
-  .pricing-card { padding: 1.5rem; }
-  .plan-price { font-size: 36px; }
-
-  /* Testimonials */
-  .testimonials-grid { grid-template-columns: 1fr; }
-  .testimonials-section { padding: 4rem 1.25rem; }
-
-  /* CTA band */
-  .cta-band { padding: 4rem 1.25rem; }
-  .cta-band h2 { font-size: 26px; }
-
-  /* Footer */
-  .footer-inner { grid-template-columns: 1fr; gap: 2rem; padding: 0 1.25rem; }
-  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
-  footer { padding: 2rem 1.25rem 1.5rem; }
-}
-
+/* ── DARK MODE ───────────────────────────────────── */
 [data-theme="dark"]{--bg:rgb(22,24,38);--white:rgb(30,32,48);--surface2:rgb(38,40,58);--border:rgb(52,55,78);--border2:rgb(68,72,100);--text:rgb(232,231,220);--muted:rgb(160,162,185);--dim:rgb(110,112,140);--accent:rgb(123,166,146);--accent-light:rgba(123,166,146,0.15);--accent-dark:rgb(95,138,118);}
 [data-theme="dark"] body{background:linear-gradient(160deg,rgb(22,24,38) 0%,rgb(18,20,32) 100%);}
-[data-theme="dark"] nav{background:rgba(28,30,46,0.95);}
-[data-theme="dark"] .hero{background:transparent;}
-[data-theme="dark"] .feature-card,[data-theme="dark"] .how-card,[data-theme="dark"] .testimonial-card,[data-theme="dark"] .pricing-card{background:var(--white);border-color:var(--border);}
+[data-theme="dark"] nav,[data-theme="dark"] .mobile-menu{background:rgba(28,30,46,0.95);}
+[data-theme="dark"] .how-section,[data-theme="dark"] .platforms-section,[data-theme="dark"] .founder-section,[data-theme="dark"] footer{background:rgb(28,30,46);}
+[data-theme="dark"] .detail-visual,[data-theme="dark"] .pricing-card{background:var(--white);border-color:var(--border);}
 [data-theme="dark"] .pricing-card.featured{background:rgb(60,61,89);}
-.dark-toggle-float{position:fixed;bottom:1.5rem;left:1.5rem;z-index:200;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:6px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:12px;font-weight:500;color:var(--muted);font-family:"Geist",sans-serif;transition:all 0.15s;user-select:none;}
+[data-theme="dark"] .token-counter{background:var(--surface2);}
+[data-theme="dark"] .hero-logo span:first-child{color:var(--text);}
+[data-theme="dark"] .nav-logo span:first-child{color:var(--text)!important;}
+
+.dark-toggle-float{position:fixed;bottom:1.5rem;left:1.5rem;z-index:200;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:6px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:12px;font-weight:500;color:var(--muted);user-select:none;transition:all 0.15s;}
 .dark-toggle-float:hover{border-color:var(--accent);color:var(--text);}
 .dark-toggle-track{width:28px;height:16px;border-radius:99px;background:var(--border2);position:relative;transition:background 0.2s;flex-shrink:0;}
 .dark-toggle-track.on{background:var(--accent);}
 .dark-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:white;transition:transform 0.2s;}
 .dark-toggle-track.on .dark-toggle-thumb{transform:translateX(12px);}
-@media(max-width:640px){.dark-toggle-float{display:none;}}
 
-/* Landing page dark mode fixes */
-[data-theme="dark"] .hero { background: transparent; }
-.hero h1 { color: rgb(60,61,89); background: none; -webkit-text-fill-color: rgb(60,61,89); }
-[data-theme="dark"] .hero h1 { color: rgb(232,231,220) !important; background: none !important; -webkit-text-fill-color: rgb(232,231,220) !important; }
-[data-theme="dark"] .hero-sub { color: var(--muted); }
-[data-theme="dark"] .hero-badge { background: var(--white); border-color: var(--border); color: var(--muted); }
-[data-theme="dark"] .stats-strip { background: var(--white); border-color: var(--border); }
-[data-theme="dark"] .stat-num { color: var(--accent); }
-[data-theme="dark"] .stat-label { color: var(--muted); }
-[data-theme="dark"] .section { background: transparent; }
-[data-theme="dark"] .section-alt { background: var(--white); }
-[data-theme="dark"] .feature-card { background: var(--white); border-color: var(--border); }
-[data-theme="dark"] .feature-icon-wrap { background: var(--surface2); }
-[data-theme="dark"] .how-card { background: var(--white); border-color: var(--border); }
-[data-theme="dark"] .how-step-num { background: var(--accent); }
-[data-theme="dark"] .testimonial-card { background: var(--white); border-color: var(--border); }
-[data-theme="dark"] .pricing-card { background: var(--white); border-color: var(--border); }
-[data-theme="dark"] .pricing-card.featured { background: rgb(60,61,89); border-color: rgb(80,82,110); }
-[data-theme="dark"] .btn-ghost { border-color: var(--border2); color: var(--muted); }
-[data-theme="dark"] .btn-ghost:hover { background: var(--surface2); color: var(--text); }
-[data-theme="dark"] .demo-card { background: var(--white); border-color: var(--border); }
-[data-theme="dark"] .demo-section { background: var(--white); border-color: var(--border); }
-[data-theme="dark"] .demo-examples { background: var(--surface2); }
-[data-theme="dark"] .demo-example-pill { background: var(--bg); border-color: var(--border2); color: var(--muted); }
-[data-theme="dark"] textarea { background: var(--bg); border-color: var(--border); color: var(--text); }
-[data-theme="dark"] textarea:focus { background: var(--white); border-color: var(--accent); }
-[data-theme="dark"] .testimonials-section { background: var(--white); }
-[data-theme="dark"] .cta-band { background: var(--surface2); }
-[data-theme="dark"] footer { background: var(--white); }
-
-[data-theme="dark"] .nav-logo span:first-child,
-[data-theme="dark"] .nav-inner span[style*="color:rgb(60,61,89)"],
-[data-theme="dark"] span[style*="color:rgb(60,61,89)"] { color: rgb(232,231,220) !important; }
-</style>
-<script defer src="/_vercel/insights/script.js"></script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "TokenLens",
-  "url": "https://tokenlens.live",
-  "description": "AI prompt token analyzer and optimizer",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://tokenlens.live/app",
-    "query-input": "required name=search_term_string"
-  }
+/* ── RESPONSIVE ──────────────────────────────────── */
+@media(max-width:768px){
+  .nav-links{display:none!important;}
+  .nav-right>*{display:none!important;}
+  .nav-right>.hamburger,.hamburger{display:flex!important;}
+  nav{padding:0 1.25rem;}
+  .hero{padding:7rem 1.25rem 4rem;}
+  .detail-grid{grid-template-columns:1fr;gap:2.5rem;}
+  .detail-grid.reverse{direction:ltr;}
+  .workflow-steps{grid-template-columns:1fr;gap:1.5rem;}
+  .workflow-steps::before{display:none;}
+  .pricing-grid{grid-template-columns:1fr;gap:1rem;}
+  .footer-inner{grid-template-columns:1fr;gap:2rem;}
+  .footer-bottom{flex-direction:column;text-align:center;}
+  .how-section,.detail-section,.platforms-section,.pricing-section,.cta-band,.founder-section{padding:4rem 1.25rem;}
 }
-</script>
+@media(max-width:640px){.dark-toggle-float{display:none;}}
+</style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-inner-land">
-  <a class="nav-logo" href="#">
-    <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:var(--text);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:var(--accent);">Lens</span>
-  </a>
-  <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#how">How it works</a>
-    <a href="#pricing">Pricing</a>
-    <a href="/extension">Extension</a>
-    <a href="/blog">Blog</a>
-  </div>
-  <div class="nav-right" id="landing-nav-right">
-    <a class="btn-ghost" href="/home">Log in</a>
-    <a class="btn-primary" href="/app">Start free →</a>
-  </div>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">
+      <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="#how">How it works</a>
+      <a class="nav-link" href="#blueprints">Blueprints</a>
+      <a class="nav-link" href="#pricing">Pricing</a>
+      <a class="nav-link" href="/blog">Blog</a>
+    </div>
+    <div class="nav-right" id="landing-nav-right">
+      <a class="btn-ghost" href="/home">Log in</a>
+      <a class="btn-cta" href="/extension">Install extension →</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
   </div>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#how" onclick="closeMobileMenu()">How it works</a>
+  <a href="#blueprints" onclick="closeMobileMenu()">Blueprints</a>
+  <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+  <a href="/blog">Blog</a>
+  <a href="/home">Log in</a>
+  <div class="mobile-menu-divider"></div>
+  <div class="mobile-dark-toggle" onclick="toggleDark()"><span>Dark mode</span><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div></div>
+  <div class="mobile-menu-divider"></div>
+  <a href="/extension" style="color:var(--accent);font-weight:600;">Install extension →</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
-    <div class="hero-badge">
-      <div class="badge-dot"></div>
-      Powered by Claude · Anthropic
+    <div class="hero-badge"><div class="badge-dot"></div>Powered by Claude · Anthropic</div>
+    <div class="hero-logo">
+      <span style="color:rgb(60,61,89);">Token</span><span style="color:rgb(123,166,146);">Lens</span>
     </div>
-
-    <div style="margin: 0 auto 2.5rem; animation: float 6s ease-in-out infinite;">
-      <span style="font-size:clamp(52px,10vw,96px);font-weight:700;letter-spacing:-0.04em;color:var(--text);">Token</span><span style="font-size:clamp(52px,10vw,96px);font-weight:700;letter-spacing:-0.04em;color:var(--accent);">Lens</span>
-    </div>
-
-    <h1>See every token. Save more.<br>Prompt smarter. Every time.</h1>
-
-    <p class="hero-sub">Paste any AI prompt and instantly see where your tokens are going, what it costs, and how to cut it down — and learn the principles behind every change.</p>
-
-    <div class="hero-cta">
-      <a class="btn-hero" href="/app">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Analyze your first prompt free
+    <h1>Optimize prompts. Save workflows.<br>Rebuild proven chats as blueprints.</h1>
+    <p class="hero-sub">The browser extension that works inside Claude, ChatGPT, and Gemini. Optimize as you type. Save your best sessions. Extract reusable templates in one click.</p>
+    <div class="hero-cta-wrap">
+      <a class="btn-hero" href="/extension">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Install the extension — it's free
       </a>
-      <a class="btn-hero-ghost" href="#how">See how it works</a>
+      <span class="hero-secondary">Works in Chrome and Firefox · <a href="/app">Try the web analyzer instead →</a></span>
     </div>
-
     <div class="social-proof">
-      <div class="proof-item"><span class="proof-check">✓</span> Free to start</div>
-      <div class="proof-divider"></div>
       <div class="proof-item"><span class="proof-check">✓</span> No credit card</div>
       <div class="proof-divider"></div>
-      <div class="proof-item"><span class="proof-check">✓</span> Results in seconds</div>
+      <div class="proof-item"><span class="proof-check">✓</span> Works inside Claude & ChatGPT</div>
       <div class="proof-divider"></div>
-      <div class="proof-item"><span class="proof-check">✓</span> Improve every prompt</div>
+      <div class="proof-item"><span class="proof-check">✓</span> Save unlimited chat logs free</div>
       <div class="proof-divider"></div>
       <div class="proof-item"><span class="proof-check">✓</span> Powered by Claude</div>
     </div>
   </div>
 </section>
 
-<!-- LIVE DEMO -->
-<section class="demo-section" id="demo">
-  <div class="demo-inner">
-    <div class="demo-left">
-      <div class="demo-col-label">Try it now</div>
-      <div class="demo-col-sub">No account needed</div>
-      <div class="demo-card" id="demo-card">
-        <div class="demo-examples">
-          <span class="demo-example-label">Try an example:</span>
-          <button class="demo-example-pill" onclick="setDemoPrompt(0)">Verbose email</button>
-          <button class="demo-example-pill" onclick="setDemoPrompt(1)">Hedging request</button>
-          <button class="demo-example-pill" onclick="setDemoPrompt(2)">Technical prompt</button>
-        </div>
-        <textarea id="demo-textarea" placeholder="Paste any AI prompt here to see a live analysis…" style="flex:1;min-height:160px;"></textarea>
-        <div class="demo-footer">
-          <span class="demo-char-count" id="demo-char-count">0 / 500 characters</span>
-          <button class="demo-btn" id="demo-btn" onclick="runDemo()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            Analyze free
-          </button>
-        </div>
-      </div>
-      <div id="demo-results" style="display:none;"></div>
-      <div id="demo-cta" style="display:none;" class="demo-cta-wrap">
-        <p class="demo-cta-text">Want unlimited analyses, score cards, and prompt history?</p>
-        <a href="/app" class="btn-hero" style="font-size:14px;padding:11px 24px;">Create free account →</a>
-      </div>
-      <a class="demo-ext-link" href="/app">Sign up now →</a>
-    </div>
-    <div class="demo-right">
-      <div class="demo-col-label">Or get it in your browser</div>
-      <div class="demo-col-sub">Works inside Claude, ChatGPT & more</div>
-      <a href="/extension" style="display:block;flex:1;">
-        <img class="demo-ext-img" src="/extension-screenshot.png" alt="TokenLens browser extension" style="height:100%;object-fit:cover;">
-      </a>
-      <a class="demo-ext-link" href="/extension">Get the extension →</a>
-    </div>
-  </div>
-</section>
-
-<!-- STATS -->
-<div class="stats-strip">
-  <div class="stats-inner" id="stats-inner" style="grid-template-columns:repeat(4,1fr)">
-    <div>
-      <div class="stat-num">73%</div>
-      <div class="stat-desc">Average token reduction on verbose prompts</div>
-    </div>
-    <div>
-      <div class="stat-num">$0.003</div>
-      <div class="stat-desc">Average cost per analysis on Sonnet</div>
-    </div>
-    <div>
-      <div class="stat-num">&lt;3s</div>
-      <div class="stat-desc">Average time to full analysis and rewrite</div>
-    </div>
-    <div>
-      <div class="stat-num">4</div>
-      <div class="stat-desc">Dimensions scored — clarity, conciseness, structure, specificity</div>
+<!-- PLATFORMS -->
+<div class="platforms-section">
+  <div class="platforms-inner">
+    <div class="platforms-title">Works inside your AI tools</div>
+    <div class="platforms-grid">
+      <div class="platform-item"><div class="platform-dot" style="background:rgb(123,166,146);"></div>Claude</div>
+      <div class="platform-item"><div class="platform-dot" style="background:#10a37f;"></div>ChatGPT</div>
+      <div class="platform-item"><div class="platform-dot" style="background:#4285f4;"></div>Gemini</div>
+      <div class="platform-item"><div class="platform-dot" style="background:#6e56cf;"></div>Perplexity</div>
+      <div class="platform-item"><div class="platform-dot" style="background:#f97316;"></div>Mistral</div>
+      <div class="platform-item"><div class="platform-dot" style="background:var(--dim);"></div>Any AI interface</div>
     </div>
   </div>
 </div>
 
-<!-- FEATURES -->
-<section class="section" id="features">
-  <div>
-    <div class="section-label">Features</div>
-    <div class="section-title">Everything you need to<br>write leaner, smarter prompts</div>
-    <div class="section-sub">TokenLens breaks down exactly where your tokens go, shows you how to fix it, and teaches you the principles so your next prompt starts better.</div>
-  </div>
-
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(91,142,240,0.1)">📊</div>
-      <div class="feature-title">Token breakdown</div>
-      <div class="feature-desc">See exactly which parts of your prompt consume the most tokens — core instruction, context, examples, filler, and more — broken down with a visual bar chart.</div>
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="how-inner">
+    <div style="text-align:center;margin-bottom:0;">
+      <div class="section-label" style="justify-content:center;display:flex;">How it works</div>
+      <div class="section-title" style="text-align:center;">Your daily workflow with TokenLens</div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(52,211,153,0.1)">💰</div>
-      <div class="feature-title">Cost estimator</div>
-      <div class="feature-desc">Know your exact cost per call before you run it. We calculate against Anthropic's Sonnet pricing so you can budget your API usage with confidence.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(139,111,232,0.1)">✨</div>
-      <div class="feature-title">Efficient rewrite</div>
-      <div class="feature-desc">Claude rewrites your prompt to say the same thing in fewer tokens. Not paraphrased nonsense — a genuinely tighter version that performs just as well.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(251,191,36,0.1)">🎯</div>
-      <div class="feature-title">Learn as you optimize</div>
-      <div class="feature-desc">Every result includes a prompt score card across clarity, conciseness, structure, and specificity — plus the principle behind each change so you improve with every analysis.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(248,113,113,0.1)">⚡</div>
-      <div class="feature-title">Instant results</div>
-      <div class="feature-desc">No waiting around. Paste your prompt, hit analyze, and get the full breakdown in under 3 seconds — token count, cost, rewrite, score card, and explanation all at once.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(139,111,232,0.1)">🏆</div>
-      <div class="feature-title">Challenge mode</div>
-      <div class="feature-desc">Test your skills against AI-generated bad prompts. Optimize them yourself, then get scored and shown what you missed. The fastest way to build prompt engineering intuition.</div>
+    <div class="workflow-steps">
+      <div class="workflow-step">
+        <div class="step-num">01</div>
+        <div class="step-title">Optimize as you type</div>
+        <div class="step-desc">The extension shows your live token count inside Claude or ChatGPT. One click trims the waste — filler, hedging, redundant context — without losing meaning.</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">02</div>
+        <div class="step-title">Save your best sessions</div>
+        <div class="step-desc">When a chat produces something worth keeping, click "Save Chat as Blueprint." The full conversation is captured and sent to your TokenLens library — raw, no analysis yet.</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">03</div>
+        <div class="step-title">Rebuild with variable slots</div>
+        <div class="step-desc">In the library, click "Create Blueprint." Claude extracts the workflow, removes the noise, and wraps every project-specific value in [VARIABLE_NAME] slots. Fill them in, export plain text, paste into your next chat.</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="how-section" id="how">
-  <div class="how-inner">
-    <div style="text-align:center">
-      <div class="section-label" style="justify-content:center;display:flex">How it works</div>
-      <div class="section-title">Three steps to smarter prompts</div>
+<!-- DETAIL: EXTENSION -->
+<section class="detail-section">
+  <div class="detail-grid">
+    <div class="detail-content">
+      <div class="detail-tag">🔌 The extension</div>
+      <div class="detail-title">Token intelligence, right where you work</div>
+      <div class="detail-desc">No tab switching. TokenLens lives inside your AI tool and gives you real-time visibility into every prompt you write.</div>
+      <div class="detail-points">
+        <div class="detail-point"><span class="detail-point-check">✓</span> Live token counter as you type — know your count before you send</div>
+        <div class="detail-point"><span class="detail-point-check">✓</span> One-click optimization — trims filler without changing your intent</div>
+        <div class="detail-point"><span class="detail-point-check">✓</span> Session token total — see the full cost of an entire conversation</div>
+        <div class="detail-point"><span class="detail-point-check">✓</span> "Save Chat as Blueprint" button — capture any session in one click</div>
+        <div class="detail-point"><span class="detail-point-check">✓</span> Works on Claude, ChatGPT, Gemini, Perplexity, Mistral</div>
+      </div>
     </div>
-    <div class="how-steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-title">Paste your prompt</div>
-        <div class="step-desc">Copy any prompt you're working on — a system prompt, a user message, a template. The longer and wordier, the more we can save you.</div>
+    <div class="detail-visual">
+      <div class="token-counter">
+        <div>
+          <div class="token-label">Session tokens</div>
+          <div class="token-count">4,218</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="savings-chip">−38% saved</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:4px;">$0.01265 est.</div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-title">TokenLens analyzes it</div>
-        <div class="step-desc">We break it down by category, estimate token count and cost, score it across four dimensions, and draft a leaner version — in seconds.</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--dim);margin-bottom:8px;font-family:'Geist Mono',monospace;">Current prompt</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;">I was wondering if you could possibly help me write a Python function that processes user data…</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+          <span style="font-size:11px;color:var(--dim);font-family:'Geist Mono',monospace;">47 tokens</span>
+          <button style="background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:5px 12px;font-size:11px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;">Optimize →</button>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-title">Understand and improve</div>
-        <div class="step-desc">Learn the principle behind every change — not just what was cut, but why. Apply the same thinking to every prompt you write going forward.</div>
+      <div style="background:rgba(123,166,146,0.08);border:1px solid rgba(123,166,146,0.25);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin-bottom:8px;font-family:'Geist Mono',monospace;">Optimized — 27 tokens (−43%)</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6;">Write a Python function that processes user data…</div>
+      </div>
+      <button style="width:100%;background:rgb(60,61,89);color:white;border:none;border-radius:var(--radius-lg);padding:11px;font-size:13px;font-weight:600;font-family:'Geist',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        📋 Save Chat as Blueprint
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- DETAIL: BLUEPRINTS -->
+<section class="detail-section" id="blueprints" style="background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);max-width:100%;padding:7rem 1.5rem;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="detail-grid reverse">
+      <div class="detail-visual">
+        <div class="blueprint-mock">
+          <div class="bp-line bp-header">BLUEPRINT: SaaS Landing Page Build</div>
+          <div class="bp-line bp-dim">Created from: Claude · 4,218 tokens</div>
+          <div class="bp-line">&nbsp;</div>
+          <div class="bp-line bp-section">VARIABLES</div>
+          <div class="bp-line">• <span class="bp-var">[COMPANY_NAME]</span> — your client or project</div>
+          <div class="bp-line">• <span class="bp-var">[TECH_STACK]</span> — Supabase, Vercel, Stripe</div>
+          <div class="bp-line">• <span class="bp-var">[PRIMARY_COLOR]</span> — brand hex value</div>
+          <div class="bp-line">• <span class="bp-var">[TARGET_USER]</span> — who this is for</div>
+          <div class="bp-line">&nbsp;</div>
+          <div class="bp-line bp-section">SETUP STEPS</div>
+          <div class="bp-line bp-step"><strong>1.</strong> [Supabase] Create project, run schema migration</div>
+          <div class="bp-line bp-step"><strong>2.</strong> [Vercel] Connect repo, set env variables</div>
+          <div class="bp-line bp-step"><strong>3.</strong> [Stripe] Create products for <span class="bp-var">[COMPANY_NAME]</span></div>
+          <div class="bp-line">&nbsp;</div>
+          <div class="bp-line bp-section">BLUEPRINT</div>
+          <div class="bp-line bp-step"><strong>1.</strong> Build landing page for <span class="bp-var">[COMPANY_NAME]</span> targeting <span class="bp-var">[TARGET_USER]</span>…</div>
+          <div class="bp-line bp-step"><strong>2.</strong> Implement auth using <span class="bp-var">[TECH_STACK]</span>…</div>
+          <div class="bp-line bp-dim">  ↳ Preserve the free/paid gate logic from original</div>
+        </div>
+      </div>
+      <div class="detail-content">
+        <div class="detail-tag">📐 Blueprint library</div>
+        <div class="detail-title">Your best workflows, ready to reuse</div>
+        <div class="detail-desc">Stop rebuilding from scratch. One click extracts the proven prompt sequence from any saved chat — with variable slots for everything that changes between projects.</div>
+        <div class="detail-points">
+          <div class="detail-point"><span class="detail-point-check">✓</span> Claude extracts only the user prompts — not the AI responses or back-and-forth</div>
+          <div class="detail-point"><span class="detail-point-check">✓</span> Every variable wrapped in <code style="font-family:'Geist Mono',monospace;font-size:12px;background:var(--amber-light);color:var(--amber);padding:1px 5px;border-radius:3px;">[VARIABLE_NAME]</code> slots</div>
+          <div class="detail-point"><span class="detail-point-check">✓</span> Auto-detects services (Supabase, Vercel, Stripe) and generates setup steps</div>
+          <div class="detail-point"><span class="detail-point-check">✓</span> Fill variables on the site, see the blueprint update live in real time</div>
+          <div class="detail-point"><span class="detail-point-check">✓</span> Export clean plain text — pastes into any AI without formatting issues</div>
+          <div class="detail-point"><span class="detail-point-check">✓</span> Fork, share publicly, or keep private</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DETAIL: ANALYZER (secondary) -->
+<section class="detail-section">
+  <div class="detail-grid">
+    <div class="detail-content">
+      <div class="detail-tag" style="background:var(--surface2);color:var(--muted);">📊 Web analyzer</div>
+      <div class="detail-title">Try it before you install</div>
+      <div class="detail-desc">The web analyzer at tokenlens.live/app lets you paste any prompt and see a full token breakdown, cost estimate, and optimized rewrite — no extension needed.</div>
+      <div class="detail-points">
+        <div class="detail-point"><span class="detail-point-check" style="color:var(--muted);">→</span> Token breakdown by category with visual bars</div>
+        <div class="detail-point"><span class="detail-point-check" style="color:var(--muted);">→</span> Cost estimate across Claude, GPT-4o, Gemini, Llama</div>
+        <div class="detail-point"><span class="detail-point-check" style="color:var(--muted);">→</span> Optimized rewrite with explanation of each change</div>
+        <div class="detail-point"><span class="detail-point-check" style="color:var(--muted);">→</span> Code optimization mode for Pro users</div>
+        <div class="detail-point"><span class="detail-point-check" style="color:var(--muted);">→</span> Batch mode — analyze 15 prompts at once</div>
+      </div>
+      <a href="/app" style="display:inline-flex;align-items:center;gap:6px;margin-top:1.5rem;font-size:14px;font-weight:600;color:var(--accent);">Try the analyzer →</a>
+    </div>
+    <div class="detail-visual" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="background:var(--surface2);border-radius:var(--radius-lg);padding:14px;font-size:13px;color:var(--muted);line-height:1.6;border:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);margin-bottom:6px;font-family:'Geist Mono',monospace;">Original prompt — 89 tokens</div>
+        Could you please help me write a Python function that will take a list of numbers and return the sum of all the even ones?
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:var(--text);">89</div>
+          <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;font-family:'Geist Mono',monospace;">Tokens</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:var(--green);">14</div>
+          <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;font-family:'Geist Mono',monospace;">Optimized</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:var(--green);">84%</div>
+          <div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;font-family:'Geist Mono',monospace;">Saved</div>
+        </div>
+      </div>
+      <div style="background:rgba(123,166,146,0.08);border:1px solid rgba(123,166,146,0.25);border-radius:var(--radius-lg);padding:12px 14px;font-size:13px;color:var(--text);line-height:1.6;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:6px;font-family:'Geist Mono',monospace;">Optimized</div>
+        Python function: sum of even numbers from a list.
       </div>
     </div>
   </div>
@@ -750,92 +519,78 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 
 <!-- PRICING -->
 <section class="pricing-section" id="pricing">
-  <div class="section-label" style="display:flex;justify-content:center">Pricing</div>
+  <div class="section-label" style="display:flex;justify-content:center;">Pricing</div>
   <div class="section-title">Simple, honest pricing</div>
-  <div class="section-sub" style="margin:0 auto">Start free. Upgrade when you're ready. No tricks, no hidden fees.</div>
+  <div class="section-sub" style="margin:0 auto;">Start free. Upgrade when blueprints become part of your workflow.</div>
+  <div class="pricing-grid">
 
-  <div class="pricing-grid" style="grid-template-columns:repeat(3,1fr);max-width:900px;align-items:stretch;" id="pricing-grid">
-
-    <div class="pricing-card" style="display:flex;flex-direction:column;">
-      <div>
-        <div class="plan-name">Free</div>
-        <div class="plan-price">$0 <span>/ month</span></div>
-        <div class="plan-desc">Perfect for trying it out</div>
-      </div>
+    <div class="pricing-card">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">$0 <span class="plan-price-sub">/ month</span></div>
+      <div class="plan-tagline">Perfect for trying it out</div>
       <div class="plan-divider"></div>
-      <div style="flex:1;">
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> 5 analyses per day</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Token breakdown & cost estimate</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Fast optimization</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> 1 challenge per day</div>
+      <div class="plan-features">
         <div class="plan-feature"><span class="plan-feature-check">✓</span> Browser extension</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> No credit card needed</div>
-        <div class="plan-feature"><span class="plan-feature-check" style="color:var(--dim)">✗</span> <span style="color:var(--dim)">Balanced optimization</span></div>
-        <div class="plan-feature"><span class="plan-feature-check" style="color:var(--dim)">✗</span> <span style="color:var(--dim)">Prompt history & library</span></div>
-        <div class="plan-feature"><span class="plan-feature-check" style="color:var(--dim)">✗</span> <span style="color:var(--dim)">Batch optimization</span></div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Live token counter</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> One-click optimization</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Save unlimited chat logs</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> 5 web analyses per day</div>
+        <div class="plan-feature"><span class="plan-feature-check plan-feature-dim">✗</span> <span class="plan-feature-dim">Blueprint generation</span></div>
+        <div class="plan-feature"><span class="plan-feature-check plan-feature-dim">✗</span> <span class="plan-feature-dim">Balanced optimization</span></div>
       </div>
-      <a class="plan-cta plan-cta-ghost" href="/app" style="margin-top:1.5rem;">Get started free</a>
+      <a class="plan-cta plan-cta-ghost" href="/app">Get started free</a>
     </div>
 
-    <div class="pricing-card featured" style="display:flex;flex-direction:column;">
+    <div class="pricing-card featured">
       <div class="featured-badge">Most popular</div>
-      <div>
-        <div class="plan-name" style="color:var(--accent)">Plus</div>
-        <div class="plan-price" style="background:rgb(123,166,146);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">$9 <span style="-webkit-text-fill-color:var(--dim)">/ month</span></div>
-        <div class="plan-desc">For regular users and teams</div>
-      </div>
+      <div class="plan-name">Plus</div>
+      <div class="plan-price" style="color:white;">$9 <span class="plan-price-sub">/ month</span></div>
+      <div class="plan-tagline">For regular builders</div>
       <div class="plan-divider"></div>
-      <div style="flex:1;">
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> 120 analyses per month</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Token breakdown & cost estimate</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Fast + Balanced optimization</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> 5 challenges per day</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Prompt history</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Browser extension</div>
+      <div class="plan-features">
+        <div class="blueprint-highlight">📐 10 blueprints / month</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Everything in Free</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> 120 web analyses / month</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Balanced optimization</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Full blueprint library</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Search, filter, fork blueprints</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Public blueprint sharing</div>
         <div class="plan-feature"><span class="plan-feature-check">✓</span> Cancel anytime</div>
-        <div class="plan-feature"><span class="plan-feature-check" style="color:var(--dim)">✗</span> <span style="color:var(--dim)">Code optimization</span></div>
-        <div class="plan-feature"><span class="plan-feature-check" style="color:var(--dim)">✗</span> <span style="color:var(--dim)">Batch optimization</span></div>
       </div>
-      <button class="plan-cta plan-cta-primary" onclick="goToCheckout('plus')" style="margin-top:1.5rem;">Get Plus →</button>
+      <button class="plan-cta plan-cta-primary" onclick="goToCheckout('plus')">Get Plus →</button>
     </div>
 
-    <div class="pricing-card" style="display:flex;flex-direction:column;">
-      <div>
-        <div class="plan-name">Pro</div>
-        <div class="plan-price">$29 <span>/ month</span></div>
-        <div class="plan-desc">High volume with all features unlocked</div>
-      </div>
+    <div class="pricing-card">
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$29 <span class="plan-price-sub">/ month</span></div>
+      <div class="plan-tagline">For power users & agencies</div>
       <div class="plan-divider"></div>
-      <div style="flex:1;">
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> High volume usage</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Token breakdown & cost estimate</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> All optimization modes + Code</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Unlimited challenges</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Batch optimization (15 prompts)</div>
+      <div class="plan-features">
+        <div class="blueprint-highlight">📐 Unlimited blueprints</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Everything in Plus</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> High volume web analyses</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Code optimization mode</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Batch analysis (15 prompts)</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Live token tracker (API proxy)</div>
         <div class="plan-feature"><span class="plan-feature-check">✓</span> Prompt history & library</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Browser extension</div>
         <div class="plan-feature"><span class="plan-feature-check">✓</span> Cancel anytime</div>
       </div>
-      <button class="plan-cta plan-cta-primary" onclick="goToCheckout('pro')" style="margin-top:1.5rem;background:linear-gradient(135deg,rgb(60,61,89),rgb(45,46,70));">Get Pro →</button>
+      <button class="plan-cta plan-cta-primary" onclick="goToCheckout('pro')" style="background:rgb(60,61,89);">Get Pro →</button>
     </div>
 
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section class="testimonials-section">
-  <div class="testimonials-inner">
-    <div style="max-width:640px;margin:0 auto;text-align:center;">
-      <div style="font-size:48px;margin-bottom:1.5rem;">👋</div>
-      <blockquote style="font-size:18px;line-height:1.75;color:var(--text);font-weight:400;margin-bottom:2rem;">
-        "I built this after watching my API costs grow without understanding why. Seeing many people complaining about the same thing in the community I decided to make it available for other users as well. Most of that spend was waste — filler words, overhead, repeated context. TokenLens makes that visible."
-      </blockquote>
-      <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;">J</div>
-        <div style="text-align:left;">
-          <div style="font-size:13px;font-weight:600;color:var(--text);">Jason</div>
-          <div style="font-size:12px;color:var(--muted);">Founder, TokenLens</div>
-        </div>
+<!-- FOUNDER NOTE -->
+<section class="founder-section">
+  <div class="founder-inner">
+    <div style="font-size:48px;margin-bottom:1.5rem;">👋</div>
+    <blockquote style="font-size:17px;line-height:1.8;color:var(--text);font-weight:400;margin-bottom:2rem;">"I kept rebuilding the same workflows from scratch. The chat that nailed a client's landing page three months ago — I'd reference it manually, copy fragments, miss steps. TokenLens blueprints are what I actually wanted: the proven sequence, stripped of noise, with slots for the things that change."</blockquote>
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;">J</div>
+      <div style="text-align:left;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">Jason</div>
+        <div style="font-size:12px;color:var(--muted);">Founder, TokenLens</div>
       </div>
     </div>
   </div>
@@ -843,19 +598,19 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 
 <!-- CTA BAND -->
 <section class="cta-band">
-  <div class="cta-band-inner">
-    <h2>Start writing better prompts today</h2>
-    <p>Free to start. No credit card. Get smarter with every analysis.</p>
-    <a class="btn-hero" href="/app">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      Analyze your first prompt free
+  <div class="cta-inner">
+    <div class="cta-title">Your best chat is a blueprint waiting to happen</div>
+    <div class="cta-sub">Install the extension. Save any session. Extract a reusable workflow in one click.</div>
+    <a class="btn-hero" href="/extension" style="display:inline-flex;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Install the extension free
     </a>
     <div style="margin-top:1.5rem;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;">
-      <span style="font-size:12px;color:var(--dim);display:flex;align-items:center;gap:5px;">🔒 Prompts never stored or used for training</span>
+      <span style="font-size:12px;color:var(--dim);">🔒 Prompts never stored for training</span>
       <span style="font-size:12px;color:var(--dim);">·</span>
-      <span style="font-size:12px;color:var(--dim);display:flex;align-items:center;gap:5px;">⚡ Powered by Anthropic Claude</span>
+      <span style="font-size:12px;color:var(--dim);">⚡ Powered by Anthropic Claude</span>
       <span style="font-size:12px;color:var(--dim);">·</span>
-      <span style="font-size:12px;color:var(--dim);display:flex;align-items:center;gap:5px;">🎯 Challenge mode included</span>
+      <span style="font-size:12px;color:var(--dim);">🆓 Free forever plan</span>
     </div>
   </div>
 </section>
@@ -864,26 +619,21 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
-      <div>
-        <span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--text);">Token</span><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--accent);">Lens</span>
-      </div>
-      <p>See every token. Save more. Prompt smarter. Every time. Powered by Anthropic Claude.</p>
+      <div><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--text);">Token</span><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--accent);">Lens</span></div>
+      <p>Optimize prompts. Save workflows. Rebuild proven chats as blueprints. Powered by Anthropic Claude.</p>
     </div>
     <div class="footer-col">
       <h4>Product</h4>
-      <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#how">How it works</a>
-      <a href="/app">Get started</a>
       <a href="/extension">Extension</a>
+      <a href="/library">Blueprint Library</a>
+      <a href="/app">Web Analyzer</a>
+      <a href="/blog">Blog</a>
     </div>
     <div class="footer-col">
       <h4>Company</h4>
       <a href="/support">Support</a>
-      <a href="#">About</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
-      <a href="/blog">Blog</a>
       <a href="https://anthropic.com" target="_blank">Powered by Anthropic</a>
     </div>
   </div>
@@ -893,11 +643,23 @@ footer { border-top: 1px solid var(--border); padding: 3rem 2.5rem 2rem; }
   </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<div class="dark-toggle-float" onclick="toggleDark()"><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div><span class="dark-toggle-label">Dark</span></div>
+
 <script>
+// ── DARK MODE ────────────────────────────────────────────────────────
+function initDarkMode(){const s=localStorage.getItem('tl_theme');if(s==='dark')document.documentElement.setAttribute('data-theme','dark');updateDarkUI();}
+function applyDark(on){document.documentElement.setAttribute('data-theme',on?'dark':'light');localStorage.setItem('tl_theme',on?'dark':'light');updateDarkUI();}
+function toggleDark(){applyDark(document.documentElement.getAttribute('data-theme')!=='dark');}
+function updateDarkUI(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.querySelectorAll('.dark-toggle-track').forEach(t=>t.classList.toggle('on',d));document.querySelectorAll('.dark-toggle-label').forEach(l=>l.textContent=d?'Light':'Dark');}
+initDarkMode();
+
+// ── NAV ──────────────────────────────────────────────────────────────
+function toggleMobileMenu(){const m=document.getElementById('mobile-menu');const b=document.getElementById('hamburger');const o=m.classList.toggle('open');b.classList.toggle('open',o);}
+function closeMobileMenu(){document.getElementById('mobile-menu').classList.remove('open');document.getElementById('hamburger').classList.remove('open');}
+
+// ── AUTH ─────────────────────────────────────────────────────────────
 const { createClient } = supabase;
 let sb, userSession;
-
 async function initLanding() {
   try {
     const res = await fetch('/api/config');
@@ -907,38 +669,21 @@ async function initLanding() {
     sb = createClient(supabaseUrl, supabaseAnonKey);
     const { data: { session } } = await sb.auth.getSession();
     userSession = session;
-
     if (session) {
-      const navRight = document.getElementById('landing-nav-right');
-      if (navRight) {
-        navRight.innerHTML = '<a class="btn-primary" href="/home" style="font-size:13px;padding:8px 18px;">Login →</a>';
-      }
+      const nav = document.getElementById('landing-nav-right');
+      if (nav) nav.innerHTML = '<a href="/library" style="font-size:13px;font-weight:500;color:var(--muted);padding:6px 12px;">Library</a><a class="btn-cta" href="/home">Go to app →</a>';
     }
-  } catch(e) {
-    // Silently fail — page works fine without auth state on landing
-  }
+  } catch(e) { /* fail silently */ }
 }
 
+// ── CHECKOUT ─────────────────────────────────────────────────────────
 async function goToCheckout(plan) {
-  if (!userSession) {
-    // Not logged in — send to app signup with plan pre-selected
-    window.location.href = '/app?signup=' + plan;
-    return;
-  }
-
+  if (!userSession) { window.location.href = '/app?signup=' + plan; return; }
   const btn = event.target;
   btn.disabled = true;
   btn.textContent = 'Loading…';
-
   try {
-    const res  = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ' + userSession.access_token
-      },
-      body: JSON.stringify({ plan })
-    });
+    const res  = await fetch('/api/checkout', { method:'POST', headers:{ 'content-type':'application/json', 'authorization':'Bearer '+userSession.access_token }, body:JSON.stringify({ plan }) });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
     window.location.href = data.url;
@@ -949,122 +694,7 @@ async function goToCheckout(plan) {
   }
 }
 
-const DEMO_EXAMPLES = [
-  `Hi, I was hoping you could help me write a professional email to my team about our upcoming project deadline. I want it to be clear but also friendly and not too formal. We need to let everyone know that the deadline has been moved to next Friday and that we need everyone to submit their work by end of day. Could you make sure it sounds like it came from a manager but still approachable? Thanks so much!`,
-  `I was wondering if maybe you could possibly help me understand how machine learning works? I'm not sure if this is too basic of a question but I feel like I don't really get it and I've tried reading about it online but it's all very confusing. If you could explain it in simple terms that would be great, but also detailed enough that I actually learn something. Sorry if that's a weird request.`,
-  `Can you review my Python function and tell me if there are any issues with it? I want to make sure it works correctly and is written well. It's supposed to handle user authentication but I'm not totally sure if it's secure or if I'm doing it right. Also if you see ways to make it faster or cleaner that would be helpful too. Let me know what you think about the overall approach.`
-];
-
-let demoUsed = false;
-
-function setDemoPrompt(idx) {
-  const ta = document.getElementById('demo-textarea');
-  ta.value = DEMO_EXAMPLES[idx];
-  updateDemoCount();
-  ta.focus();
-}
-
-function updateDemoCount() {
-  const ta = document.getElementById('demo-textarea');
-  const el = document.getElementById('demo-char-count');
-  if (ta && el) {
-    const len = ta.value.length;
-    el.textContent = `${len} / 500 characters`;
-    el.style.color = len > 500 ? '#dc2626' : '';
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const ta = document.getElementById('demo-textarea');
-  if (ta) ta.addEventListener('input', updateDemoCount);
-});
-
-async function runDemo() {
-  const ta  = document.getElementById('demo-textarea');
-  const btn = document.getElementById('demo-btn');
-  const prompt = ta?.value.trim();
-
-  if (!prompt || prompt.length < 10) return;
-  if (prompt.length > 500) { ta.style.borderColor = '#dc2626'; return; }
-
-  if (demoUsed) {
-    document.getElementById('demo-cta').style.display = 'block';
-    document.getElementById('demo-cta').scrollIntoView({ behavior: 'smooth' });
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerHTML = '<div style="width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.75s linear infinite;display:inline-block;"></div> Analyzing…';
-
-  try {
-    const res  = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ prompt, demo: true })
-    });
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.error || 'Analysis failed');
-
-    demoUsed = true;
-    const r = data.result;
-    const savings = r.savings_percent || 0;
-    const effTokens = r.efficient_tokens || 0;
-    const origTokens = r.estimated_tokens || 0;
-
-    document.getElementById('demo-results').style.display = 'block';
-    document.getElementById('demo-results').innerHTML = `
-      <div class="demo-result-card">
-        <div class="demo-result-header">
-          <div class="demo-result-title">📊 Analysis results</div>
-          <span class="demo-savings-badge">−${savings}% tokens</span>
-        </div>
-        <div class="demo-result-body">
-          <div class="demo-stat-row">
-            <div class="demo-stat">
-              <div class="demo-stat-val">${origTokens}</div>
-              <div class="demo-stat-lbl">Original</div>
-            </div>
-            <div class="demo-stat">
-              <div class="demo-stat-val">${effTokens}</div>
-              <div class="demo-stat-lbl">Optimized</div>
-            </div>
-            <div class="demo-stat">
-              <div class="demo-stat-val" style="color:#16a34a">−${savings}%</div>
-              <div class="demo-stat-lbl">Saved</div>
-            </div>
-          </div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9ca3af;margin-bottom:8px;font-family:'Geist Mono',monospace;">✨ Optimized version</div>
-          <div class="demo-efficient">${(r.efficient_prompt || '').replace(/\n/g, '<br>')}</div>
-        </div>
-      </div>`;
-
-    document.getElementById('demo-cta').style.display = 'block';
-    document.getElementById('demo-results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-    btn.innerHTML = '✓ Analysis complete — try another above';
-    btn.disabled = false;
-    btn.onclick = () => {
-      document.getElementById('demo-cta').scrollIntoView({ behavior: 'smooth' });
-    };
-
-  } catch(err) {
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Analyze free';
-    document.getElementById('demo-results').style.display = 'block';
-    document.getElementById('demo-results').innerHTML = `<div style="padding:1rem;color:#dc2626;font-size:13px;text-align:center;">Something went wrong — try again or <a href="/app" style="color:rgb(123,166,146);">sign up free</a> for full access.</div>`;
-  }
-}
-
 initLanding();
-
-function initDarkMode(){const s=localStorage.getItem('tl_theme');if(s==='dark')document.documentElement.setAttribute('data-theme','dark');updateDarkUI();}
-function applyDark(on){document.documentElement.setAttribute('data-theme',on?'dark':'light');localStorage.setItem('tl_theme',on?'dark':'light');updateDarkUI();}
-function toggleDark(){applyDark(document.documentElement.getAttribute('data-theme')!=='dark');}
-function updateDarkUI(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.querySelectorAll('.dark-toggle-track').forEach(t=>t.classList.toggle('on',d));document.querySelectorAll('.dark-toggle-label').forEach(l=>l.textContent=d?'Light':'Dark');}
-initDarkMode();
-
 </script>
-<div class="dark-toggle-float" onclick="toggleDark()"><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div><span class="dark-toggle-label">Dark</span></div>
 </body>
 </html>
