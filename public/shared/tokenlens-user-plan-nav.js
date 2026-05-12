@@ -215,12 +215,12 @@
     }
   }
 
-  function applyLibraryVisibility(plan) {
-    const normalized = normalizePlan(plan);
-    const display = normalized === 'pro' ? 'block' : 'none';
-    ['nav-library', 'mobile-nav-library'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = display;
+function applyLibraryVisibility(plan) {
+  ['nav-library', 'mobile-nav-library'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'block';
+  });
+}
     });
   }
 
