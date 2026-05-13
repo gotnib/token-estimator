@@ -353,7 +353,7 @@ nav{padding:0 1.25rem;}
       <div class="social-proof">
         <div class="proof-item"><span class="proof-check">✓</span> No credit card</div>
         <div class="proof-divider"></div>
-        <div class="proof-item"><span class="proof-check">✓</span> Works inside Claude & ChatGPT</div>
+        <div class="proof-item"><span class="proof-check">✓</span> Works inside Claude &amp; ChatGPT</div>
         <div class="proof-divider"></div>
         <div class="proof-item"><span class="proof-check">✓</span> Save unlimited chat logs free</div>
       </div>
@@ -396,12 +396,12 @@ nav{padding:0 1.25rem;}
       <div class="workflow-step">
         <div class="step-num">02</div>
         <div class="step-title">Save your best sessions</div>
-        <div class="step-desc">When a chat produces something worth keeping, click "Save Chat as Blueprint." The full conversation is captured and sent to your TokenLens library — raw, no analysis yet.</div>
+        <div class="step-desc">When a chat produces something worth keeping, click “Save Chat as Blueprint.” The full conversation is captured and sent to your TokenLens library — raw, no analysis yet.</div>
       </div>
       <div class="workflow-step">
         <div class="step-num">03</div>
         <div class="step-title">Rebuild with variable slots</div>
-        <div class="step-desc">In the library, click "Create Blueprint." Claude extracts the workflow, removes the noise, and wraps every project-specific value in [VARIABLE_NAME] slots. Fill them in, export plain text, paste into your next chat.</div>
+        <div class="step-desc">In the library, click “Create Blueprint.” Claude extracts the workflow, removes the noise, and wraps every project-specific value in [VARIABLE_NAME] slots. Fill them in, export plain text, paste into your next chat.</div>
       </div>
     </div>
   </div>
@@ -418,7 +418,7 @@ nav{padding:0 1.25rem;}
         <div class="detail-point"><span class="detail-point-check">✓</span> Live token counter as you type — know your count before you send</div>
         <div class="detail-point"><span class="detail-point-check">✓</span> One-click optimization — trims filler without changing your intent</div>
         <div class="detail-point"><span class="detail-point-check">✓</span> Session token total — see the full cost of an entire conversation</div>
-        <div class="detail-point"><span class="detail-point-check">✓</span> "Save Chat as Blueprint" button — capture any session in one click</div>
+        <div class="detail-point"><span class="detail-point-check">✓</span> “Save Chat as Blueprint” button — capture any session in one click</div>
         <div class="detail-point"><span class="detail-point-check">✓</span> Works on Claude, ChatGPT, Gemini, Perplexity, Mistral</div>
       </div>
     </div>
@@ -581,7 +581,7 @@ nav{padding:0 1.25rem;}
     <div class="pricing-card">
       <div class="plan-name">Pro</div>
       <div class="plan-price">$29 <span class="plan-price-sub">/ month</span></div>
-      <div class="plan-tagline">For power users & agencies</div>
+      <div class="plan-tagline">For power users &amp; agencies</div>
       <div class="plan-divider"></div>
       <div class="plan-features">
         <div class="blueprint-highlight">📐 Unlimited blueprints</div>
@@ -590,7 +590,7 @@ nav{padding:0 1.25rem;}
         <div class="plan-feature"><span class="plan-feature-check">✓</span> Code optimization mode</div>
         <div class="plan-feature"><span class="plan-feature-check">✓</span> Batch analysis (15 prompts)</div>
         <div class="plan-feature"><span class="plan-feature-check">✓</span> Live token tracker (API proxy)</div>
-        <div class="plan-feature"><span class="plan-feature-check">✓</span> Prompt history & library</div>
+        <div class="plan-feature"><span class="plan-feature-check">✓</span> Prompt history &amp; library</div>
         <div class="plan-feature"><span class="plan-feature-check">✓</span> Cancel anytime</div>
       </div>
       <button class="plan-cta plan-cta-primary" onclick="goToCheckout('pro')" style="background:rgb(60,61,89);">Get Pro →</button>
@@ -602,7 +602,7 @@ nav{padding:0 1.25rem;}
 <section class="founder-section">
   <div class="founder-inner">
     <div style="font-size:48px;margin-bottom:1.5rem;">👋</div>
-    <blockquote style="font-size:17px;line-height:1.8;color:var(--text);font-weight:400;margin-bottom:2rem;">"I kept rebuilding the same workflows from scratch. The chat that nailed a client's landing page three months ago — I'd reference it manually, copy fragments, miss steps. TokenLens blueprints are what I actually wanted: the proven sequence, stripped of noise, with slots for the things that change."</blockquote>
+    <blockquote style="font-size:17px;line-height:1.8;color:var(--text);font-weight:400;margin-bottom:2rem;">“I kept rebuilding the same workflows from scratch. The chat that nailed a client’s landing page three months ago — I’d reference it manually, copy fragments, miss steps. TokenLens blueprints are what I actually wanted: the proven sequence, stripped of noise, with slots for the things that change.”</blockquote>
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
       <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;">J</div>
       <div style="text-align:left;">
@@ -689,8 +689,12 @@ async function initLanding() {
     userSession = session;
     if (session) {
       const nav = document.getElementById('landing-nav-right');
-      if (nav) nav.innerHTML = '<a class="btn-cta" href="/home">Login</a>';
-      // Also update mobile menu Log in link
+      if (nav) {
+        const loginBtn = nav.querySelector('a[href="/home"]');
+        if (loginBtn) { loginBtn.textContent = 'Login'; loginBtn.className = 'btn-cta'; }
+        const installBtn = nav.querySelector('a[href="/extension"]');
+        if (installBtn) installBtn.style.display = 'none';
+      }
       const mobileLogin = document.getElementById('mobile-login-link');
       if (mobileLogin) mobileLogin.textContent = 'Login';
     }
