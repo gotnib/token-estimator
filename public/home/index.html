@@ -96,9 +96,11 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25
 .msg-error{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:1rem;}
 .home-page{max-width:680px;margin:0 auto;padding:0 1.5rem;}
 .greeting{text-align:center;min-height:calc(100vh - 60px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:4rem;}
-.greeting-name{font-size:clamp(42px,8vw,72px);font-weight:700;letter-spacing:-0.04em;line-height:1.05;margin-bottom:1rem;color:var(--text);opacity:0;transform:translateY(24px);animation:greetingIn 1s cubic-bezier(0.16,1,0.3,1) .1s forwards;}
-.greeting-sub{font-size:clamp(15px,2vw,18px);color:var(--muted);font-weight:400;opacity:0;transform:translateY(16px);animation:greetingIn 1s cubic-bezier(0.16,1,0.3,1) 1s forwards;}
-@keyframes greetingIn{to{opacity:1;transform:translateY(0);}}
+.greeting-name{font-size:clamp(42px,8vw,72px);font-weight:700;letter-spacing:-0.04em;line-height:1.05;margin-bottom:1rem;color:var(--text);opacity:0;}
+.greeting-sub{font-size:clamp(15px,2vw,18px);color:var(--muted);font-weight:400;opacity:0;}
+.greeting-name.ready{animation:greetingIn .7s cubic-bezier(0.16,1,0.3,1) forwards;}
+.greeting-sub.ready{animation:greetingIn .6s cubic-bezier(0.16,1,0.3,1) .15s forwards;}
+@keyframes greetingIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
 .mode-card{background:var(--white);border:2px solid var(--border);border-radius:var(--radius-xl);padding:2rem 1.5rem;text-decoration:none;display:flex;flex-direction:column;align-items:center;text-align:center;transition:all 0.2s;position:relative;overflow:hidden;}
 .mode-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.1);border-color:var(--accent);}
@@ -194,8 +196,8 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
 <!-- HOME VIEW (shown after login) -->
 <div class="home-page" id="home-view" style="display:none;">
   <div class="greeting">
-    <div class="greeting-name" id="greeting-name">Welcome back</div>
-    <div class="greeting-sub">What would you like to do today?</div>
+    <div class="greeting-name" id="greeting-name"></div>
+    <div class="greeting-sub" id="greeting-sub"></div>
   </div>
 
 </div>
@@ -272,7 +274,12 @@ async function showHomeView(session) {
     const username = p?.username || session.user?.email?.split('@')[0] || '';
     const planLabels = { free:'FREE', plus:'PLUS', pro:'PRO' };
     const planColors = { free:'color:rgb(60,61,89)', plus:'color:rgb(60,61,89)', pro:'color:#b45309' };
-    document.getElementById('greeting-name').textContent = 'Hey ' + username + ' 👋';
+    document.getElementById('greeting-name').textContent = 'Welcome back, ' + username;
+    document.getElementById('greeting-sub').textContent = 'Good to see you.';
+    requestAnimationFrame(() => {
+      document.getElementById('greeting-name').classList.add('ready');
+      document.getElementById('greeting-sub').classList.add('ready');
+    });
 
     const pill = document.getElementById('nav-plan-pill');
     if (pill) pill.innerHTML = `<span style="font-size:13px;font-weight:500;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${username}</span><span style="${planColors[plan]};font-weight:600;font-size:13px;margin-left:6px;">${planLabels[plan]}</span>`;
@@ -284,7 +291,12 @@ async function showHomeView(session) {
 
   } catch(e) {
     const name = (session.user?.email||'').split('@')[0];
-    document.getElementById('greeting-name').textContent = 'Hey ' + name + ' 👋';
+    document.getElementById('greeting-name').textContent = 'Welcome back, ' + name;
+    document.getElementById('greeting-sub').textContent = 'Good to see you.';
+    requestAnimationFrame(() => {
+      document.getElementById('greeting-name').classList.add('ready');
+      document.getElementById('greeting-sub').classList.add('ready');
+    });
   }
 }
 
