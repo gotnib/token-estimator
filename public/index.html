@@ -689,8 +689,12 @@ async function initLanding() {
     userSession = session;
     if (session) {
       const nav = document.getElementById('landing-nav-right');
-      if (nav) nav.innerHTML = '<a class="btn-cta" href="/home">Login</a>';
-      // Also update mobile menu Log in link
+      if (nav) {
+        const loginBtn = nav.querySelector('a[href="/home"]');
+        if (loginBtn) { loginBtn.textContent = 'Login'; loginBtn.className = 'btn-cta'; }
+        const installBtn = nav.querySelector('a[href="/extension"]');
+        if (installBtn) installBtn.style.display = 'none';
+      }
       const mobileLogin = document.getElementById('mobile-login-link');
       if (mobileLogin) mobileLogin.textContent = 'Login';
     }
