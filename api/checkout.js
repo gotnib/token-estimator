@@ -2,9 +2,14 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).end();
+
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const stripe      = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
@@ -41,13 +46,13 @@ export default async function handler(req, res) {
   const appUrl = process.env.APP_URL || `https://${req.headers.host}`;
 
   try {
-    const subId  = profile?.stripe_subscription_id;
+    const subId = profile?.stripe_subscription_id;
     const status = profile?.subscription_status;
 
-    // Existing subscriber — swap plan immediately
+    // Existing subscriber — swap plan immediately (no trial on upgrades)
     if (subId && (status === 'active' || status === 'cancelling')) {
       const subscription = await stripe.subscriptions.retrieve(subId);
-      const itemId       = subscription.items.data[0]?.id;
+      const itemId = subscription.items.data[0]?.id;
       if (!itemId) throw new Error('Could not find subscription item.');
 
       const updated = await stripe.subscriptions.update(subId, {
@@ -58,7 +63,6 @@ export default async function handler(req, res) {
       });
 
       const expiresAt = new Date(updated.current_period_end * 1000).toISOString();
-
       await supabase.from('users').update({
         plan: requestedPlan,
         subscription_status: 'active',
@@ -68,7 +72,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ upgraded: true, plan: requestedPlan });
     }
 
-    // New subscriber — create customer if needed then checkout
+    // New subscriber — create Stripe customer if needed
     let customerId = profile?.stripe_customer_id;
     if (!customerId) {
       const customer = await stripe.customers.create({
@@ -85,14 +89,17 @@ export default async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/account?upgraded=true`,
-      cancel_url:  `${appUrl}/account`,
+      cancel_url: `${appUrl}/account`,
       metadata: { supabase_user_id: user.id, plan: requestedPlan },
       subscription_data: {
-        metadata: { supabase_user_id: user.id, plan: requestedPlan }
+        metadata: { supabase_user_id: user.id, plan: requestedPlan },
+        // 7-day free trial for Plus only
+        ...(requestedPlan === 'plus' && { trial_period_days: 7 })
       }
     });
 
     return res.status(200).json({ url: session.url });
+
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
