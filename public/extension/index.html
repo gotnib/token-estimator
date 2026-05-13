@@ -4,338 +4,118 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Browser Extension — AI Prompt Token Counter | TokenLens</title>
+<link rel="canonical" href="https://tokenlens.live/extension">
+<meta name="robots" content="index, follow">
 <link rel="icon" type="image/png" sizes="128x128" href="/tokenlens_favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="/_vercel/insights/script.js"></script>
 <style>
 :root {
-  --bg: rgb(242,241,233);
-  --white: rgb(250,249,244);
-  --surface2: rgb(235,234,226);
-  --border: rgb(215,213,203);
-  --border2: rgb(195,193,182);
-  --text: rgb(60,61,89);
-  --muted: rgb(100,101,120);
-  --dim: rgb(140,141,158);
-  --accent: rgb(123,166,146);
-  --accent-dark: rgb(95,138,118);
-  --accent-light: rgba(123,166,146,0.12);
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --shadow: 0 4px 16px rgba(60,61,89,0.08);
-  --shadow-lg: 0 8px 32px rgba(60,61,89,0.12);
+  --bg: rgb(242,241,233);--white: rgb(250,249,244);--surface2: rgb(235,234,226);
+  --border: rgb(215,213,203);--border2: rgb(195,193,182);
+  --text: rgb(60,61,89);--muted: rgb(100,101,120);--dim: rgb(140,141,158);
+  --accent: rgb(123,166,146);--accent-dark: rgb(95,138,118);--accent-light: rgba(123,166,146,0.12);
+  --radius: 8px;--radius-lg: 12px;--radius-xl: 16px;
+  --shadow: 0 4px 16px rgba(60,61,89,0.08);--shadow-lg: 0 8px 32px rgba(60,61,89,0.12);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 a { color: inherit; }
-body {
-  background: linear-gradient(160deg, rgb(242,241,233) 0%, rgb(232,231,220) 100%);
-  color: var(--text);
-  font-family: 'Geist', sans-serif;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
+body { background: linear-gradient(160deg, rgb(242,241,233) 0%, rgb(232,231,220) 100%); color: var(--text); font-family: 'Geist', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+/* ── NAV ── */
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.25rem;height:60px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.nav-inner{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;}
+.nav-logo{text-decoration:none;}
+.nav-links{display:flex;align-items:center;gap:4px;justify-content:center;}
+.nav-link{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);transition:all 0.15s;}
+.nav-link:hover{color:var(--text);background:var(--surface2);}
+.nav-link.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
+.nav-right{display:flex;align-items:center;gap:10px;justify-content:flex-end;}
+.btn-nav{background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:500;font-family:'Geist',sans-serif;color:var(--text);cursor:pointer;transition:all 0.15s;text-decoration:none;}
+.btn-nav:hover{background:var(--surface2);}
+.btn-nav-primary{background:var(--accent);color:white;border-color:var(--accent);}
+.btn-nav-primary:hover{background:var(--accent-dark);}
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:var(--radius);}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;position:absolute;top:60px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:99;padding:0.75rem 1.25rem 1rem;}
+.mobile-menu.open{display:block;}
+.mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:var(--radius);border:none;background:none;font-family:'Geist',sans-serif;cursor:pointer;transition:background 0.15s;}
+.mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface2);}
+.mobile-menu a.active{color:var(--accent);background:var(--accent-light);}
+.mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
+.mobile-dark-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;border-radius:var(--radius);user-select:none;}
+.mobile-dark-toggle:hover{background:var(--surface2);}
+@media(max-width:640px){
+  .nav-links{display:none!important;}
+  .nav-right>*{display:none!important;}
+  .nav-right>.hamburger,.hamburger{display:flex!important;}
+  .nav-inner{grid-template-columns:1fr auto!important;}
+  .nav-right{justify-content:flex-end;}
 }
-
-/* NAV */
-nav {
-  background: rgb(250,249,244);
-  border-bottom: 1px solid var(--border);
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 1.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-}
-.nav-inner {
-  width: 100%;
-  max-width: 1100px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-}
-.nav-logo { text-decoration: none; }
-.nav-right { display: flex; justify-content: flex-end; }
-.btn-nav {
-  background: transparent;
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  padding: 7px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: 'Geist', sans-serif;
-  color: var(--text);
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-}
-.btn-nav:hover { background: var(--surface2); }
-
-.page { max-width: 980px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
-
-/* HERO */
-.hero { text-align: center; margin-bottom: 3rem; }
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 99px;
-  padding: 5px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  font-family: 'Geist Mono', monospace;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 1.25rem;
-}
-.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-.hero h1 {
-  font-size: clamp(24px, 4vw, 38px);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  margin-bottom: 1rem;
-  color: var(--text);
-  white-space: nowrap;
-}
-.hero h1 span { color: var(--accent); }
-.hero p {
-  font-size: 16px;
-  color: var(--muted);
-  max-width: 520px;
-  margin: 0 auto 2rem;
-  line-height: 1.7;
-}
-
-/* NOTICE */
-.notice {
-  background: rgba(123,166,146,0.1);
-  border: 1px solid rgba(123,166,146,0.3);
-  border-radius: var(--radius-lg);
-  padding: 12px 18px;
-  font-size: 13px;
-  color: var(--accent-dark);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: 600px;
-  margin: 0 auto 3rem;
-  text-align: left;
-}
-
-/* DOWNLOAD BUTTONS */
-.download-grid {
-  display: flex;
-  justify-content: center;
-  max-width: 640px;
-  margin: 0 auto 1.5rem;
-}
-.download-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1rem 1.25rem;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.download-card:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
-}
-.browser-logo { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; border-radius: 8px; }
-.browser-info { flex: 1; min-width: 0; }
-.browser-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.browser-sub { font-size: 12px; color: var(--muted); }
-.download-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--muted);
-  font-size: 14px;
-  transition: all 0.15s;
-}
-.download-card:hover .download-icon {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-}
-.free-note {
-  text-align: center;
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-/* SCREENSHOTS */
-.screenshots {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 4rem;
-}
-.screenshot-wrap {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.screenshot-label {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  font-family: 'Geist Mono', monospace;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  background: var(--surface2);
-}
-.screenshot-wrap img {
-  width: 100%;
-  display: block;
-}
-
-/* INSTALL STEPS */
-.install-section { margin-bottom: 4rem; }
-.section-title {
-  text-align: center;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 1.5rem;
-  color: var(--text);
-}
-.browsers-grid {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-}
-.install-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.install-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface2);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.install-header-icon { font-size: 20px; }
-.install-header-title { font-size: 14px; font-weight: 700; }
-.install-steps { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-.step {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-.step-num {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.step-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
-.step-text strong { color: var(--text); font-weight: 600; }
-.step-code {
-  display: inline-block;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 11px;
-  color: var(--text);
-  margin: 2px 0;
-}
-
-/* FEATURES */
-.features { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 4rem; }
-.feature-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 1.5rem;
-}
-.feature-icon { font-size: 24px; margin-bottom: 10px; }
-.feature-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-.feature-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
-
-@media(max-width:640px) {
-  .download-grid { grid-template-columns: 1fr; max-width: 100%; }
-  .screenshots { grid-template-columns: 1fr; }
-  .browsers-grid { grid-template-columns: 1fr; }
-  .features { grid-template-columns: 1fr; }
-  .page { padding: 2rem 1.25rem 4rem; }
-}
-
-.screenshot-wrap { cursor: zoom-in; transition: box-shadow 0.2s, transform 0.2s; }
-.screenshot-wrap:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
-.screenshot-label { display: flex; align-items: center; justify-content: space-between; }
-.screenshot-expand { font-size: 11px; color: var(--dim); font-family: 'Geist', sans-serif; text-transform: none; letter-spacing: 0; }
-.lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; align-items: center; justify-content: center; padding: 2rem; cursor: zoom-out; }
-.lightbox.open { display: flex; }
-.lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 12px; box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
-.lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; width: 36px; height: 36px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
+/* ── DARK ── */
 [data-theme="dark"]{--bg:rgb(22,24,38);--white:rgb(30,32,48);--surface2:rgb(38,40,58);--border:rgb(52,55,78);--border2:rgb(68,72,100);--text:rgb(232,231,220);--muted:rgb(160,162,185);--dim:rgb(110,112,140);--accent:rgb(123,166,146);--accent-light:rgba(123,166,146,0.15);--accent-dark:rgb(95,138,118);}
 [data-theme="dark"] body{background:linear-gradient(160deg,rgb(22,24,38) 0%,rgb(18,20,32) 100%);}
-[data-theme="dark"] nav{background:rgb(28,30,46);}
+[data-theme="dark"] nav,[data-theme="dark"] .mobile-menu{background:rgb(28,30,46);}
 [data-theme="dark"] .download-card,[data-theme="dark"] .install-card,[data-theme="dark"] .feature-card,[data-theme="dark"] .screenshot-wrap{background:var(--white);border-color:var(--border);}
-[data-theme="dark"] .install-header{background:var(--surface2);}
-[data-theme="dark"] .screenshot-label{background:var(--surface2);}
-.dark-toggle-float{position:fixed;bottom:1.5rem;left:1.5rem;z-index:200;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:6px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:12px;font-weight:500;color:var(--muted);font-family:"Geist",sans-serif;user-select:none;transition:all 0.15s;}
+[data-theme="dark"] .install-header,[data-theme="dark"] .screenshot-label{background:var(--surface2);}
+[data-theme="dark"] .nav-logo span:first-child,[data-theme="dark"] span[style*="color:rgb(60,61,89)"]{color:rgb(232,231,220)!important;}
+/* ── DARK FLOAT ── */
+.dark-toggle-float{position:fixed;bottom:1.5rem;left:1.5rem;z-index:200;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:6px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:12px;font-weight:500;color:var(--muted);user-select:none;transition:all 0.15s;}
 .dark-toggle-float:hover{border-color:var(--accent);color:var(--text);}
 .dark-toggle-track{width:28px;height:16px;border-radius:99px;background:var(--border2);position:relative;transition:background 0.2s;flex-shrink:0;}
 .dark-toggle-track.on{background:var(--accent);}
 .dark-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:white;transition:transform 0.2s;}
 .dark-toggle-track.on .dark-toggle-thumb{transform:translateX(12px);}
 @media(max-width:640px){.dark-toggle-float{display:none;}}
-
-nav{background:var(--white);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:center;padding:0 1.5rem;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.nav-inner{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;}
-.nav-links-center{display:flex;align-items:center;gap:4px;justify-content:center;}
-.nav-link-item{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all 0.15s;}
-.nav-link-item:hover{color:var(--text);background:var(--surface2);}
-.nav-link-item.active{color:var(--accent);background:var(--accent-light);}
-.nav-right-ext{display:flex;align-items:center;justify-content:flex-end;gap:8px;}
-.btn-nav-ext{background:transparent;border:1px solid var(--border2);border-radius:8px;padding:7px 16px;font-size:13px;font-weight:500;font-family:"Geist",sans-serif;color:var(--text);cursor:pointer;text-decoration:none;}
-.btn-nav-ext:hover{background:var(--surface2);}
-
+/* ── PAGE STYLES (unchanged from original) ── */
+.page { max-width: 980px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+.hero { text-align: center; margin-bottom: 3rem; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--white); border: 1px solid var(--border); border-radius: 99px; padding: 5px 14px; font-size: 12px; font-weight: 600; color: var(--muted); font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.25rem; }
+.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.hero h1 { font-size: clamp(24px, 4vw, 38px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 1rem; color: var(--text); white-space: nowrap; }
+.hero h1 span { color: var(--accent); }
+.hero p { font-size: 16px; color: var(--muted); max-width: 520px; margin: 0 auto 2rem; line-height: 1.7; }
+.notice { background: rgba(123,166,146,0.1); border: 1px solid rgba(123,166,146,0.3); border-radius: var(--radius-lg); padding: 12px 18px; font-size: 13px; color: var(--accent-dark); display: flex; align-items: center; gap: 10px; max-width: 600px; margin: 0 auto 3rem; text-align: left; }
+.download-grid { display: flex; justify-content: center; max-width: 640px; margin: 0 auto 1.5rem; }
+.download-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; text-decoration: none; display: flex; align-items: center; gap: 14px; transition: all 0.2s; cursor: pointer; }
+.download-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-1px); }
+.browser-logo { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; border-radius: 8px; }
+.browser-info { flex: 1; min-width: 0; }
+.browser-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.browser-sub { font-size: 12px; color: var(--muted); }
+.download-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--muted); font-size: 14px; transition: all 0.15s; }
+.download-card:hover .download-icon { background: var(--accent); border-color: var(--accent); color: white; }
+.free-note { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 3rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.screenshots { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 4rem; }
+.screenshot-wrap { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow); cursor: zoom-in; transition: box-shadow 0.2s, transform 0.2s; }
+.screenshot-wrap:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.screenshot-label { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--muted); font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; background: var(--surface2); display: flex; align-items: center; justify-content: space-between; }
+.screenshot-expand { font-size: 11px; color: var(--dim); font-family: 'Geist', sans-serif; text-transform: none; letter-spacing: 0; }
+.screenshot-wrap img { width: 100%; display: block; }
+.install-section { margin-bottom: 4rem; }
+.section-title { text-align: center; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1.5rem; color: var(--text); }
+.browsers-grid { display: flex; justify-content: center; gap: 1.5rem; }
+.install-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow); }
+.install-header { padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; gap: 10px; }
+.install-header-title { font-size: 14px; font-weight: 700; }
+.install-steps { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.step { display: flex; align-items: flex-start; gap: 12px; }
+.step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: white; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.step-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.step-text strong { color: var(--text); font-weight: 600; }
+.step-code { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text); margin: 2px 0; }
+.features { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 4rem; }
+.feature-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1.5rem; }
+.feature-icon { font-size: 24px; margin-bottom: 10px; }
+.feature-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.feature-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; align-items: center; justify-content: center; padding: 2rem; cursor: zoom-out; }
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 12px; box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
+.lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; width: 36px; height: 36px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:var(--white);}
 .footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:2rem;}
 .footer-brand p{font-size:13px;color:var(--dim);margin-top:10px;max-width:260px;line-height:1.65;}
@@ -345,65 +125,48 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
 .footer-bottom{max-width:1100px;margin:0 auto;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--dim);flex-wrap:wrap;gap:8px;}
 .footer-bottom a{color:var(--dim);text-decoration:none;}
 .footer-bottom a:hover{color:var(--muted);}
-@media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-bottom{flex-direction:column;text-align:center;}}
-
-.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;}
-.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
-.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-.hamburger.open span:nth-child(2){opacity:0;}
-.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-.mobile-menu{display:none;position:absolute;top:60px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:99;padding:0.75rem 1.25rem 1rem;}
-.mobile-menu.open{display:block;}
-.mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:8px;border:none;background:none;font-family:"Geist",sans-serif;cursor:pointer;transition:background 0.15s;}
-.mobile-menu a:hover,.mobile-menu button:hover{background:var(--surface2);}
-.mobile-menu-divider{height:1px;background:var(--border);margin:6px 0;}
-.mobile-dark-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;border-radius:8px;user-select:none;}
-.mobile-dark-toggle:hover{background:var(--surface2);}
-@media(max-width:640px){.nav-links-center{display:none!important;}.nav-right-ext{display:none!important;}.hamburger{display:flex!important;}.nav-inner{grid-template-columns:1fr auto!important;}}
+@media(max-width:640px){.download-grid{grid-template-columns:1fr;max-width:100%;}.screenshots{grid-template-columns:1fr;}.browsers-grid{grid-template-columns:1fr;}.features{grid-template-columns:1fr;}.page{padding:2rem 1.25rem 4rem;}.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-bottom{flex-direction:column;text-align:center;}}
 </style>
-<script defer src="/_vercel/insights/script.js"></script>
-<link rel="canonical" href="https://tokenlens.live/extension">
-<meta name="robots" content="index, follow">
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <a href="/" style="text-decoration:none;">
-      <span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:var(--text);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:var(--accent);">Lens</span>
-    </a>
-    <div class="nav-links-center">
-      <a class="nav-link-item" href="/app">Analyzer</a>
-      <a class="nav-link-item" href="/library">Library</a>
-      <a class="nav-link-item" href="/extension" style="color:var(--accent);background:var(--accent-light);">Extension</a>
-      <a class="nav-link-item" href="/blog">Blog</a>
-      <a class="nav-link-item" href="/account">Account</a>
+    <a class="nav-logo" href="/"><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(60,61,89);">Token</span><span style="font-weight:700;font-size:19px;letter-spacing:-0.02em;color:rgb(123,166,146);">Lens</span></a>
+    <div class="nav-links">
+      <a class="nav-link" href="/app">Analyzer</a>
+      <a class="nav-link" href="/library">Library</a>
+      <a class="nav-link active" href="/extension">Extension</a>
+      <a class="nav-link" href="/blog">Blog</a>
+      <a class="nav-link" href="/account">Account</a>
     </div>
-    <div class="nav-right-ext" id="ext-nav-right">
-      <div id="ext-nav-pill" style="display:flex;align-items:center;gap:6px;"></div>
-      <button class="btn-nav-ext" id="ext-logout" style="display:none" onclick="extLogout()">Log out</button>
-      <a class="btn-nav-ext" id="ext-open-app" href="/app">Open app →</a>
+    <div class="nav-right" id="nav-right">
+      <div id="nav-plan-pill" style="display:flex;align-items:center;gap:6px;"></div>
+      <button class="btn-nav" id="btn-logout" style="display:none" onclick="siteLogout()">Log out</button>
+      <button class="btn-nav" id="btn-login" onclick="window.location.href='/home'">Log in</button>
+      <button class="btn-nav btn-nav-primary" id="btn-signup" onclick="window.location.href='/app'">Try free</button>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
-    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
 <div class="mobile-menu" id="mobile-menu">
-  <div id="mobile-plan-pill" style="display:flex;align-items:center;gap:8px;padding:10px 12px;"></div>
+  <div id="mobile-plan-row" style="padding:8px 12px;display:flex;align-items:center;gap:8px;"></div>
   <div class="mobile-menu-divider"></div>
   <a href="/app">Analyzer</a>
   <a href="/library">Library</a>
-  <a href="/extension">Extension</a>
+  <a href="/extension" class="active">Extension</a>
   <a href="/blog">Blog</a>
   <a href="/account">Account</a>
   <div class="mobile-menu-divider"></div>
   <div class="mobile-dark-toggle" onclick="toggleDark()"><span>Dark mode</span><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div></div>
   <div class="mobile-menu-divider"></div>
-  <button id="mobile-logout" style="display:none" onclick="extLogout()">Log out</button>
+  <button id="mobile-btn-logout" style="display:none" onclick="siteLogout()">Log out</button>
+  <button id="mobile-btn-login" onclick="window.location.href='/home';toggleMobileMenu()">Log in</button>
+  <button id="mobile-btn-signup" onclick="window.location.href='/app';toggleMobileMenu()">Try free</button>
 </div>
 
 <div class="page">
-
   <!-- HERO -->
   <div class="hero">
     <div class="hero-badge"><div class="hero-badge-dot"></div>Browser Extension</div>
@@ -411,16 +174,9 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
     <p>Analyze and optimize prompts directly inside Claude, ChatGPT, and other AI interfaces — without switching tabs.</p>
   </div>
 
-  <!-- NOTICE -->
+  <!-- VIDEO -->
   <div style="max-width:900px;margin:0 auto 2.5rem;">
-    <video
-      src="/extension/extension-demo.mp4"
-      autoplay
-      loop
-      muted
-      playsinline
-      style="width:100%;border-radius:var(--radius-xl);border:1px solid var(--border);box-shadow:var(--shadow-lg);display:block;aspect-ratio:3192/1440;background:var(--surface2);"
-    ></video>
+    <video src="/extension/extension-demo.mp4" autoplay loop muted playsinline style="width:100%;border-radius:var(--radius-xl);border:1px solid var(--border);box-shadow:var(--shadow-lg);display:block;aspect-ratio:3192/1440;background:var(--surface2);"></video>
   </div>
 
   <!-- NOTICE -->
@@ -429,7 +185,7 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
     <span>Chrome Web Store Add-on listing pending approval. Direct downloads available below in the meantime.</span>
   </div>
 
-  <!-- DOWNLOAD BUTTONS -->
+  <!-- DOWNLOAD -->
   <div class="download-grid">
     <a class="download-card" href="/extension/tokenlens-extension-v2.zip" download>
       <img class="browser-logo" src="/extension/chrome-logo.png" alt="Chrome">
@@ -477,134 +233,43 @@ footer{border-top:1px solid var(--border);padding:3rem 1.5rem 2rem;background:va
   <div class="install-section">
     <div class="section-title">Installation instructions</div>
     <div class="browsers-grid">
-
-      <!-- CHROME -->
       <div class="install-card">
         <div class="install-header">
           <div class="install-header-title">Chrome / Chromium / Arc / Brave</div>
         </div>
         <div class="install-steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div class="step-text"><strong>Download</strong> the Chrome .zip file above and extract the folder to somewhere you'll remember.</div>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div class="step-text">Open a new tab and navigate to <span class="step-code">chrome://extensions</span></div>
-          </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <div class="step-text">Toggle <strong>Developer mode</strong> on using the switch in the top-right corner.</div>
-          </div>
-          <div class="step">
-            <div class="step-num">4</div>
-            <div class="step-text">Click <strong>Load unpacked</strong> and select the extracted <span class="step-code">tokenlens-v2</span> folder.</div>
-          </div>
-          <div class="step">
-            <div class="step-num">5</div>
-            <div class="step-text">The TL icon will appear in your toolbar. Pin it for easy access and log in with your TokenLens account.</div>
-          </div>
+          <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Download</strong> the Chrome .zip file above and extract the folder to somewhere you'll remember.</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text">Open a new tab and navigate to <span class="step-code">chrome://extensions</span></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text">Toggle <strong>Developer mode</strong> on using the switch in the top-right corner.</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text">Click <strong>Load unpacked</strong> and select the extracted <span class="step-code">tokenlens-v2</span> folder.</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text">The TL icon will appear in your toolbar. Pin it for easy access and log in with your TokenLens account.</div></div>
         </div>
       </div>
-
-      
-        </div>
-      </div>
-
     </div>
   </div>
-
 </div>
 
-
-     
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">×</button>
   <img id="lightbox-img" src="" alt="">
 </div>
-<script>
-function openLightbox(img) {
-  document.getElementById('lightbox-img').src = img.src;
-  document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
-</script>
-<div class="dark-toggle-float" onclick="toggleDark()"><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div><span class="dark-toggle-label">Dark</span></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-let _extSb;
-(async () => {
-  try {
-    const { supabaseUrl, supabaseAnonKey } = await fetch('/api/config').then(r => r.json());
-    _extSb = supabase.createClient(supabaseUrl, supabaseAnonKey);
-    const { data: { session } } = await _extSb.auth.getSession();
-    if (session) {
-      const { data: profile } = await _extSb.from('users').select('plan, username').eq('id', session.user.id).single();
-      const plan = profile?.plan || 'free';
-      const username = profile?.username || session.user.email?.split('@')[0] || '';
-      const planLabels = { free:'FREE', plus:'PLUS', pro:'PRO' };
-      const planColors = { free:'color:rgb(60,61,89)', plus:'color:rgb(60,61,89)', pro:'color:#b45309' };
-      const pill = document.getElementById('ext-nav-pill');
-      if (pill) pill.innerHTML = `
-        <span style="font-size:13px;font-weight:500;color:var(--muted);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${username}</span>
-        <span style="${planColors[plan]};font-weight:600;font-size:13px;">${planLabels[plan]}</span>`;
-      const logout = document.getElementById('ext-logout');
-      const openApp = document.getElementById('ext-open-app');
-      if (logout) logout.style.display = 'block';
-      const mobileLogout = document.getElementById('mobile-logout');
-      if (mobileLogout) mobileLogout.style.display = 'block';
-      if (openApp) openApp.style.display = 'none';
-    }
-  } catch(e) {}
-})();
-
-function toggleMobileMenu() {
-  const menu = document.getElementById('mobile-menu');
-  const btn  = document.getElementById('hamburger');
-  if (!menu || !btn) return;
-  const open = menu.classList.toggle('open');
-  btn.classList.toggle('open', open);
-  const pill = document.getElementById('ext-nav-pill');
-  const mobilePill = document.getElementById('mobile-plan-pill');
-  if (pill && mobilePill) mobilePill.innerHTML = pill.innerHTML;
-}
-async function extLogout() {
-  if (_extSb) await _extSb.auth.signOut();
-  window.location.href = '/';
-}
-function initDarkMode(){const s=localStorage.getItem('tl_theme');if(s==='dark')document.documentElement.setAttribute('data-theme','dark');updateDarkUI();}
-function applyDark(on){document.documentElement.setAttribute('data-theme',on?'dark':'light');localStorage.setItem('tl_theme',on?'dark':'light');updateDarkUI();}
-function toggleDark(){applyDark(document.documentElement.getAttribute('data-theme')!=='dark');}
-function updateDarkUI(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.querySelectorAll('.dark-toggle-track').forEach(t=>t.classList.toggle('on',d));document.querySelectorAll('.dark-toggle-label').forEach(l=>l.textContent=d?'Light':'Dark');}
-initDarkMode();
-</script>
 
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
-      <div>
-        <span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--text);">Token</span><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--accent);">Lens</span>
-      </div>
+      <div><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--text);">Token</span><span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;color:var(--accent);">Lens</span></div>
       <p>See every token. Save more. Prompt smarter. Every time. Powered by Anthropic Claude.</p>
     </div>
     <div class="footer-col">
       <h4>Product</h4>
-      <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#how">How it works</a>
-      <a href="/app">Get started</a>
+      <a href="/app">Analyzer</a>
+      <a href="/library">Library</a>
       <a href="/extension">Extension</a>
+      <a href="/blog">Blog</a>
     </div>
     <div class="footer-col">
       <h4>Company</h4>
       <a href="/support">Support</a>
-      <a href="#">About</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="https://anthropic.com" target="_blank">Powered by Anthropic</a>
@@ -615,5 +280,49 @@ initDarkMode();
     <span>Built with <a href="https://anthropic.com">Claude</a> · Hosted on <a href="https://vercel.com">Vercel</a></span>
   </div>
 </footer>
+
+<div class="dark-toggle-float" onclick="toggleDark()"><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div><span class="dark-toggle-label">Dark</span></div>
+
+<script>
+function openLightbox(img){document.getElementById('lightbox-img').src=img.src;document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden';}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
+</script>
+<script>
+(function() {
+  function initDarkMode(){const s=localStorage.getItem('tl_theme');if(s==='dark')document.documentElement.setAttribute('data-theme','dark');updateDarkUI();}
+  function applyDark(on){document.documentElement.setAttribute('data-theme',on?'dark':'light');localStorage.setItem('tl_theme',on?'dark':'light');updateDarkUI();}
+  function toggleDark(){applyDark(document.documentElement.getAttribute('data-theme')!=='dark');}
+  function updateDarkUI(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.querySelectorAll('.dark-toggle-track').forEach(t=>t.classList.toggle('on',d));document.querySelectorAll('.dark-toggle-label').forEach(l=>l.textContent=d?'Light':'Dark');}
+  window.toggleDark=toggleDark;
+  window.toggleMobileMenu=function(){const m=document.getElementById('mobile-menu');const b=document.getElementById('hamburger');if(!m||!b)return;const o=m.classList.toggle('open');b.classList.toggle('open',o);const pill=document.getElementById('nav-plan-pill'),mp=document.getElementById('mobile-plan-row');if(pill&&mp)mp.innerHTML=pill.innerHTML;};
+  window.siteLogout=async function(){try{const {createClient}=supabase;const cfg=await fetch('/api/config').then(r=>r.json());const sb=createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);await sb.auth.signOut();}catch(e){}window.location.href='/';};
+  initDarkMode();
+  async function initNav(){
+    try{
+      if(typeof supabase==='undefined')return;
+      const {createClient}=supabase;
+      const cfg=await fetch('/api/config').then(r=>r.json());
+      const sb=createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+      const {data:{session}}=await sb.auth.getSession();
+      if(!session)return;
+      const {data:profile}=await sb.from('users').select('plan,username').eq('id',session.user.id).single();
+      const plan=profile?.plan||'free';
+      const username=profile?.username||session.user.email?.split('@')[0]||'';
+      const planLabels={free:'FREE',plus:'PLUS',pro:'PRO'};
+      const planColors={free:'color:rgb(60,61,89)',plus:'color:rgb(60,61,89)',pro:'color:#b45309'};
+      const pill=document.getElementById('nav-plan-pill');
+      if(pill)pill.innerHTML=`<span style="font-size:13px;font-weight:500;color:var(--muted);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${username}</span><span style="${planColors[plan]};font-weight:600;font-size:13px;margin-left:4px;">${planLabels[plan]}</span>`;
+      document.getElementById('btn-logout').style.display='block';
+      document.getElementById('btn-login').style.display='none';
+      document.getElementById('btn-signup').style.display='none';
+      document.getElementById('mobile-btn-logout').style.display='block';
+      document.getElementById('mobile-btn-login').style.display='none';
+      document.getElementById('mobile-btn-signup').style.display='none';
+    }catch(e){}
+  }
+  initNav();
+})();
+</script>
 </body>
 </html>
