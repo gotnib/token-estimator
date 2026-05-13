@@ -324,11 +324,11 @@ nav{padding:0 1.25rem;}
   <a href="#blueprints" onclick="closeMobileMenu()">Blueprints</a>
   <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
   <a href="/blog">Blog</a>
-  <a href="/home">Log in</a>
+  <div class="mobile-menu-divider"></div>
+  <a href="/home" id="mobile-login-link">Log in</a>
+  <a href="/extension" style="color:var(--accent);font-weight:600;">Install extension →</a>
   <div class="mobile-menu-divider"></div>
   <div class="mobile-dark-toggle" onclick="toggleDark()"><span>Dark mode</span><div class="dark-toggle-track"><div class="dark-toggle-thumb"></div></div></div>
-  <div class="mobile-menu-divider"></div>
-  <a href="/extension" style="color:var(--accent);font-weight:600;">Install extension →</a>
 </div>
 
 <!-- HERO -->
@@ -688,6 +688,9 @@ async function initLanding() {
     if (session) {
       const nav = document.getElementById('landing-nav-right');
       if (nav) nav.innerHTML = '<a class="btn-cta" href="/home">Login</a>';
+      // Also update mobile menu Log in link
+      const mobileLogin = document.getElementById('mobile-login-link');
+      if (mobileLogin) mobileLogin.textContent = 'Login';
     }
   } catch(e) { /* fail silently */ }
 }
