@@ -118,27 +118,43 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 .mobile-dark-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;border-radius:var(--radius);user-select:none;}
 .mobile-dark-toggle:hover{background:var(--surface2);}
 /* ── HERO ────────────────────────────────────────── */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 1.5rem 6rem;position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;top:20%;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(123,166,146,0.08) 0%,rgba(60,61,89,0.04) 50%,transparent 70%);pointer-events:none;}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:8rem 2rem 5rem;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:20%;left:30%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(123,166,146,0.08) 0%,rgba(60,61,89,0.04) 50%,transparent 70%);pointer-events:none;}
 .hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:0.4;pointer-events:none;mask-image:radial-gradient(ellipse 80% 60% at 50% 40%,black,transparent);}
-.hero-inner{position:relative;z-index:1;max-width:780px;}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:2rem;font-family:'Geist Mono',monospace;letter-spacing:0.04em;}
+.hero-inner{position:relative;z-index:1;max-width:1100px;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.hero-text{text-align:left;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:1.75rem;font-family:'Geist Mono',monospace;letter-spacing:0.04em;}
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-.hero-logo{font-size:clamp(56px,10vw,96px);font-weight:700;letter-spacing:-0.04em;line-height:1;margin-bottom:2rem;animation:float 7s ease-in-out infinite;}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.hero h1{font-size:clamp(20px,3vw,28px);font-weight:500;color:var(--muted);letter-spacing:-0.01em;line-height:1.5;margin-bottom:1rem;max-width:560px;margin-left:auto;margin-right:auto;}
-.hero-sub{font-size:clamp(15px,2vw,17px);color:var(--dim);max-width:480px;margin:0 auto 2.5rem;line-height:1.75;font-weight:400;}
-.hero-cta-wrap{margin-bottom:3rem;}
-.btn-hero{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:white;border:none;border-radius:var(--radius-xl);padding:16px 36px;font-size:17px;font-weight:700;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 24px rgba(123,166,146,0.35);}
+.hero-logo{font-size:clamp(48px,6vw,80px);font-weight:700;letter-spacing:-0.04em;line-height:1;margin-bottom:1.5rem;}
+.hero h1{font-size:clamp(18px,2vw,24px);font-weight:500;color:var(--muted);letter-spacing:-0.01em;line-height:1.55;margin-bottom:1rem;max-width:460px;}
+.hero-sub{font-size:clamp(14px,1.5vw,16px);color:var(--dim);max-width:420px;margin:0 0 2rem;line-height:1.75;font-weight:400;}
+.hero-cta-wrap{margin-bottom:2rem;}
+.btn-hero{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:white;border:none;border-radius:var(--radius-xl);padding:14px 30px;font-size:16px;font-weight:700;font-family:'Geist',sans-serif;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 24px rgba(123,166,146,0.35);}
 .btn-hero:hover{background:var(--accent-dark);transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,166,146,0.45);}
-.hero-secondary{display:block;margin-top:1rem;font-size:13px;color:var(--dim);}
+.hero-secondary{display:block;margin-top:0.75rem;font-size:13px;color:var(--dim);}
 .hero-secondary a{color:var(--accent);font-weight:500;}
 .hero-secondary a:hover{color:var(--accent-dark);}
-.social-proof{display:flex;align-items:center;gap:16px;justify-content:center;flex-wrap:wrap;}
-.proof-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--dim);}
-.proof-check{color:var(--accent);font-size:12px;}
-.proof-divider{width:1px;height:14px;background:var(--border);}
+.social-proof{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.proof-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim);}
+.proof-check{color:var(--accent);font-size:11px;}
+.proof-divider{width:1px;height:12px;background:var(--border);}
+/* ── HERO SCREENSHOTS ── */
+.hero-visuals{position:relative;display:flex;align-items:flex-start;justify-content:center;gap:0;}
+.hero-screenshot{border-radius:18px;box-shadow:0 24px 60px rgba(60,61,89,0.18),0 8px 20px rgba(60,61,89,0.1);max-width:200px;width:100%;display:block;transition:transform 0.3s ease;}
+.hero-screenshot-1{position:relative;z-index:2;transform:rotate(-3deg) translateX(20px);opacity:0;animation:screenshotIn .7s cubic-bezier(0.16,1,0.3,1) .2s forwards;}
+.hero-screenshot-2{position:relative;z-index:1;transform:rotate(2deg) translateX(-20px);opacity:0;animation:screenshotIn .7s cubic-bezier(0.16,1,0.3,1) .4s forwards;}
+.hero-screenshot-1:hover{transform:rotate(-1deg) translateX(20px) scale(1.03);}
+.hero-screenshot-2:hover{transform:rotate(0deg) translateX(-20px) scale(1.03);}
+@keyframes screenshotIn{from{opacity:0;transform:rotate(var(--rot,0deg)) translateY(30px) translateX(var(--tx,0px));}to{opacity:1;transform:rotate(var(--rot,0deg)) translateX(var(--tx,0px));}}
+@media(max-width:768px){
+  .hero-inner{grid-template-columns:1fr;gap:3rem;text-align:center;}
+  .hero-text{text-align:center;}
+  .hero h1,.hero-sub{max-width:100%;}
+  .social-proof{justify-content:center;}
+  .hero-visuals{justify-content:center;}
+  .hero-screenshot{max-width:160px;}
+}
 /* ── HOW IT WORKS ────────────────────────────────── */
 .how-section{padding:7rem 1.5rem;background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
 .how-inner{max-width:1000px;margin:0 auto;}
@@ -307,27 +323,31 @@ nav{padding:0 1.25rem;}
 <!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
-    <div class="hero-badge"><div class="badge-dot"></div>Powered by Claude · Anthropic</div>
-    <div class="hero-logo">
-      <span style="color:rgb(60,61,89);">Token</span><span style="color:rgb(123,166,146);">Lens</span>
+    <div class="hero-text">
+      <div class="hero-badge"><div class="badge-dot"></div>Powered by Claude · Anthropic</div>
+      <div class="hero-logo">
+        <span style="color:rgb(60,61,89);">Token</span><span style="color:rgb(123,166,146);">Lens</span>
+      </div>
+      <h1>Optimize prompts. Save workflows.<br>Rebuild proven chats as blueprints.</h1>
+      <p class="hero-sub">The browser extension that works inside Claude, ChatGPT, and Gemini. Optimize as you type. Save your best sessions. Extract reusable templates in one click.</p>
+      <div class="hero-cta-wrap">
+        <a class="btn-hero" href="/extension">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Install the extension — it's free
+        </a>
+        <span class="hero-secondary">Works in Chrome and Firefox · <a href="/app">Try the web analyzer instead →</a></span>
+      </div>
+      <div class="social-proof">
+        <div class="proof-item"><span class="proof-check">✓</span> No credit card</div>
+        <div class="proof-divider"></div>
+        <div class="proof-item"><span class="proof-check">✓</span> Works inside Claude & ChatGPT</div>
+        <div class="proof-divider"></div>
+        <div class="proof-item"><span class="proof-check">✓</span> Save unlimited chat logs free</div>
+      </div>
     </div>
-    <h1>Optimize prompts. Save workflows.<br>Rebuild proven chats as blueprints.</h1>
-    <p class="hero-sub">The browser extension that works inside Claude, ChatGPT, and Gemini. Optimize as you type. Save your best sessions. Extract reusable templates in one click.</p>
-    <div class="hero-cta-wrap">
-      <a class="btn-hero" href="/extension">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Install the extension — it's free
-      </a>
-      <span class="hero-secondary">Works in Chrome and Firefox · <a href="/app">Try the web analyzer instead →</a></span>
-    </div>
-    <div class="social-proof">
-      <div class="proof-item"><span class="proof-check">✓</span> No credit card</div>
-      <div class="proof-divider"></div>
-      <div class="proof-item"><span class="proof-check">✓</span> Works inside Claude & ChatGPT</div>
-      <div class="proof-divider"></div>
-      <div class="proof-item"><span class="proof-check">✓</span> Save unlimited chat logs free</div>
-      <div class="proof-divider"></div>
-      <div class="proof-item"><span class="proof-check">✓</span> Powered by Claude</div>
+    <div class="hero-visuals">
+      <img class="hero-screenshot hero-screenshot-1" src="/screenshot-analyze.png" alt="TokenLens Analyze tab" style="--rot:-3deg;--tx:20px;">
+      <img class="hero-screenshot hero-screenshot-2" src="/screenshot-poweruser.png" alt="TokenLens Power User tab" style="--rot:2deg;--tx:-20px;">
     </div>
   </div>
 </section>
